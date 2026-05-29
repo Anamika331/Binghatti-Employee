@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Binghatti — Announcements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: linear-gradient(90deg, #e9e9ee 0%, #fff6cf 100%);
+      --bg-card: rgba(255, 255, 255, 0.90);
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --accent-gradient: linear-gradient(90deg, #e9e9ee 0%, #fff6cf 100%);
+      --gold-1: #d4af37;
+      --border-color: #E5E7EB;
+      --shadow-soft: rgba(99, 99, 99, 0.08);
+      --shadow-accent: rgba(233, 233, 238, 0.4);
+      --glass-blur: 8px;
+      --max-width: 1200px;
+    }
+
+    /* Page */
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 28px;
+    }
+
+    /* Layout container */
+    .app {
+
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 260px 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Layout container */
+    .app {
+
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 260px 1fr 320px;
+      gap: 20px;
+      align-items: start;
+      height: calc(100vh - 56px);
+      /* fit screen */
+    }
+
+    /* Left sidebar */
+    .sidebar {
+      position: sticky;
+      top: 28px;
+      align-self: start;
+      height: fit-content;
+    }
+
+    /* Right sidebar */
+    .rightbar {
+      position: sticky;
+      top: 28px;
+      align-self: start;
+      height: fit-content;
+    }
+
+    /* Make center scrollable */
+    .center {
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+      padding-right: 8px;
+      /* space for scrollbar */
+    }
+
+    /* Left sidebar */
+    .sidebar {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 24px var(--shadow-soft);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .brand-title {
+      font-weight: 600;
+      font-size: 20px;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+    }
+
+    .cat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .small-btn {
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--accent-gradient);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow-accent);
+    }
+
+    .category-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cat-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all .15s ease;
+    }
+
+    .cat-item:hover {
+      transform: translateX(6px);
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .cat-item.active {
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.12), rgba(246, 226, 122, 0.06));
+      border-left: 4px solid var(--gold-1);
+      padding-left: 8px;
+    }
+
+    /* Center column */
+    .center {
+      min-height: 120px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 600;
+      text-align: left;
+      /* left aligned per request */
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chip {
+      background: var(--bg-card);
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 14px var(--shadow-soft);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Create box (like screenshot) */
+    .create-box {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 14px;
+      box-shadow: 0 8px 24px var(--shadow-soft);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .avatar-sm {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      overflow: hidden;
+      flex: 0 0 44px;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .avatar-sm img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .create-input {
+      flex: 1;
+    }
+
+    .input-area {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: white;
+      outline: none;
+      font-size: 14px;
+    }
+
+    /* media buttons */
+    .media-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .media-btn {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.95);
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Announcements feed */
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 12px 30px var(--shadow-soft);
+      overflow: hidden;
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.09);
+    }
+
+    .card-head {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      align-items: flex-start;
+    }
+
+    .card-head .name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .card-head .meta {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .card-body {
+      padding: 0 16px 16px 16px;
+    }
+
+    .category-pill {
+      display: inline-block;
+      font-weight: 700;
+      padding: 6px 8px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: var(--accent-gradient);
+      color: var(--text-primary);
+      font-size: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.02);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, var(--gold-1), #f6e27a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: left;
+    }
+
+    .card-datetime {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .card-thumb {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 2px solid #f3f3f1;
+    }
+
+    /* content collapse */
+    .card-content {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+      max-height: 84px;
+      overflow: hidden;
+      transition: max-height .45s ease;
+    }
+
+    .card-content.expanded {
+      max-height: 1000px;
+    }
+
+    /* card footer actions */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .read-more {
+      background: linear-gradient(90deg, var(--gold-1), #f6e27a);
+      color: var(--text-primary);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .18s ease;
+    }
+
+    .read-more:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(212, 175, 55, 0.15);
+    }
+
+    /* Right sidebar */
+    .rightbar {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 24px var(--shadow-soft);
+      backdrop-filter: blur(var(--glass-blur));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pinned-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .pinned-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pin-item {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .pin-item .mini-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    /* AI panel inside rightbar */
+    .ai-panel {
+      margin-top: 6px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      box-shadow: 0 6px 18px var(--shadow-soft);
+    }
+
+    .ai-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .ai-title {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-body {
+      font-size: 13px;
+      color: var(--text-primary);
+      min-height: 80px;
+      max-height: 220px;
+      overflow: auto;
+      line-height: 1.45;
+    }
+
+    .ai-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* responsive */
+    @media (max-width:1100px) {
+      .app {
+        grid-template-columns: 1fr;
+        padding-bottom: 40px;
+      }
+
+      .rightbar {
+        order: 3;
+      }
+
+      .sidebar {
+        order: 1;
+      }
+
+      .center {
+        order: 2;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <img src="pixellent.png" class="logo-image">
+      <div class="logo-text"></div>
+    </div>
+
+
+    <nav class="main-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="employee-attendance.html">Attendance</a>
+      <a href="salary_employee.html">Salary</a>
+      <a href="parking.html">Parking</a>
+      <a href="delivery_Employee.html">Delivery</a>
+      <a href="pantry.html">Pantry</a>
+      <a href="employee_appointments.html">Appointments</a>
+      <a href="meeting-room.html">Facilities</a>
+      <a href="visitior-list.html">Visitor</a>
+      <a href="anoucement.html" class="active">Insights</a>
+      <a href="employee-chat.html">Chats</a>
+      <a href="maintenance.html">Maintenance</a>
+
+    </nav>
+
+    <div class="header-actions">
+      <a href="AI-assistant.html" class="setting-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+        </svg>
+        <span>AI</span>
+      </a>
+      <button class="icon-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+          </path>
+        </svg>
+      </button>
+      <div class="user-profile-btn"></div>
+    </div>
+  </header>
+  <div class="app">
+
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" aria-label="Categories">
+      <div class="brand-title">Announcement</div>
+
+      <div class="cat-header">
+        <div style="font-weight:600;">Category</div>
+        <button class="small-btn" id="addCategoryBtn">+ Add</button>
+      </div>
+
+      <div class="category-list" id="categoryList">
+        <!-- categories populated by JS -->
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN -->
+    <main class="center">
+      <div class="header-row">
+        <div class="page-title">Announcements</div>
+        <div class="header-actions">
+          <div class="chip" id="clock">--:--:--</div>
+          <div class="chip" id="totalCount">0 items</div>
+        </div>
+      </div>
+
+      <!-- Create announcement box -->
+      <div class="create-box" role="region" aria-label="Create announcement">
+        <div class="avatar-sm">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=60"
+            alt="user">
+        </div>
+        <div class="create-input">
+          <input id="quickTitle" class="input-area" placeholder="Create Announcement" />
+          <div class="media-row">
+            <button class="media-btn" data-type="photo">Photo</button>
+            <button class="media-btn" data-type="video">Video</button>
+            <button class="media-btn" data-type="event">Event</button>
+            <div style="flex:1"></div>
+            <button class="small-btn" id="createBtn">Generate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed -->
+      <section class="feed" id="feed">
+        <!-- announcement cards inserted via JS -->
+      </section>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="rightbar" aria-label="Pinned & AI">
+      <div>
+        <div class="pinned-title">Pinned Announcement</div>
+        <div class="pinned-list" id="pinnedList">
+          <!-- pinned items via JS -->
+        </div>
+      </div>
+
+      <!-- AI Panel -->
+      <div class="ai-panel" id="aiPanel">
+        <div class="ai-header">
+          <div class="ai-title">AI Summary Assistant</div>
+          <div style="font-size:12px;color:var(--text-secondary);">Binghatti AI</div>
+        </div>
+        <div class="ai-body" id="aiBody">Click <strong>Summarize</strong> to get a brief, elegant summary of
+          announcements.</div>
+        <div class="ai-actions">
+          <button class="small-btn" id="summarizeBtn">Summarize</button>
+          <button class="small-btn" id="briefBtn">Brief</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- READ / ADD MODAL (hidden, used to show full post) -->
+  <div id="modalRoot"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; padding:18px;">
+    <div
+      style="background:white; width:100%; max-width:760px; border-radius:12px; overflow:hidden; box-shadow:0 40px 90px rgba(0,0,0,0.5);">
+      <div style="padding:18px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-weight:700;">Announcement</div>
+        <button id="closeModalBtn" style="background:transparent;border:none;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div id="modalContent"
+        style="padding:16px; max-height:70vh; overflow:auto; border-top:1px solid var(--border-color);"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------------------------
+       Data + initial setup
+       --------------------------- */
+    const categories = ['All Announcement', 'General', 'New Hire', 'SOP Updates', 'Policy Updates', 'Promotion', 'Transfer', 'Training', 'Special'];
+    let selectedCategory = 'All Announcement';
+
+    let announcements = [
+      {
+        id: genId(), author: 'Mufti Hidayat', role: 'Project Manager', date: '2025-08-20', time: '21:00', category: 'General',
+        title: 'Welcome to Binghatti People 🎉',
+        content: 'We\'re thrilled to share some exciting updates with you! Our team has been hard at work and we are delighted to introduce features that will enhance your resident experience, including VIP concierge and new community events. Stay tuned for invitations and exclusive previews.',
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80',
+        pinned: true
+      },
+      {
+        id: genId(), author: 'Raihan Fikri', role: 'UI/UX Designer', date: '2025-08-07', time: '21:00', category: 'SOP Updates',
+        title: 'SOP Improvements for Residents',
+        content: 'We have refined our SOPs to make them more user-friendly and efficient. Expect clearer processes for service requests and improved response times. Thank you for your feedback!',
+        image: 'https://images.unsplash.com/photo-1511009646506-aaa5cb6d89eb?q=80&w=706&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        pinned: false
+      },
+      {
+        id: genId(), author: 'Operations', role: 'Facilities', date: '2025-08-07', time: '17:00', category: 'Maintenance',
+        title: 'Pool Renovation Notice',
+        content: 'Pool maintenance is scheduled for two days. We will close the pool from 9:00 AM to 5:00 PM for cleaning and resurfacing. Apologies for the inconvenience — enjoy complimentary access to partner gyms during this period.',
+        image: 'https://images.unsplash.com/photo-1697779055997-627444414abd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=1200&q=80',
+        pinned: false
+      },
+      {
+        id: genId(), author: 'Community', role: 'Events', date: '2025-08-25', time: '19:00', category: 'Event',
+        title: 'Art Exhibition at Binghatti Gallery',
+        content: 'Join us for an exclusive exhibition featuring contemporary Middle Eastern artists. Limited seats — RSVP through the owners portal to reserve your spot for the opening night.',
+        image: 'https://plus.unsplash.com/premium_photo-1706140656287-1a20e06bc319?q=80&w=1948&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=1200&q=80',
+        pinned: false
+      },
+      {
+        id: genId(), author: 'Concierge', role: 'Services', date: '2025-08-30', time: '20:00', category: 'VIP Notice',
+        title: 'Sky Restaurant Preview Dinner',
+        content: 'You are invited to preview the Sky Restaurant menu. Complimentary welcome drink included. Please confirm your attendance with concierge.',
+        image: 'https://images.unsplash.com/photo-1653259035321-0483c4e44c7e?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=1200&q=80',
+        pinned: false
+      }
+    ];
+
+    /* ---------------------------
+       Helpers
+       --------------------------- */
+    function genId() { return 'id_' + Math.random().toString(36).slice(2, 9); }
+    function formatDate(d) { return new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); }
+    function formatTime(t) { const [h, m] = t.split(':'); const dt = new Date(); dt.setHours(h, m); return dt.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' }); }
+    function isUpcoming(a) { return new Date(a.date + 'T' + a.time) >= new Date(); }
+
+    /* ---------------------------
+       Clock
+       --------------------------- */
+    const clockEl = document.getElementById('clock');
+    function updateClock() { clockEl.textContent = new Date().toLocaleTimeString(); }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ---------------------------
+       Render categories
+       --------------------------- */
+    const categoryListEl = document.getElementById('categoryList');
+    function renderCategories() {
+      categoryListEl.innerHTML = '';
+      categories.forEach(cat => {
+        const el = document.createElement('div');
+        el.className = 'cat-item' + (cat === selectedCategory ? ' active' : '');
+        el.innerHTML = `<span>${cat}</span> <span style="background:#eef3ff;padding:4px 8px;border-radius:8px;font-weight:700;color:#0b3c6a;">${countFor(cat)}</span>`;
+        el.onclick = () => { selectedCategory = cat; renderAll(); };
+        categoryListEl.appendChild(el);
+      });
+    }
+    function countFor(cat) {
+      if (cat === 'All Announcement') return announcements.length;
+      return announcements.filter(a => a.category === cat).length;
+    }
+    renderCategories();
+
+    /* ---------------------------
+       Render feed & pinned
+       --------------------------- */
+    const feedEl = document.getElementById('feed');
+    const pinnedListEl = document.getElementById('pinnedList');
+    const totalCountEl = document.getElementById('totalCount');
+
+    function renderAll() {
+      renderCategories();
+      renderFeed();
+      renderPinned();
+      totalCountEl.textContent = `${announcements.length} items`;
+    }
+
+    function renderFeed() {
+      feedEl.innerHTML = '';
+      // Filter by selected category
+      let list = announcements.slice().sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+      if (selectedCategory !== 'All Announcement') {
+        list = list.filter(a => a.category === selectedCategory);
+      }
+
+      // Group by date => we will display grouped headers in descending order
+      const groups = {};
+      list.forEach(item => {
+        const key = formatDate(item.date);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(item);
+      });
+
+      // Render groups in order
+      Object.keys(groups).forEach(dateKey => {
+        const header = document.createElement('div');
+        header.className = 'date-group';
+        header.textContent = dateKey;
+        feedEl.appendChild(header);
+
+        groups[dateKey].forEach(a => {
+          const card = document.createElement('article');
+          card.className = 'card';
+          card.innerHTML = `
+        <div class="card-head">
+          <div class="avatar-sm" style="width:48px;height:48px;">
+            <img src="${avatarFor(a.author)}" alt="${a.author}">
+          </div>
+          <div style="flex:1">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div class="name">${a.author}</div>
+                <div class="meta">${a.role} • ${formatTime(a.time)}</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="action-btn" title="Pin/Unpin" data-id="${a.id}">${a.pinned ? '📌' : '📍'}</button>
+                <button class="action-btn" title="More" data-id="${a.id}">⋯</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="category-pill">${a.category}</div>
+          <div class="card-title">${a.title}</div>
+          <div class="card-datetime">${formatTime(a.time)} • ${a.author}</div>
+          <img class="card-thumb" src="${a.image}" alt="${a.title}" />
+          <div class="card-content" id="content-${a.id}">${a.content}</div>
+        </div>
+
+        <div class="card-footer">
+          <div class="actions">
+            <button class="action-btn" data-like="${a.id}">👍 12</button>
+            <button class="action-btn" data-comment="${a.id}">💬 2</button>
+            <button class="action-btn" data-share="${a.id}">↗ Share</button>
+          </div>
+          <div>
+            <button class="read-more" data-id="${a.id}">Read More</button>
+          </div>
+        </div>
+      `;
+
+          feedEl.appendChild(card);
+
+          // attach read more toggle
+          const readBtn = card.querySelector('.read-more');
+          const contentDiv = card.querySelector('.card-content');
+          readBtn.addEventListener('click', () => {
+            const expanded = contentDiv.classList.toggle('expanded');
+            readBtn.textContent = expanded ? 'Read Less' : 'Read More';
+          });
+
+          // attach pin/unpin button
+          const pinBtn = card.querySelector('.action-btn[title="Pin/Unpin"]');
+          pinBtn.addEventListener('click', () => {
+            a.pinned = !a.pinned;
+            renderAll();
+            // auto refresh AI summary
+            autoSummarizeDebounced();
+          });
+
+          // attach more button (open modal)
+          const moreBtn = card.querySelector('.action-btn[title="More"]');
+          moreBtn.addEventListener('click', () => openModalWith(a));
+        });
+      });
+    }
+
+    function renderPinned() {
+      pinnedListEl.innerHTML = '';
+      const pinned = announcements.filter(a => a.pinned).slice(0, 5);
+      if (pinned.length === 0) {
+        pinnedListEl.innerHTML = '<div style="color:var(--text-secondary); font-size:13px;">No pinned announcements</div>';
+        return;
+      }
+      pinned.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'pin-item';
+        el.innerHTML = `
+      <div class="mini-title">${p.title}</div>
+      <div style="font-size:13px;color:var(--text-secondary); margin-bottom:8px;">${p.category} • ${formatDate(p.date)}</div>
+      <div style="font-size:13px;color:var(--text-secondary);">${p.content.slice(0, 80)}${p.content.length > 80 ? '…' : ''}</div>
+    `;
+        el.addEventListener('click', () => openModalWith(p));
+        pinnedListEl.appendChild(el);
+      });
+    }
+
+    /* ---------------------------
+       Avatar helper (generates stable avatar per author)
+       --------------------------- */
+    function avatarFor(name) {
+      // Use a simple set of Unsplash person photos to avoid broken links
+      const seed = Math.abs(hashCode(name)) % 12 + 1;
+      const urls = [
+        'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
+        'https://images.unsplash.com/photo-1527980965255-d3b416303d12',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
+        'https://images.unsplash.com/photo-1517841905240-472988babdf9',
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
+        'https://images.unsplash.com/photo-1554151228-14d9def656e4',
+        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
+        'https://images.unsplash.com/photo-1527980965255-d3b416303d12'
+      ];
+
+      return urls[seed - 1] + '?auto=format&fit=crop&w=400&q=70';
+    }
+    function hashCode(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; } return h; }
+
+    /* ---------------------------
+       Modal (view full)
+       --------------------------- */
+    const modalRoot = document.getElementById('modalRoot');
+    const modalContent = document.getElementById('modalContent');
+    document.getElementById('closeModalBtn').addEventListener('click', () => modalRoot.style.display = 'none');
+
+    function openModalWith(a) {
+      modalContent.innerHTML = `
+    <div style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:56px; height:56px; border-radius:999px; overflow:hidden;">
+        <img src="${avatarFor(a.author)}" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div>
+        <div style="font-weight:800; font-size:18px;">${a.title}</div>
+        <div style="color:var(--text-secondary); margin-top:6px;">${a.author} • ${a.role} • ${formatDate(a.date)} ${formatTime(a.time)}</div>
+      </div>
+    </div>
+    <img src="${a.image}" style="width:100%; margin-top:12px; border-radius:10px; object-fit:cover; max-height:320px;">
+    <div style="margin-top:12px; line-height:1.6; color:var(--text-primary);">${a.content}</div>
+  `;
+      modalRoot.style.display = 'flex';
+    }
+
+    /* ---------------------------
+       Quick create & simulated live updates
+       --------------------------- */
+    document.getElementById('createBtn').addEventListener('click', () => {
+      const titleInput = document.getElementById('quickTitle');
+      const txt = titleInput.value.trim();
+      if (!txt) return;
+      const newA = {
+        id: genId(),
+        author: 'You',
+        role: 'Manager',
+        date: new Date().toISOString().slice(0, 10),
+        time: new Date().toTimeString().slice(0, 5),
+        category: 'General',
+        title: txt,
+        content: txt + ' — details will follow shortly. This announcement was created from the quick box.',
+        image: randomImage(),
+        pinned: false
+      };
+      announcements.unshift(newA); // add to top
+      titleInput.value = '';
+      renderAll();
+      showToast('Announcement created');
+      autoSummarizeDebounced();
+    });
+
+    /* simple toast */
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style, { position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: '26px', background: 'rgba(17,24,39,0.95)', color: '#fff', padding: '10px 16px', borderRadius: '8px', zIndex: 9999 });
+      document.body.appendChild(t);
+      setTimeout(() => t.style.opacity = '0', 2500);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function randomImage() {
+      // use unsplash random with keywords relevant to luxury/residence
+      const queries = ['luxury-building', 'dubai-architecture', 'interior-luxury', 'hotel-interior', 'rooftop-dinner'];
+      const q = queries[Math.floor(Math.random() * queries.length)];
+      return `https://source.unsplash.com/1200x800/?${q}&sig=${Math.random().toString(36).slice(2, 6)}`;
+    }
+
+    /* ---------------------------
+       AI summarizer (typing + "live" feel)
+       --------------------------- */
+    const aiBody = document.getElementById('aiBody');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const briefBtn = document.getElementById('briefBtn');
+
+    summarizeBtn.addEventListener('click', () => summarizeAnnouncements('long'));
+    briefBtn.addEventListener('click', () => summarizeAnnouncements('short'));
+
+    let summarizeTimeout = null;
+    function autoSummarizeDebounced() {
+      if (summarizeTimeout) clearTimeout(summarizeTimeout);
+      summarizeTimeout = setTimeout(() => summarizeAnnouncements('short'), 1200);
+    }
+
+    function summarizeAnnouncements(mode = 'short') {
+      // Show thinking placeholder
+      aiBody.innerHTML = '<em style="color:var(--text-secondary)">AI is reviewing announcements & drafting a summary…</em>';
+      document.getElementById('aiPanel').classList.add('glow');
+
+      // Simulate reading (fake latency)
+      setTimeout(() => {
+        const upcoming = announcements.filter(a => isUpcoming(a));
+        const previous = announcements.filter(a => !isUpcoming(a));
+        let text = '';
+        if (mode === 'short') {
+          text = `Total ${announcements.length}. Upcoming: ${upcoming.slice(0, 3).map(x => x.title).join('; ')}. Recent: ${previous.slice(0, 3).map(x => x.title).join('; ')}.`;
+        } else {
+          // longer nicer paragraph
+          text = `Binghatti currently has ${announcements.length} active announcements. Key upcoming items include ${upcoming.map(x => `${x.title} on ${formatDate(x.date)}`).slice(0, 5).join(', ')}. Recent updates cover ${previous.map(x => x.title).slice(0, 5).join(', ')}. For more details, open the announcements in the center feed.`;
+        }
+
+        // type effect
+        typeWriter(aiBody, text, 0, () => {
+          document.getElementById('aiPanel').classList.remove('glow');
+        });
+      }, 900 + Math.random() * 700);
+    }
+
+    function typeWriter(el, text, i, cb) {
+      el.textContent = '';
+      let idx = 0;
+      const step = () => {
+        idx++;
+        el.textContent = text.slice(0, idx);
+        if (idx < text.length) setTimeout(step, 18 + (Math.random() * 20));
+        else if (cb) cb();
+      };
+      step();
+    }
+
+    /* ---------------------------
+       Pin simulation: auto add random announcements every 18s
+       --------------------------- */
+    setInterval(() => {
+      const random = {
+        id: genId(),
+        author: ['Community', 'Facilities', 'Management'][Math.floor(Math.random() * 3)],
+        role: 'Team',
+        date: new Date(Date.now() + (Math.random() * 7 - 3) * 24 * 3600 * 1000).toISOString().slice(0, 10), // +/- days
+        time: `${8 + Math.floor(Math.random() * 10)}:00`,
+        category: ['Event', 'Maintenance', 'VIP Notice', 'General'][Math.floor(Math.random() * 4)],
+        title: ['Special Owners Brunch', 'Power Maintenance', 'Concierge Upgrade', 'Private Viewing'][Math.floor(Math.random() * 4)] + ' ' + Math.floor(Math.random() * 90),
+        content: 'This is an automatically generated update to simulate live activity on the announcements feed. Details will be provided via the owners portal.',
+        image: 'https://plus.unsplash.com/premium_photo-1700942979300-3f93fe14d60b?q=80&w=1279&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        pinned: false
+      };
+      announcements.unshift(random);
+      renderAll();
+      // update AI
+      autoSummarizeDebounced();
+    }, 18000);
+
+    /* ---------------------------
+       Utilities & initial render
+       --------------------------- */
+    function renderAllInitial() {
+      renderAll();
+      // initial auto summarize
+      setTimeout(() => summarizeAnnouncements('short'), 1000);
+    }
+    renderAllInitial();
+
+    /* close modal on outside click */
+    modalRoot.addEventListener('click', (ev) => {
+      if (ev.target === modalRoot) modalRoot.style.display = 'none';
+    });
+  </script>
+</body>
+
+</html>

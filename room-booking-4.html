@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Co-Share Rooms — Agent Bookings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg-grad-a: #e9e9ee;
+      --bg-grad-b: #fff6cf;
+      --ink: #1f2937;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --chip-green-bg: #ecfdf5;
+      --chip-green-fg: #047857;
+      --chip-gray-bg: #f3f4f6;
+      --chip-gray-fg: #6b7280;
+      --chip-gold-bg: #fef9c3;
+      --chip-gold-fg: #a16207;
+      --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+      --radius-xl: 1.5rem;
+      --pill-pad: .75rem 2rem;
+      --lux-bg: #ffffff;
+      --lux-panel: rgba(0, 0, 0, .03);
+      --lux-glass: rgba(0, 0, 0, .04);
+      --lux-gold: #D4AF37;
+      --lux-gold-2: #b78f2a;
+      --lux-black: #000;
+      --lux-muted: rgba(0, 0, 0, .65);
+      --lux-radius: 14px;
+      --lux-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+      --seat: #f3f4f6;
+      --seat-edge: #e5e7eb;
+      --seat-txt: #374151;
+      --seat-selected: #1f2937;
+      --seat-selected-txt: #fff;
+      --seat-reserved: #fca5a5;
+      --seat-busy: #ef4444;
+      --aisle: #fff;
+
+      /* modal theme */
+      --bg: #fafafa;
+      --line: #c7c9d1;
+      --line-strong: #9da0aa;
+      --purple: #b78f2a;
+      --purple-2: #b78f2a;
+      --purple-3: #b78f2a;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--ink)
+    }
+
+    .dashboard-container {
+      background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+      min-height: 100vh
+    }
+
+    .wrap {
+      margin: 0 auto;
+      padding: 20px 16px 80px
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 6px 0 8px
+    }
+
+    .header h1 {
+      font-weight: 300;
+      font-size: 2.2rem;
+      margin: 0
+    }
+
+    .subtitle {
+      color: var(--ink-2);
+      font-weight: 300;
+      margin: 4px 0 0
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      font-family: 'Poppins';
+      border: none;
+      border-radius: 9999px;
+      padding: .3rem 1.2rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-2);
+      font-weight: 400
+    }
+
+    .btn-primary {
+      height: 45px;
+      width: 200px;
+      background: #fcd34d;
+      color: var(--ink)
+    }
+
+    .btn-dark {
+      display: none;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      font-size: .75rem;
+      font-family: "Poppins";
+      background: #000;
+      color: #fff;
+    }
+
+    /* Board: filters + cards */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 14px 0
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .pill {
+      font-family: "Poppins";
+      padding: .5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      box-shadow: var(--shadow-2);
+      color: var(--ink-2);
+      font-weight: 300
+    }
+
+    .search {
+      position: relative
+    }
+
+    .search input {
+      width: min(360px, 64vw);
+      padding: .7rem 1rem .7rem 2.4rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      background: #fff;
+      font-family: 'Poppins';
+      box-shadow: var(--shadow-2)
+    }
+
+    .search svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--muted)
+    }
+
+    /* Table */
+    .card {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      box-shadow: var(--shadow-1)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 960px
+    }
+
+    thead {
+      background: #f9fafb;
+      position: sticky;
+      top: 0
+    }
+
+    th {
+      text-align: left;
+      font-size: .75rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: .7rem
+    }
+
+    td {
+      padding: 1rem .7rem;
+      color: var(--ink-2);
+      font-size: .95rem;
+      white-space: nowrap;
+      border-bottom: 1px solid #eef0f3
+    }
+
+    .status {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 9999px;
+      font-size: .78rem
+    }
+
+    .status.active {
+      background: var(--chip-green-bg);
+      color: var(--chip-green-fg)
+    }
+
+    .status.inactive {
+      background: var(--chip-gray-bg);
+      color: var(--chip-gray-fg)
+    }
+
+    .chip {
+      padding: .35rem .7rem;
+      border-radius: 9999px;
+      font-size: .78rem;
+      background: var(--chip-gray-bg);
+      color: var(--chip-gray-fg)
+    }
+
+    .chip.vip {
+      background: var(--chip-gold-bg);
+      color: var(--chip-gold-fg)
+    }
+
+    /* Modal base */
+    .modal {
+
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      background: rgba(0, 0, 0, .4);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      padding-top: 20px;
+    }
+
+    .modal.show {
+      display: flex
+    }
+
+    .modal-content {
+      background: var(--lux-bg);
+      border: 1px solid rgba(0, 0, 0, .06);
+      border-radius: 18px;
+      box-shadow: var(--lux-shadow);
+      width: min(1000px, 94vw);
+      padding: 18px 18px 20px;
+      position: relative;
+      animation: pop .28s ease;
+      overflow-y: scroll;
+      height: 730px;
+    }
+
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(.98)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer
+    }
+
+    /* ====== MODAL (new BMS-style UI) ====== */
+    .page_modl {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6px 4px 4px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .grid_modl {
+      display: grid;
+      grid-template-columns: 1.2fr .9fr;
+      gap: 28px
+    }
+
+    @media (max-width:960px) {
+      .grid_modl {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .photo-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06)
+    }
+
+    .hero {
+      height: 200px;
+      width: 100%;
+      object-fit: cover
+    }
+
+    .pc-body {
+      padding: 16px
+    }
+
+    .pc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .title {
+      font-weight: 400;
+      margin: 0
+    }
+
+    .price {
+      display: none;
+      white-space: nowrap
+    }
+
+    .meta {
+      display: flex;
+      gap: 14px;
+      color: #9aa0aa;
+      font-size: .9rem;
+      margin: 10px 0;
+      font-weight: 100;
+    }
+
+    .note {
+      background: #fff;
+      color: #4b5563;
+      font-weight: 100;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06)
+    }
+
+    .panel h3 {
+      margin: 4px 0 12px;
+      font-weight: 500
+    }
+
+    .panel label {
+      display: block;
+      font-size: .85rem;
+      color: #6b7280;
+      margin: 10px 0 6px
+    }
+
+    .panel .input,
+    .panel .select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+      font-family: 'Poppins'
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    @media (max-width:720px) {
+      .cols {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .btn_modl {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Poppins'
+    }
+
+    .seat-wrap {
+      margin-top: 18px;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, .06)
+    }
+
+    .room {
+      position: relative;
+      padding: 18px 22px 6px;
+      border-radius: 16px;
+      margin: 0 auto;
+      width: min(980px, 96%);
+      background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+      box-shadow: inset 0 -40px 80px rgba(183, 143, 42, 0.06), inset 0 20px 40px rgba(255, 255, 255, 0.8)
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 16px 0
+    }
+
+    .row-line {
+      display: none;
+      height: 2px;
+      background: linear-gradient(90deg, #cfd2da, #b5b9c4, #cfd2da);
+      flex: 1;
+      border-radius: 2px
+    }
+
+    .rlabel {
+      display: none;
+      width: 22px;
+      text-align: center;
+      color: #8d90a0;
+      font-weight: 600
+    }
+
+    .seats {
+      display: grid;
+      gap: 10px
+    }
+
+    .seat {
+      width: 32px;
+      height: 28px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+      transition: transform .1s ease, filter .1s ease, opacity .1s ease
+    }
+
+    .seat:hover {
+      transform: translateY(-1px)
+    }
+
+    .available {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%239aa0aa' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%23ffffff'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%23ffffff'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%23ffffff'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%23ffffff'/></g></svg>")
+    }
+
+    .booked {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%239aa0aa' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%23e7e7ee'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%23d9d9e3'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%23efeff5'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%23efeff5'/></g></svg>");
+      cursor: not-allowed;
+      opacity: .85
+    }
+
+    .selected {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%235b21b6' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%237c3aed'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%235b21b6'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%236b21a8'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%236b21a8'/></g></svg>")
+    }
+
+    .legend {
+      display: flex;
+      gap: 22px;
+      justify-content: center;
+      align-items: center;
+      color: #9aa0aa;
+      font-size: .9rem;
+      padding: 10px 0 0
+    }
+
+    .legend .item {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .legend .sw {
+      width: 26px;
+      height: 22px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center
+    }
+
+    .sw.av {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%239aa0aa' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%23ffffff'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%23ffffff'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%23ffffff'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%23ffffff'/></g></svg>")
+    }
+
+    .sw.bk {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%239aa0aa' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%23e7e7ee'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%23d9d9e3'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%23efeff5'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%23efeff5'/></g></svg>")
+    }
+
+    .sw.sl {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><g fill='none' stroke='%235b21b6' stroke-width='2'><rect x='14' y='10' width='36' height='22' rx='6' ry='6' fill='%237c3aed'/><rect x='18' y='36' width='28' height='8' rx='4' ry='4' fill='%235b21b6'/><rect x='10' y='16' width='8' height='14' rx='3' ry='3' fill='%236b21a8'/><rect x='46' y='16' width='8' height='14' rx='3' ry='3' fill='%236b21a8'/></g></svg>")
+    }
+
+    .tip {
+      position: fixed;
+      pointer-events: none;
+      transform: translate(-50%, -140%);
+      background: #b78f2a;
+      color: #fff;
+      padding: 10px 12px 8px;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(109, 40, 217, .25);
+      display: none;
+      z-index: 1000
+    }
+
+    .tip small {
+      display: block;
+      opacity: .85;
+      font-size: .7rem;
+      letter-spacing: .12em
+    }
+
+    .tip strong {
+      font-size: 1.1rem;
+      letter-spacing: .08em
+    }
+
+    .tip:after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -8px;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      background: #b78f2a;
+      clip-path: polygon(50% 100%, 0 0, 100% 0)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    thead {
+      background: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 0;
+    }
+
+    th {
+      text-align: left;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: .75rem;
+    }
+
+    td {
+      padding: 1rem .75rem;
+      font-size: .9rem;
+      color: var(--ink-2);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .btn-save {
+      font-family: "Poppins";
+      background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 100;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <div class="wrap">
+      <div class="header">
+        <div>
+          <h1>Co-Share Rooms</h1>
+          <p class="subtitle">For agent companies: see who booked which room, when — and reserve seats.
+          </p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="exportCsv" style="display: none;">Export CSV</button>
+          <button class="btn btn-primary" id="openBooking">New Booking</button>
+        </div>
+      </div>
+
+
+
+      <div class="card" style="overflow:auto">
+        <div class="toolbar">
+          <div class="filters">
+            <div class="search">
+              <input id="search" placeholder="Search by company, POC, room, or seat" />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+              </svg>
+            </div>
+            <select id="filterRoom" class="pill"></select>
+            <input id="filterDate" class="pill" type="date" />
+            <select id="filterStatus" class="pill">
+              <option value="">All status</option>
+              <option>Confirmed</option>
+              <option>Cancelled</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button class="btn btn-dark" id="clearFilters">Clear</button>
+          </div>
+        </div>
+        <table id="bookingsTbl">
+          <thead>
+            <tr>
+              <th>Agent Company</th>
+              <th>POC</th>
+              <th>Contact</th>
+              <th>Room</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Seats</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal (replaced content) -->
+  <div class="modal" id="bookingModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-btn" data-close>&times;</button>
+
+      <div class="page_modl">
+        <div class="grid_modl">
+          <!-- LEFT: Room preview + details + seat picker -->
+          <div>
+            <div class="photo-card">
+              <img id="hero" class="hero" src="room-1.jpg" alt="Room preview">
+              <div class="pc-body">
+                <div class="pc-row">
+                  <h3 class="title" id="roomName">Marina Boardroom</h3>
+                  <div class="price"><span id="roomPrice">$ 150</span>/seat</div>
+                </div>
+                <div class="meta" id="roomMeta">
+                  <span>👥 up to 24</span>
+                  <span>🖥️ Projector</span>
+                  <span>📝 Whiteboard</span>
+                </div>
+                <div class="note" id="roomNote">The extra space enables you to host client demos comfortably. Enjoy
+                  skyline views and premium coffee.</div>
+              </div>
+            </div>
+
+            <!-- Seat picker block -->
+            <div class="seat-wrap">
+              <div class="room" id="seatRoom"></div>
+              <div class="legend">
+                <div class="item"><span class="sw av"></span> Available</div>
+                <div class="item"><span class="sw bk"></span> Booked</div>
+                <div class="item"><span class="sw sl"></span> Selected</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Booking form -->
+          <div class="panel">
+            <h3>Seat booking details</h3>
+            <div>
+              <label>Choose room</label>
+              <select id="roomSelect" class="select"></select>
+            </div>
+            <label>Agent Company</label>
+            <input class="input" id="agentCompany" placeholder="Agent Company Name" />
+            <div class="cols">
+              <div>
+                <label>First name</label>
+                <input class="input" id="firstName" placeholder="Name" />
+              </div>
+              <div>
+                <label>Last name</label>
+                <input class="input" id="lastName" placeholder="Name" />
+              </div>
+            </div>
+            <div class="cols">
+              <div>
+                <label>Email address</label>
+                <input class="input" id="email" placeholder="you@example.com" />
+              </div>
+              <div>
+                <label>Mob. no</label>
+                <input class="input" id="phone" placeholder="+971 50 123 4567" />
+              </div>
+            </div>
+            <div class="cols">
+              <div>
+                <label>Date</label>
+                <input class="input" id="date" type="date" />
+              </div>
+              <div>
+                <label>Time</label>
+                <select class="select" id="time">
+                  <option>09:00–11:00</option>
+                  <option>11:30–13:30</option>
+                  <option>14:30–16:30</option>
+                  <option>17:00–19:00</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label>Address</label>
+              <input class="input" id="address" placeholder="Address" />
+            </div>
+            <div style="display:flex; align-items:flex-end; margin-top:20px; justify-content:flex-end">
+              <button class="btn-save" id="bookBtn" style="width:100%">Add Booking</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.page_modl -->
+    </div>
+  </div>
+
+  <div class="tip" id="tip"><small>ROW &nbsp; SEAT</small><strong id="tipTxt">A 01</strong></div>
+
+  <!-- Main table + filters logic -->
+  <script>
+    /* ------------------------------ Data ------------------------------ */
+    const ROOMS = [
+      { id: 'A', name: 'Marina Boardroom', capacity: 24, rows: [8, 8, 8], cols: 8, aisles: [4], features: ['Board', 'HDMI', 'AC'] },
+      { id: 'B', name: 'Palm Meeting Room', capacity: 16, rows: [6, 4, 6], cols: 6, aisles: [3], features: ['TV', 'Whiteboard'] },
+      { id: 'C', name: 'Creek Collaboration', capacity: 30, rows: [10, 10, 10], cols: 10, aisles: [5], features: ['Projector', 'Stage'] },
+      { id: 'D', name: 'Desert Hub', capacity: 12, rows: [4, 4, 4], cols: 4, aisles: [], features: ['Huddle', 'AC'] },
+    ];
+
+    // Demo seeded bookings (also loaded from localStorage)
+    const seedBookings = [
+      { id: crypto.randomUUID(), company: 'Falcon Properties', poc: 'Omar Al-Mansouri', contact: '+971 50 111 2233', room: 'A', date: '2025-08-13', time: '11:30–13:30', seats: ['B03', 'B04', 'B05'], status: 'Confirmed' },
+      { id: crypto.randomUUID(), company: 'Blue Dunes Realty', poc: 'Sara Khan', contact: 'sara.khan@example.com', room: 'B', date: '2025-08-14', time: '09:00–11:00', seats: ['A01', 'A02'], status: 'Confirmed' },
+      { id: crypto.randomUUID(), company: 'Harbor Estates', poc: 'James Parker', contact: '+971 58 222 8899', room: 'C', date: '2025-08-12', time: '17:00–19:00', seats: ['C07', 'C08', 'C09', 'C10'], status: 'Confirmed' },
+      { id: crypto.randomUUID(), company: 'Falcon Properties', poc: 'Omar Al-Mansouri', contact: '+971 50 111 2233', room: 'A', date: '2025-08-13', time: '11:30–13:30', seats: ['B03', 'B04', 'B05'], status: 'Confirmed' },
+      { id: crypto.randomUUID(), company: 'Blue Dunes Realty', poc: 'Sara Khan', contact: 'sara.khan@example.com', room: 'B', date: '2025-08-14', time: '09:00–11:00', seats: ['A01', 'A02'], status: 'Confirmed' },
+      { id: crypto.randomUUID(), company: 'Harbor Estates', poc: 'James Parker', contact: '+971 58 222 8899', room: 'C', date: '2025-08-12', time: '17:00–19:00', seats: ['C07', 'C08', 'C09', 'C10'], status: 'Confirmed' },
+
+    ];
+
+    const storeKey = 'coshare_bookings_v1';
+    let BOOKINGS = seedBookings;
+
+    /* ------------------------------ Utils ------------------------------ */
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+    const fmtDate = iso => new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+    const save = () => BOOKINGS;
+
+    function renderFilters() {
+      filterRoom.innerHTML = '<option value="">All rooms</option>' + ROOMS.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+    }
+
+    function matchesFilters(b) {
+      if (filterRoom.value && b.room !== filterRoom.value) return false;
+      if (filterDate.value && b.date !== filterDate.value) return false;
+      if (filterStatus.value && b.status !== filterStatus.value) return false;
+      const q = search.value.trim().toLowerCase();
+      if (q) {
+        const hay = [b.company, b.poc, b.contact, b.room, b.seats.join(' ')].join(' ').toLowerCase();
+        return hay.includes(q);
+      }
+      return true;
+    }
+
+    const rowsEl = $('#rows');
+    const filterRoom = $('#filterRoom');
+    const filterDate = $('#filterDate');
+    const filterStatus = $('#filterStatus');
+    const search = $('#search');
+
+    function renderTable() {
+      const frag = document.createDocumentFragment();
+      rowsEl.innerHTML = '';
+      BOOKINGS.filter(matchesFilters).forEach(b => {
+        const tr = document.createElement('tr');
+        const roomName = ROOMS.find(r => r.id === b.room)?.name || b.room;
+        tr.innerHTML = `
+          <td>${b.company || 'Agent Booking'}</td>
+          <td>${b.poc || '—'}</td>
+          <td>${b.contact || '—'}</td>
+          <td><span class="chip">${roomName}</span></td>
+          <td>${fmtDate(b.date)}</td>
+          <td>${b.time}</td>
+          <td>${b.seats.length} <small style="color:var(--muted)">(${b.seats.join(', ')})</small></td>
+          <td><span class="status ${b.status === 'Confirmed' ? 'active' : 'inactive'}">${b.status}</span></td>
+          <td>
+            <button class="btn btn-ghost" data-view="${b.id}">View</button>
+            <button class="btn btn-dark" data-cancel="${b.id}">Cancel</button>
+          </td>`;
+        frag.appendChild(tr);
+      });
+      rowsEl.appendChild(frag);
+    }
+
+    // Table actions
+    rowsEl.addEventListener('click', (e) => {
+      const cancelId = e.target.getAttribute('data-cancel');
+      const viewId = e.target.getAttribute('data-view');
+      if (cancelId) {
+        const b = BOOKINGS.find(x => x.id === cancelId); if (!b) return;
+        if (confirm(`Cancel booking for ${b.company || 'Agent Booking'} in ${ROOMS.find(r => r.id === b.room)?.name}?`)) {
+          b.status = 'Cancelled'; save(); renderTable();
+        }
+      }
+      if (viewId) {
+        const b = BOOKINGS.find(x => x.id === viewId); if (!b) return;
+        alert(`${b.company || 'Agent Booking'} — ${b.poc || '—'}\nRoom: ${ROOMS.find(r => r.id === b.room)?.name} (${b.room})\nDate: ${b.date}\nTime: ${b.time}\nSeats: ${b.seats.join(', ')}`);
+      }
+    });
+
+    // Filters
+    $('#clearFilters').addEventListener('click', () => { filterRoom.value = ''; filterDate.value = ''; filterStatus.value = ''; search.value = ''; renderTable(); });
+    [filterRoom, filterDate, filterStatus].forEach(el => el.addEventListener('change', renderTable));
+    search.addEventListener('input', renderTable);
+
+    // Export CSV
+    function exportCSV() {
+      const headers = ['Agent Company', 'POC', 'Contact', 'Room ID', 'Room Name', 'Date', 'Time', 'Seat Count', 'Seats', 'Status'];
+      const visible = BOOKINGS.filter(matchesFilters);
+      const rows = visible.map(b => [
+        b.company || 'Agent Booking', b.poc || '—', b.contact || '—', b.room, (ROOMS.find(r => r.id === b.room)?.name || b.room), b.date, b.time, b.seats.length, b.seats.join(' '), b.status
+      ]);
+      const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `agent_room_bookings_${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    $('#exportCsv').addEventListener('click', exportCSV);
+
+    /* ------------------------------ Init (table) ------------------------------ */
+    renderFilters();
+    renderTable();
+  </script>
+
+  <!-- Modal controller (BookMyShow-style seat UI) -->
+  <script>
+    // Booking modal elements
+    const bookingModal = document.getElementById('bookingModal');
+    const hero = bookingModal.querySelector('#hero');
+    const roomNameEl = bookingModal.querySelector('#roomName');
+    const roomPriceEl = bookingModal.querySelector('#roomPrice');
+    const roomMeta = bookingModal.querySelector('#roomMeta');
+    const roomNote = bookingModal.querySelector('#roomNote');
+    const seatRoom = bookingModal.querySelector('#seatRoom');
+    const roomSelect = bookingModal.querySelector('#roomSelect');
+    const dateEl = bookingModal.querySelector('#date');
+    const timeEl = bookingModal.querySelector('#time');
+    const tip = document.getElementById('tip');
+    const tipTxt = document.getElementById('tipTxt');
+
+    // Modal room catalog (separate from table ROOMS to include price/image/layout)
+    const ROOMS_MODAL = [
+      { id: 'A', name: 'Marina Boardroom', price: 150, capacity: 24, features: ['Projector', 'Whiteboard'], image: 'room-1.jpg', note: 'The extra space enables you to host client demos comfortably. Enjoy skyline views and premium coffee.', layout: [{ row: 'E', seats: 12, offset: 0 }, { row: 'D', seats: 12, offset: 0 }, { row: 'C', seats: 8, offset: 2 }, { row: 'B', seats: 10, offset: 1 }, { row: 'A', seats: 10, offset: 1 }] },
+      { id: 'B', name: 'Palm Meeting Room', price: 120, capacity: 16, features: ['TV', 'HDMI'], image: 'room-2.jpg', note: 'Cozy space for client calls and quick stand-ups. Natural light and plants included.', layout: [{ row: 'E', seats: 10, offset: 1 }, { row: 'D', seats: 10, offset: 1 }, { row: 'C', seats: 8, offset: 1 }, { row: 'B', seats: 8, offset: 1 }, { row: 'A', seats: 6, offset: 2 }] },
+      { id: 'C', name: 'Creek Collaboration', price: 180, capacity: 30, features: ['Projector', 'Stage'], image: 'room-3.jpg', note: 'Large collaboration hub with mini-stage. Perfect for workshops and launches.', layout: [{ row: 'F', seats: 14, offset: 0 }, { row: 'E', seats: 14, offset: 0 }, { row: 'D', seats: 12, offset: 1 }, { row: 'C', seats: 12, offset: 1 }, { row: 'B', seats: 10, offset: 2 }, { row: 'A', seats: 10, offset: 2 }] },
+    ];
+
+    function setMinToday() {
+      const t = new Date(); t.setHours(0, 0, 0, 0);
+      const iso = t.toISOString().slice(0, 10);
+      dateEl.min = iso; if (!dateEl.value) dateEl.value = iso;
+    }
+
+    // Normalize seats like 'B3' -> 'B03' for comparison
+    const norm = s => s.replace(/^(\w)(\d{1,2})$/, (_, a, b) => a + String(b).padStart(2, '0'));
+
+    // Compute reserved seats using existing BOOKINGS for selected room/date/time
+    function reservedFor(roomId, date, time) {
+      const taken = BOOKINGS
+        .filter(b => b.room === roomId && b.date === date && b.time === time && b.status === 'Confirmed')
+        .flatMap(b => b.seats.map(norm));
+      return new Set(taken);
+    }
+
+    function buildSeatMap(room) {
+      seatRoom.innerHTML = '';
+      const res = reservedFor(room.id, dateEl.value, timeEl.value);
+      room.layout.forEach(conf => {
+        const rowEl = document.createElement('div'); rowEl.className = 'row';
+        const left = document.createElement('div'); left.className = 'rlabel'; left.textContent = conf.row;
+        const right = left.cloneNode(true);
+        const seats = document.createElement('div'); seats.className = 'seats';
+        const totalCols = conf.seats + conf.offset * 2; seats.style.gridTemplateColumns = `repeat(${totalCols}, 1fr)`;
+        for (let c = 0; c < totalCols; c++) {
+          if (c < conf.offset || c >= conf.offset + conf.seats) { const blank = document.createElement('div'); blank.style.width = '32px'; blank.style.height = '1px'; seats.appendChild(blank); continue; }
+          const seat = document.createElement('div');
+          const seatNum = String(c - conf.offset + 1).padStart(2, '0');
+          const id = `${conf.row}${seatNum}`;
+          seat.className = res.has(id) ? 'seat booked' : 'seat available';
+          seat.dataset.id = id;
+          seat.setAttribute('aria-label', `Row ${conf.row} Seat ${seatNum}`);
+          seat.addEventListener('mouseenter', (e) => { tip.style.display = 'block'; tipTxt.textContent = `${conf.row}  ${seatNum}`; moveTip(e); });
+          seat.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+          seat.addEventListener('mousemove', moveTip);
+          seat.addEventListener('click', () => { if (seat.classList.contains('booked')) return; seat.classList.toggle('selected'); seat.classList.toggle('available'); });
+          seats.appendChild(seat);
+        }
+        const line = document.createElement('div'); line.className = 'row-line';
+        rowEl.appendChild(left); rowEl.appendChild(line); rowEl.appendChild(seats); rowEl.appendChild(right);
+        seatRoom.appendChild(rowEl);
+      });
+    }
+
+    function moveTip(e) { tip.style.left = e.clientX + 'px'; tip.style.top = e.clientY + 'px'; }
+
+    function loadRoom(id) {
+      const r = ROOMS_MODAL.find(x => x.id === id); if (!r) return;
+      hero.src = r.image; roomNameEl.textContent = r.name; roomPriceEl.textContent = `$ ${r.price}`;
+      roomMeta.innerHTML = `<span>👥 up to ${r.capacity}</span>` + r.features.map(f => `<span>• ${f}</span>`).join('');
+      roomNote.textContent = r.note;
+      buildSeatMap(r);
+    }
+
+    function initModalUI() {
+      roomSelect.innerHTML = ROOMS_MODAL.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+      setMinToday();
+      loadRoom(ROOMS_MODAL[0].id);
+    }
+
+    // open/close
+    document.getElementById('openBooking').addEventListener('click', () => {
+      bookingModal.classList.add('show'); bookingModal.setAttribute('aria-hidden', 'false');
+      initModalUI();
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('[data-close]') || (e.target === bookingModal)) {
+        bookingModal.classList.remove('show'); bookingModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // react to changes
+    roomSelect.addEventListener('change', e => loadRoom(e.target.value));
+    dateEl.addEventListener('change', () => loadRoom(roomSelect.value));
+    timeEl.addEventListener('change', () => loadRoom(roomSelect.value));
+
+    // Persist booking back to table/localStorage
+    document.getElementById('bookBtn').addEventListener('click', () => {
+      const seats = $$('.seat.selected', seatRoom).map(s => s.dataset.id);
+      if (seats.length === 0) { alert('Please select at least one seat.'); return; }
+      const agentCompany = $('#agentCompany').value.trim();
+      const first = $('#firstName').value.trim();
+      const last = $('#lastName').value.trim();
+      const email = $('#email').value.trim();
+      const phone = $('#phone').value.trim();
+      const date = dateEl.value;
+      const time = timeEl.value;
+      const room = roomSelect.value;
+      const id = crypto.randomUUID();
+      const contact = email || phone || '—';
+      const poc = (first || last) ? `${first} ${last}`.trim() : '—';
+      BOOKINGS.unshift({ id, company: agentCompany || 'Agent Booking', poc, contact, room, date, time, seats: seats.sort(), status: 'Confirmed' });
+      save();
+      renderTable();
+      alert('Booking requested successfully.');
+      bookingModal.classList.remove('show'); bookingModal.setAttribute('aria-hidden', 'true');
+    });
+  </script>
+</body>
+
+</html>

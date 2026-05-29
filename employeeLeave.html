@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leave Requests</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg-grad-a: #e9e9ee;
+            --selected: #fde68a;
+            --bg-grad-b: #fff6cf;
+            --ink: #1f2937;
+            --ink-2: #374151;
+            --muted: #6b7280;
+            --chip-green-bg: #ecfdf5;
+            --chip-green-fg: #047857;
+            --chip-gray-bg: #f3f4f6;
+            --chip-gray-fg: #6b7280;
+            --chip-gold-bg: #fef9c3;
+            --chip-gold-fg: #a16207;
+            --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+            --pill-pad: .75rem 2rem;
+            --radius-xl: 1.5rem;
+
+            /* White/Gold modal theme */
+            --lux-bg: #ffffff;
+            --lux-panel: rgba(0, 0, 0, 0.03);
+            --lux-glass: rgba(0, 0, 0, 0.04);
+            --lux-gold: #D4AF37;
+            --lux-gold-2: #b78f2a;
+            --lux-black: #000000;
+            --lux-muted: rgba(0, 0, 0, 0.65);
+            --lux-radius: 14px;
+            --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif !important;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dashboard-container {
+            background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 0rem;
+            padding: 0 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        /* Top row actions  */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 100%;
+            margin: 0 1rem 1.25rem;
+        }
+
+        .dflex-secend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .progress-item {
+            text-align: center;
+        }
+
+        .progress-item p {
+            font-size: .875rem;
+            color: var(--muted);
+            margin: .25rem 0;
+        }
+
+        .progress-bar {
+            font-weight: 500;
+            padding: .75rem 2rem;
+            border-radius: 9999px;
+            box-shadow: var(--shadow-2);
+            white-space: nowrap;
+        }
+
+        .progress-total {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .add-entity-btn {
+            font-family: "Poppins", sans-serif !important;
+            ;
+            background: #fcd34d;
+            color: var(--ink);
+            font-weight: 400;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow-2);
+            transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+            white-space: nowrap;
+        }
+
+        .add-entity-btn:hover {
+            background: #facc15;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
+        }
+
+        /* Table card */
+        .table-container {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            width: 98%;
+            margin: 20px auto 10px;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            padding: 2rem;
+            padding-top: 90px;
+        }
+
+        @media (max-width:720px) {
+            .table-scroll {
+                padding: 1rem;
+                padding-top: 90px;
+            }
+        }
+
+        .table-top-btn-boxes {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .btn-tble1 {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            border: none;
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+        }
+
+        .btn-tble2 {
+            min-width: 110px;
+            height: 40px;
+            padding: 0 14px;
+            background: #fff;
+            border-radius: 30px;
+            border: none;
+            box-shadow: var(--shadow-2);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        thead {
+            background: #f9fafb;
+            position: sticky;
+            top: 0;
+            z-index: 0;
+        }
+
+        th {
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .75rem;
+        }
+
+        td {
+            padding: 1rem .75rem;
+            font-size: .9rem;
+            color: var(--ink-2);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: border-color .15s ease, background .15s ease;
+        }
+
+        .checkbox-cell input[type="checkbox"]:checked {
+            background-color: #111;
+            border-color: #111;
+        }
+
+        .checkbox-cell input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 4px;
+            height: 9px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* SELECTED ROW */
+        tbody tr.selected td {
+            background-color: var(--selected);
+        }
+
+        tbody tr.selected td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        tbody tr.selected td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        tbody tr.selected::after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            right: 6px;
+            top: 2px;
+            bottom: 2px;
+            border-radius: 14px;
+            pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+        }
+
+        tbody tr[aria-selected="true"] {
+            outline: 2px solid transparent;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            object-fit: cover;
+        }
+
+        .pill {
+            padding: .35rem .75rem;
+            border-radius: 9999px;
+            font-size: .75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .pill.approved {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+        }
+
+        .pill.pending {
+            background: var(--chip-gold-bg);
+            color: var(--chip-gold-fg);
+        }
+
+        .pill.rejected {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+
+        .view-btn {
+            background: var(--ink);
+            color: #fff;
+            padding: .4rem 1rem;
+            font-size: 12px;
+            font-weight: 100;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease;
+            box-shadow: var(--shadow-2);
+            position: relative;
+            font-family: "Poppins", sans-serif !important;
+            ;
+        }
+
+        .view-btn:hover {
+            background: #374151;
+            transform: translateY(-1px);
+        }
+
+        .view-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, .28), transparent);
+            opacity: 0;
+            border-radius: 9999px;
+            transition: opacity .3s ease;
+        }
+
+        .view-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Base modal (used by View) */
+        .modal {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, .4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.hidden {
+            display: none !important;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: min(900px, 92vw);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+            position: relative;
+            animation: zoomBounce .4s ease;
+        }
+
+        @keyframes zoomBounce {
+            0% {
+                transform: scale(.8);
+                opacity: 0
+            }
+
+            60% {
+                transform: scale(1.05);
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            font-size: 1.6rem;
+            color: #6b7280;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #111827;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f3f4f6;
+        }
+
+        .modal-header-text h2 {
+            font-size: 1.6rem;
+            margin: 0;
+            color: var(--ink);
+        }
+
+        .modal-header-text p {
+            margin: .15rem 0 0;
+            color: var(--muted);
+        }
+
+        .modal-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .75rem 1.25rem;
+            margin-top: .75rem;
+        }
+
+        .modal-detail {
+            border: 1px solid #e5e7eb;
+            border-radius: .75rem;
+            padding: .75rem 1rem;
+        }
+
+        .modal-detail .label {
+            font-size: .75rem;
+            color: var(--muted);
+            margin: 0 0 .15rem;
+            font-weight: 600;
+        }
+
+        .modal-detail .value {
+            font-size: .95rem;
+            color: var(--ink-2);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: .6rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .btn-dark {
+            font-family: "Poppins", sans-serif !important;
+            ;
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: .55rem 1.2rem;
+            font-weight: 100;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            font-family: "Poppins", sans-serif !important;
+            ;
+            background: #fcd34d;
+            color: var(--ink);
+            border: none;
+            border-radius: 9999px;
+            padding: .55rem 1.2rem;
+            font-weight: 100;
+            cursor: pointer;
+        }
+
+        /* Row entrance */
+        tbody tr {
+            animation: fadeSlideIn .45s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        tbody tr:nth-child(even) {
+            animation-delay: .05s;
+        }
+
+        tbody tr:nth-child(odd) {
+            animation-delay: .1s;
+        }
+
+        @keyframes fadeSlideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive niceties */
+        @media (max-width:720px) {
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .add-entity-btn {
+                width: 100%;
+            }
+
+            .modal-detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                min-width: 900px;
+            }
+        }
+
+        /* Search + Sort (table header controls) */
+        .table-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-input {
+            padding: .7rem 1rem .7rem 2.4rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: var(--shadow-2);
+            font-size: .9rem;
+            color: black;
+            font-weight: 100;
+            font-family: "Poppins", sans-serif !important;
+            ;
+            width: min(340px, 58vw);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .btn-sort {
+            min-width: 130px;
+            height: 40px;
+            padding: 0 14px;
+            background: #fff;
+            border-radius: 30px;
+            border: none;
+            box-shadow: var(--shadow-2);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-sort.is-active {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        @media (max-width:720px) {
+            .search-input {
+                width: 56vw;
+            }
+        }
+
+        /* Pill-style filter buttons */
+        .filter-pill {
+            background: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.7rem 1.4rem;
+            font-size: 0.9rem;
+            font-family: "Poppins", sans-serif !important;
+            ;
+            font-weight: 100;
+            color: var(--ink-2);
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .filter-pill span {
+            font-weight: 400;
+            color: var(--ink);
+        }
+
+        .filter-pill:hover {
+            background: #f9fafb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+            transform: translateY(-1px);
+        }
+
+        .filter-pill svg {
+            width: 16px;
+            height: 16px;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        /* Status Dropdown Menu */
+        .status-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .1);
+            z-index: 10;
+            padding: 8px;
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .status-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .status-dropdown button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--ink-2);
+            font-weight: 100;
+            font-family: "Poppins", sans-serif !important;
+            ;
+            transition: background 0.1s ease;
+        }
+
+        .status-dropdown button:hover {
+            background: #f3f4f6;
+        }
+
+        .filter-pill-wrap {
+            position: relative;
+        }
+
+        /* Export Button */
+        #exportBtn {
+            background: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.7rem 1.4rem;
+            font-size: 0.9rem;
+            font-family: "Poppins", sans-serif !important;
+            ;
+            font-weight: 100;
+            color: var(--ink-2);
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        #exportBtn:hover {
+            background: #f9fafb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+            transform: translateY(-1px);
+        }
+
+        #exportBtn svg {
+            width: 16px;
+            height: 16px;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        /* Selected row highlight */
+        tr.selected {
+            background-color: #fde68a;
+        }
+
+        tbody tr.selected td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        tbody tr.selected td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        /* ========= Apply Leave Modal ========= */
+        #applyLeaveModal {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 28px;
+        }
+
+        #applyLeaveModal .modal-content {
+            width: 760px;
+            max-width: calc(100% - 48px);
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 22px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: var(--lux-shadow);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            align-items: start;
+            transform: translateY(12px);
+            animation: pop 260ms ease;
+            overflow: hidden;
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.995)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        /* Title */
+        #applyLeaveModal .acm-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 4px 0 4px 0;
+        }
+
+        #applyLeaveModal .acm-title h2 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: .2px;
+            font-weight: 100;
+            color: var(--lux-black);
+        }
+
+        #applyLeaveModal .acm-title p {
+            margin: 6px 0 0 0;
+            color: var(--lux-muted);
+            font-size: 13px;
+        }
+
+        /* Close button (square) */
+        #applyLeaveModal .close-btn {
+            all: unset;
+            position: absolute;
+            right: 22px;
+            top: 18px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+
+        #applyLeaveModal .close-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Form grid */
+        #applyLeaveModal .add-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        #applyLeaveModal label {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: var(--lux-muted);
+            font-weight: 100;
+        }
+
+        #applyLeaveModal .input,
+        #applyLeaveModal .select,
+        #applyLeaveModal .textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--lux-black);
+            outline: none;
+            font-size: 18px;
+            font-weight: 100;
+            transition: box-shadow .12s ease, border-color .12s ease;
+            font-family: "Poppins", sans-serif !important;
+        }
+
+        #applyLeaveModal .textarea {
+            min-height: 84px;
+            resize: vertical;
+            grid-column: 1 / -1;
+        }
+
+        #applyLeaveModal .input:focus,
+        #applyLeaveModal .select:focus,
+        #applyLeaveModal .textarea:focus {
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.08);
+            border-color: rgba(212, 175, 55, 0.32);
+        }
+
+        #applyLeaveModal .full {
+            grid-column: 1 / -1;
+        }
+
+        /* Actions */
+        #applyLeaveModal .actions {
+            margin-top: 4px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        #applyLeaveModal .btn-cancel {
+            font-family: "Poppins", sans-serif !important;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--lux-muted);
+            cursor: pointer;
+        }
+
+        #applyLeaveModal .btn-save {
+            font-family: "Poppins", sans-serif !important;
+            background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 100;
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+        }
+
+        @media (max-width: 900px) {
+            #applyLeaveModal .modal-content {
+                padding: 16px;
+            }
+
+            #applyLeaveModal .add-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .subtitle-text {
+            font-weight: 100;
+            font-size: .9rem;
+            color: black;
+            margin: .25rem 0 0;
+        }
+
+        /* === View Profile Modal (centered card) === */
+        .view-card {
+            width: min(720px, 92vw);
+            padding: 28px 24px 22px;
+            border-radius: 18px;
+            border: 1px solid rgba(0, 0, 0, .06);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, .12);
+        }
+
+        .vc-header {
+            display: grid;
+            justify-items: center;
+            text-align: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .vc-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: .4rem .7rem;
+            border-radius: 9999px;
+            font-size: .85rem;
+            font-weight: 600;
+            background: #f3f4f6;
+            color: #374151;
+            box-shadow: var(--shadow-2);
+        }
+
+        .badge.approved {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+        }
+
+        .badge.pending {
+            background: var(--chip-gold-bg);
+            color: var(--chip-gold-fg);
+        }
+
+        .badge.rejected {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+
+        .vc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .75rem 1rem;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .vc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .vc-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: .8rem 1rem;
+            background: #fff;
+        }
+
+        .vc-item .label {
+            font-size: .75rem;
+            color: var(--muted);
+            font-weight: 100;
+            margin: 0 0 .2rem;
+        }
+
+        .vc-item .value {
+            font-size: .95rem;
+            color: var(--ink-2);
+            margin: 0;
+            font-weight: 100;
+        }
+
+        /* close button (square, top-right) */
+        .view-card .close-btn {
+            right: 14px;
+            top: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, .06);
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+            color: var(--ink-2);
+        }
+
+
+        /* ===== AI Leave Assistant Modal ===== */
+        #aiLeaveModal .modal-content {
+            width: 720px;
+            max-width: calc(100% - 48px);
+            background: var(--lux-bg);
+            padding: 24px;
+        }
+
+        #aiLeaveModal .modal-content .close-btn {
+            right: 20px;
+            top: 16px;
+        }
+
+        #aiLeaveModal .modal-header h2 {
+            font-size: 20px;
+        }
+
+        #aiLeaveModal .modal-header p {
+            font-size: 13px;
+        }
+
+        #aiLeaveModal .ai-modal-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        #aiLeaveModal .input-box {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 10px;
+            padding: 12px;
+            position: relative;
+            background: rgba(212, 175, 55, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #aiLeaveModal .input-box .input-wrap {
+            position: relative;
+        }
+
+        #aiLeaveModal .input-box textarea {
+            width: 100%;
+            height: 100px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: "Poppins", sans-serif !important;
+            font-size: 14px;
+            color: var(--lux-black);
+            font-weight: 100;
+            resize: none;
+            padding-right: 32px;
+            /* Space for the voice icon */
+        }
+
+        #aiLeaveModal .input-box .voice-icon {
+            position: absolute;
+            bottom: 4px;
+            right: 0px;
+            width: 24px;
+            height: 24px;
+            color: var(--lux-muted);
+            cursor: pointer;
+        }
+
+        #aiLeaveModal .generate-btn-wrap {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #aiLeaveModal .generate-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(90deg, #fcd34d, #d4af37);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: "Poppins", sans-serif !important;
+            ;
+            font-weight: 100;
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+            transition: background .15s ease, transform .15s ease;
+        }
+
+        #aiLeaveModal .generate-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        #aiLeaveModal .generate-btn:disabled {
+            background: var(--muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #aiLeaveModal .generate-btn svg {
+            width: 18px;
+            height: 18px;
+            color: #fff;
+        }
+
+        #aiLeaveModal .output-box {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: var(--lux-panel);
+            min-height: 120px;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            justify-content: center;
+            color: var(--lux-muted);
+            font-size: 14px;
+            font-weight: 100;
+        }
+
+        #aiLeaveModal .output-box pre {
+            white-space: pre-wrap;
+            margin: 0;
+            font-family: "Poppins", sans-serif !important;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        #aiLeaveModal .output-box .ai-icon {
+            width: 26px;
+            height: 26px;
+            color: var(--lux-gold);
+        }
+
+        #aiLeaveModal .modal-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #aiLeaveModal .modal-actions .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        #aiLeaveModal .modal-actions .btn-clear {
+            font-family: "Poppins", sans-serif !important;
+            ;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: var(--lux-muted);
+            cursor: pointer;
+        }
+
+        #aiLeaveModal .modal-actions .btn-confirm {
+            font-family: "Poppins", sans-serif !important;
+            ;
+            background: #34d399;
+            /* Green for confirm */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 100;
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(52, 211, 153, 0.14);
+        }
+
+        /* Floating AI button */
+        /* Floating AI button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 50px;
+            height: 52px;
+            background: linear-gradient(90deg, #fcd34d, #d4af37);
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.08);
+            border: none;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            z-index: 40;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14), 0 6px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--lux-gold);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loader-dot:nth-child(1) {
+            animation-delay: -.32s;
+        }
+
+        .loader-dot:nth-child(2) {
+            animation-delay: -.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Leave Requests</h1>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 1rem 1.25rem;">
+            <div>
+                <p class="subtitle-text">Manage and track your leave requests with ease.</p>
+            </div>
+            <button class="add-entity-btn" id="openAdd">Apply Leave</button>
+        </div>
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="search-wrap">
+                    <input id="searchInput" class="search-input" type="text" placeholder="Search requests" />
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+                    </svg>
+                </div>
+                <div class="filter-pill-wrap">
+                    <button class="filter-pill" id="filterStatusBtn">Status <svg xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg></button>
+                    <div class="status-dropdown" id="statusDropdown">
+                        <button data-status-filter="All">All</button>
+                        <button data-status-filter="Pending">Pending</button>
+                        <button data-status-filter="Approved">Approved</button>
+                        <button data-status-filter="Rejected">Rejected</button>
+                    </div>
+                </div>
+                <button class="filter-pill" id="exportBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                        <path
+                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                    </svg>
+                    Export
+                </button>
+            </div>
+            <div class="table-top-btn-boxes">
+                <button class="btn-tble1" id="btnAddInline" title="Add">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"
+                        fill="currentColor">
+                        <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
+                    </svg>
+                </button>
+                <button class="btn-tble1" id="btnSwap" title="Toggle Compact Rows">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"
+                        fill="currentColor">
+                        <path d="M3 7h13v2H3V7zm5 4h13v2H8v-2zM3 15h13v2H3v-2z" />
+                    </svg>
+                </button>
+            </div>
+            <table id="leaveTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Leave Type</th>
+                        <th>Applied On</th>
+                        <th>No. of Days</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="leaveBody"></tbody>
+            </table>
+        </div>
+       <button class="fab" id="openAiModal">
+            <svg class="svg-inline--fa fa-robot fa-w-20" aria-hidden="true" data-prefix="fas" data-icon="robot" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg=""><path fill="currentColor" d="M0 256v128c0 17.7 14.3 32 32 32h32V224H32c-17.7 0-32 14.3-32 32zM464 96H352V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H176c-44.2 0-80 35.8-80 80v272c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V176c0-44.2-35.8-80-80-80zM256 416h-64v-32h64v32zm-32-120c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm128 120h-64v-32h64v32zm96 0h-64v-32h64v32zm-32-120c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm192-72h-32v192h32c17.7 0 32-14.3 32-32V256c0-17.7-14.3-32-32-32z"></path></svg>
+        </button>
+        <div id="viewModal" class="modal hidden">
+            <div class="modal-content view-card">
+                <button class="close-btn" data-close>&times;</button>
+                <div class="vc-header">
+                    <h2 class="vc-name">Leave Details</h2>
+                    <div class="vc-badges">
+                        <span id="vmStatusBadge" class="badge">Status</span>
+                    </div>
+                </div>
+                <div class="vc-grid">
+                    <div class="vc-item">
+                        <p class="label">Leave Type</p>
+                        <p class="value" id="vmLeaveType">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">Applied On</p>
+                        <p class="value" id="vmAppliedOn">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">No. of Days</p>
+                        <p class="value" id="vmNoOfDays">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">Start Date</p>
+                        <p class="value" id="vmStartDate">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">End Date</p>
+                        <p class="value" id="vmEndDate">—</p>
+                    </div>
+                    <div class="vc-item" style="grid-column: 1 / -1;">
+                        <p class="label">Reason</p>
+                        <p class="value" id="vmReason">—</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-dark" data-close>Close</button>
+                </div>
+            </div>
+        </div>
+        <div id="applyLeaveModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="acmTitle">
+            <div class="modal-content" role="document" aria-describedby="acmDesc">
+                <button class="close-btn" data-close aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="rgba(0,0,0,0.85)" stroke-width="1.6"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+                <div class="acm-title">
+                    <div>
+                        <h2 id="acmTitle">Apply for Leave</h2>
+                        <p class="lead" id="acmDesc"
+                            style="margin:6px 0 18px 0; color:var(--lux-muted); font-size:13px;">
+                            Fill the details to submit your leave request.</p>
+                    </div>
+                </div>
+                <form id="applyLeaveForm">
+                    <div class="add-form-grid">
+                        <div>
+                            <label for="leaveType">Leave Type</label>
+                            <select id="leaveType" name="leaveType" class="select" required>
+                                <option value="" disabled selected>Select...</option>
+                                <option value="Sick Leave">Sick Leave</option>
+                                <option value="Vacation Leave">Vacation Leave</option>
+                                <option value="Personal Leave">Personal Leave</option>
+                                <option value="Maternity Leave">Maternity Leave</option>
+                                <option value="Paternity Leave">Paternity Leave</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="numberOfDays">Number of Days</label>
+                            <input type="number" id="numberOfDays" name="numberOfDays" class="input" min="1" required />
+                        </div>
+                        <div class="full">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" class="input" required />
+                        </div>
+                        <div class="full">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate" name="endDate" class="input" required />
+                        </div>
+                        <div class="full">
+                            <label for="reason">Reason</label>
+                            <textarea id="reason" name="reason" class="textarea" required></textarea>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn-cancel" data-close>Cancel</button>
+                        <button type="submit" class="btn-save">Apply Leave</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="aiLeaveModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiModalTitle">
+            <div class="modal-content">
+                <button class="close-btn" data-close aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="rgba(0,0,0,0.85)" stroke-width="1.6"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+                <div class="modal-header">
+                    <div>
+                        <h2 id="aiModalTitle">AI Leave Assistant</h2>
+                        <p>Generate a leave request using AI.</p>
+                    </div>
+                </div>
+                <div class="ai-modal-grid">
+                    <div class="input-box">
+                        <div class="input-wrap">
+                            <textarea id="aiInput" placeholder="Describe your leave request..."></textarea>
+                            <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="2" width="6" height="11" rx="3"></rect>
+                                <path d="M5 10v3a7 7 0 0 0 14 0v-3"></path>
+                                <path d="M12 19v3"></path>
+                            </svg>
+                        </div>
+                        <div class="generate-btn-wrap">
+                            <button class="generate-btn" id="aiGenerateBtn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8z" />
+                                    <path d="M12 6.5l4 4-1.5 1.5L12 9.5V17h-2V9.5l-2.5 2.5L6 10.5z" />
+                                </svg>
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+                    <div class="output-box" id="aiOutputBox">
+                        <svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2A10 10 0 1022 12 10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-15a.75.75 0 00-.75.75v.5a.75.75 0 001.5 0v-.5A.75.75 0 0012 5zm0 14a.75.75 0 00.75-.75v-.5a.75.75 0 00-1.5 0v.5a.75.75 0 00.75.75zm3.626-11.455a.75.75 0 00-.895-.231l-.22.091a.75.75 0 00.232.894l.22-.091a.75.75 0 00-.231-.894zM8.374 8.545a.75.75 0 00-.232.894l.22.091a.75.75 0 00-.232.894l-.22-.09a.75.75 0 00.895.231l.22-.091a.75.75 0 00-.232-.894l-.22.091a.75.75 0 00.231-.894zM12 16a4 4 0 004-4H8a4 4 0 004 4z" />
+                        </svg>
+                        <p>No draft generated yet.</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-clear" id="aiClearBtn">Clear</button>
+                    <button class="btn-confirm" id="aiConfirmBtn">Confirm & Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveBody = document.getElementById("leaveBody");
+        const addLeaveBtn = document.getElementById("openAdd");
+        const applyLeaveModal = document.getElementById("applyLeaveModal");
+        const applyLeaveForm = document.getElementById("applyLeaveForm");
+        const viewModal = document.getElementById("viewModal");
+        const openAiModal = document.getElementById("openAiModal");
+        const aiLeaveModal = document.getElementById("aiLeaveModal");
+        const aiInput = document.getElementById("aiInput");
+        const aiGenerateBtn = document.getElementById("aiGenerateBtn");
+        const aiOutputBox = document.getElementById("aiOutputBox");
+        const aiClearBtn = document.getElementById("aiClearBtn");
+        const aiConfirmBtn = document.getElementById("aiConfirmBtn");
+        const searchInput = document.getElementById("searchInput");
+        const filterStatusBtn = document.getElementById("filterStatusBtn");
+        const statusDropdown = document.getElementById("statusDropdown");
+        const allCloseBtns = document.querySelectorAll("[data-close]");
+        const tableTopBtnBoxes = document.querySelector(".table-top-btn-boxes");
+        const table = document.getElementById("leaveTable");
+        const btnAddInline = document.getElementById("btnAddInline");
+        const btnSwap = document.getElementById("btnSwap");
+
+        let selectedRows = new Set();
+        let currentFilter = "All";
+        let isCompact = false;
+        let originalTableHTML = "";
+
+        let leaveRequests = [{
+            id: 1,
+            leaveType: "Sick Leave",
+            appliedOn: "2024-07-28",
+            startDate: "2024-08-01",
+            endDate: "2024-08-03",
+            reason: "Feeling unwell.",
+            status: "Pending",
+            days: 3,
+        }, {
+            id: 2,
+            leaveType: "Vacation Leave",
+            appliedOn: "2024-07-20",
+            startDate: "2024-09-01",
+            endDate: "2024-09-14",
+            reason: "Trip to the mountains.",
+            status: "Approved",
+            days: 14,
+        }, {
+            id: 3,
+            leaveType: "Personal Leave",
+            appliedOn: "2024-07-15",
+            startDate: "2024-08-20",
+            endDate: "2024-08-20",
+            reason: "Family emergency.",
+            status: "Rejected",
+            days: 1,
+        }, {
+            id: 4,
+            leaveType: "Sick Leave",
+            appliedOn: "2024-07-10",
+            startDate: "2024-07-15",
+            endDate: "2024-07-17",
+            reason: "Severe cold and fever.",
+            status: "Approved",
+            days: 3,
+        }, {
+            id: 5,
+            leaveType: "Vacation Leave",
+            appliedOn: "2024-06-01",
+            startDate: "2024-07-01",
+            endDate: "2024-07-05",
+            reason: "Short getaway.",
+            status: "Approved",
+            days: 5,
+        }, {
+            id: 6,
+            leaveType: "Personal Leave",
+            appliedOn: "2024-05-18",
+            startDate: "2024-06-10",
+            endDate: "2024-06-11",
+            reason: "Attending a wedding.",
+            status: "Pending",
+            days: 2,
+        }, {
+            id: 7,
+            leaveType: "Maternity Leave",
+            appliedOn: "2024-04-01",
+            startDate: "2024-05-01",
+            endDate: "2024-07-30",
+            reason: "Expecting a baby.",
+            status: "Approved",
+            days: 91,
+        }, {
+            id: 8,
+            leaveType: "Paternity Leave",
+            appliedOn: "2024-03-10",
+            startDate: "2024-04-10",
+            endDate: "2024-04-12",
+            reason: "Newborn child.",
+            status: "Approved",
+            days: 3,
+        }, {
+            id: 9,
+            leaveType: "Vacation Leave",
+            appliedOn: "2024-02-05",
+            startDate: "2024-03-01",
+            endDate: "2024-03-08",
+            reason: "Annual vacation.",
+            status: "Approved",
+            days: 8,
+        }, {
+            id: 10,
+            leaveType: "Sick Leave",
+            appliedOn: "2024-01-20",
+            startDate: "2024-01-21",
+            endDate: "2024-01-21",
+            reason: "Fever.",
+            status: "Rejected",
+            days: 1,
+        },];
+
+        // Utility function to format dates
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            });
+        }
+
+        // Function to render table rows
+        function renderTable(data) {
+            leaveBody.innerHTML = "";
+            const frag = document.createDocumentFragment();
+
+            data.forEach((request) => {
+                const tr = document.createElement("tr");
+                tr.dataset.id = request.id;
+                tr.setAttribute("aria-selected", "false");
+
+                if (selectedRows.has(request.id)) {
+                    tr.classList.add("selected");
+                    tr.setAttribute("aria-selected", "true");
+                }
+
+                tr.innerHTML = `
+            <td class="checkbox-cell"><input type="checkbox" ${selectedRows.has(request.id) ? "checked" : ""
+                    }></td>
+            <td>${request.leaveType}</td>
+            <td>${formatDate(request.appliedOn)}</td>
+            <td>${request.days}</td>
+            <td>${formatDate(request.startDate)}</td>
+            <td>${formatDate(request.endDate)}</td>
+            <td><span class="pill ${request.status.toLowerCase()}">${request.status
+                    }</span></td>
+            <td><button class="view-btn" data-id="${request.id}">View</button></td>
+        `;
+                frag.appendChild(tr);
+            });
+
+            leaveBody.appendChild(frag);
+        }
+
+        // Handle checkbox change
+        leaveBody.addEventListener("change", function (e) {
+            if (e.target.type === "checkbox") {
+                const row = e.target.closest("tr");
+                const id = parseInt(row.dataset.id, 10);
+                if (e.target.checked) {
+                    selectedRows.add(id);
+                    row.classList.add("selected");
+                    row.setAttribute("aria-selected", "true");
+                } else {
+                    selectedRows.delete(id);
+                    row.classList.remove("selected");
+                    row.setAttribute("aria-selected", "false");
+                }
+                updateTableButtonsVisibility();
+            }
+        });
+
+        // Toggle table top buttons based on selection
+        function updateTableButtonsVisibility() {
+            if (selectedRows.size > 0) {
+                tableTopBtnBoxes.style.display = "flex";
+            } else {
+                tableTopBtnBoxes.style.display = "none";
+            }
+        }
+
+        // Handle view button click
+        leaveBody.addEventListener("click", function (e) {
+            if (e.target.classList.contains("view-btn")) {
+                const id = parseInt(e.target.dataset.id, 10);
+                const request = leaveRequests.find((r) => r.id === id);
+                if (request) {
+                    document.getElementById("vmLeaveType").textContent = request.leaveType;
+                    document.getElementById("vmAppliedOn").textContent = formatDate(
+                        request.appliedOn
+                    );
+                    document.getElementById("vmNoOfDays").textContent = request.days;
+                    document.getElementById("vmStartDate").textContent = formatDate(
+                        request.startDate
+                    );
+                    document.getElementById("vmEndDate").textContent = formatDate(
+                        request.endDate
+                    );
+                    document.getElementById("vmReason").textContent = request.reason;
+                    const statusBadge = document.getElementById("vmStatusBadge");
+                    statusBadge.textContent = request.status;
+                    statusBadge.className = `badge ${request.status.toLowerCase()}`;
+                    viewModal.classList.remove("hidden");
+                }
+            }
+        });
+
+        // Open/Close Modals
+        addLeaveBtn.addEventListener("click", () => {
+            applyLeaveModal.classList.remove("hidden");
+        });
+
+        openAiModal.addEventListener("click", () => {
+            aiLeaveModal.classList.remove("hidden");
+        });
+
+        allCloseBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                btn.closest(".modal").classList.add("hidden");
+            });
+        });
+
+        // Close modal when clicking outside
+        [applyLeaveModal, viewModal, aiLeaveModal].forEach((modal) => {
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) {
+                    modal.classList.add("hidden");
+                }
+            });
+        });
+
+        // Add new leave request
+        applyLeaveForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const newRequest = {
+                id: leaveRequests.length > 0 ?
+                    Math.max(...leaveRequests.map((r) => r.id)) + 1 :
+                    1,
+                leaveType: document.getElementById("leaveType").value,
+                appliedOn: new Date().toISOString().slice(0, 10),
+                startDate: document.getElementById("startDate").value,
+                endDate: document.getElementById("endDate").value,
+                reason: document.getElementById("reason").value,
+                status: "Pending",
+                days: ((new Date(document.getElementById("endDate").value) - new Date(document.getElementById("startDate").value)) / (1000 * 60 * 60 * 24)) + 1,
+            };
+            leaveRequests.push(newRequest);
+            renderTable(leaveRequests);
+            applyLeaveModal.classList.add("hidden");
+            applyLeaveForm.reset();
+        });
+
+        // AI Leave Assistant Functionality (simulated)
+
+        aiGenerateBtn.addEventListener("click", async () => {
+            const input = aiInput.value.trim();
+            if (!input) {
+                aiOutputBox.innerHTML =
+                    `<svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2A10 10 0 1022 12 10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-15a.75.75 0 00-.75.75v.5a.75.75 0 001.5 0v-.5A.75.75 0 0012 5zm0 14a.75.75 0 00.75-.75v-.5a.75.75 0 00-1.5 0v.5a.75.75 0 00.75.75zm3.626-11.455a.75.75 0 00-.895-.231l-.22.091a.75.75 0 00.232.894l.22-.091a.75.75 0 00-.231-.894zM8.374 8.545a.75.75 0 00-.232.894l.22.091a.75.75 0 00-.232.894l-.22-.09a.75.75 0 00.895.231l.22-.091a.75.75 0 00-.232-.894l-.22.091a.75.75 0 00.231-.894zM12 16a4 4 0 004-4H8a4 4 0 004 4z" />
+                    </svg>
+                    <p>Please provide a description to generate a draft.</p>`;
+                return;
+            }
+
+            aiOutputBox.innerHTML = `
+                <div class="loader-dots">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("https://binghatti-test-2.vercel.app/chatbot", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        queryText: "Who are you?"
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+
+                const data = await response.json();
+
+                aiOutputBox.innerHTML = `<pre>${data.answer}</pre>`;
+            } catch (error) {
+                console.error("Error calling AI chatbot API:", error);
+                aiOutputBox.innerHTML =
+                    `<p style='text-align:center; color: #b91c1c;'>Error: Could not retrieve a response from the AI assistant.</p>`;
+            }
+        });
+
+        aiClearBtn.addEventListener("click", () => {
+            aiInput.value = "";
+            aiOutputBox.innerHTML =
+                `<svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2A10 10 0 1022 12 10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-15a.75.75 0 00-.75.75v.5a.75.75 0 001.5 0v-.5A.75.75 0 0012 5zm0 14a.75.75 0 00.75-.75v-.5a.75.75 0 00-1.5 0v.5a.75.75 0 00.75.75zm3.626-11.455a.75.75 0 00-.895-.231l-.22.091a.75.75 0 00.232.894l.22-.091a.75.75 0 00-.231-.894zM8.374 8.545a.75.75 0 00-.232.894l.22.091a.75.75 0 00-.232.894l-.22-.09a.75.75 0 00.895.231l.22-.091a.75.75 0 00-.232-.894l-.22.091a.75.75 0 00.231-.894zM12 16a4 4 0 004-4H8a4 4 0 004 4z" />
+                </svg>
+                <p>No draft generated yet.</p>`;
+        });
+
+        aiConfirmBtn.addEventListener("click", () => {
+            aiLeaveModal.classList.add("hidden");
+        });
+
+        // Search functionality
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = leaveRequests.filter((request) => {
+                const matchesSearch =
+                    Object.values(request).some((value) =>
+                        String(value).toLowerCase().includes(searchTerm)
+                    ) || formatDate(request.appliedOn).toLowerCase().includes(searchTerm) || formatDate(request.startDate).toLowerCase().includes(searchTerm) || formatDate(request.endDate).toLowerCase().includes(searchTerm);
+                const matchesFilter =
+                    currentFilter === "All" || request.status === currentFilter;
+                return matchesSearch && matchesFilter;
+            });
+            renderTable(filteredData);
+        }
+        searchInput.addEventListener("input", filterTable);
+
+        // Status filter dropdown
+        filterStatusBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            statusDropdown.classList.toggle("active");
+        });
+        statusDropdown.addEventListener("click", (e) => {
+            if (e.target.tagName === "BUTTON") {
+                currentFilter = e.target.dataset.statusFilter;
+                filterTable();
+                statusDropdown.classList.remove("active");
+            }
+        });
+        document.addEventListener("click", () => {
+            statusDropdown.classList.remove("active");
+        });
+
+        // Inline Add & Compact view buttons
+        btnAddInline.addEventListener("click", () => {
+            alert("Inline add functionality would be here.");
+        });
+
+        btnSwap.addEventListener("click", () => {
+            isCompact = !isCompact;
+            table.classList.toggle("compact");
+            btnSwap.classList.toggle("is-active");
+            if (isCompact) {
+                alert("Toggled to compact view.");
+            } else {
+                alert("Toggled to default view.");
+            }
+        });
+
+        renderTable(leaveRequests);
+        updateTableButtonsVisibility();
+    });
+</script>
+
+</html>

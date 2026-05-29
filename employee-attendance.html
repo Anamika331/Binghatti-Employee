@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Attendance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="style.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-grad-a: #e9e9ee;
+      --selected: #fde68a;
+      --bg-grad-b: #fff6cf;
+      --ink: #1f2937;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --chip-green-bg: #ecfdf5;
+      --chip-green-fg: #047857;
+      --chip-gray-bg: #f3f4f6;
+      --chip-gray-fg: #6b7280;
+      --chip-gold-bg: #fef9c3;
+      --chip-gold-fg: #a16207;
+      --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --radius-xl: 1.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif !important;
+    }
+
+    body {
+      font-family: "Lexend", sans-serif;
+      margin: 0;
+      background: linear-gradient(90deg,
+          var(--bg-grad-a) 0%,
+          var(--bg-grad-b) 100%);
+      min-height: 100vh;
+    }
+
+    .dashboard-container {
+      width: 100%;
+      padding: 1rem 2rem;
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* Clock-in Action Bar */
+    .actions-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-2);
+      margin-bottom: 1.5rem;
+    }
+
+    .welcome-message {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--ink-2);
+    }
+
+    .clock-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .clock-actions .status-display {
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    #currentTime {
+      margin-right: 10px;
+      font-weight: 500;
+      color: var(--ink);
+      font-family: monospace;
+      font-size: 1.1rem;
+      background-color: #f3f4f6;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .clock-btn {
+      font-family: "Lexend";
+      background: #fcd34d;
+      color: var(--ink);
+      font-weight: 500;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: var(--shadow-2);
+      transition: background 0.2s ease, transform 0.2s ease,
+        box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .clock-btn:hover:not(:disabled) {
+      background: #facc15;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .clock-btn:disabled {
+      background-color: #e5e7eb;
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: var(--shadow-2);
+    }
+
+    /* Content Grid Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Table / Chart Card Styling */
+    .card-container {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .card-header h2 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-input {
+      padding: 0.6rem 1rem 0.6rem 2.2rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      background: #fff;
+      font-size: 0.9rem;
+      color: black;
+      font-weight: 100;
+      font-family: "Lexend", sans-serif;
+      width: min(280px, 40vw);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f9fafb;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 1rem 0.75rem;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:last-child {
+      border-bottom: none;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .profile img {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      object-fit: cover;
+    }
+
+    .pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .pill.green {
+      background: var(--chip-green-bg);
+      color: var(--chip-green-fg);
+    }
+
+    .pill.gray {
+      background: var(--chip-gray-bg);
+      color: var(--chip-gray-fg);
+    }
+
+    .pill.gold {
+      background: var(--chip-gold-bg);
+      color: var(--chip-gold-fg);
+    }
+
+    /* Chart-specific styles */
+    .filter-pills {
+      display: flex;
+      gap: 0.5rem;
+      background-color: #f3f4f6;
+      padding: 0.25rem;
+      border-radius: 9999px;
+    }
+
+    .filter-pills button {
+      font-family: "Lexend", sans-serif;
+      border: none;
+      background-color: transparent;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: #4b5563;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .filter-pills button.active {
+      background-color: #fff;
+      color: var(--ink);
+      box-shadow: var(--shadow-2);
+    }
+
+    .chart-wrapper {
+      flex-grow: 1;
+      position: relative;
+    }
+
+    #employeeHoursChart {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+
+
+
+    .wrapper {}
+
+
+
+    .wrapper .tabs {
+      display: grid;
+      padding-left: 20px;
+    }
+
+    .wrapper [role="tablist"] {
+      display: flex;
+      gap: 10px;
+    }
+
+    .wrapper [role="tabpanel"] {
+
+      padding: 0rem 0rem 2rem;
+    }
+
+
+    .wrapper button[aria-selected=true] {
+      background: #fcd34d;
+      box-shadow: none;
+      color: rgba(0, 0, 0, 0.7);
+    }
+
+    .wrapper button {
+      background: #fff;
+      border: 0;
+      color: black;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 15px;
+      padding: 10px 40px;
+      border: none;
+      border-radius: 50px;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .wrapper button[aria-selected="true"] {
+      background: #fcd34d;
+      box-shadow: none;
+      color: rgba(0, 0, 0, 0.7);
+    }
+
+    button:focus {
+      outline: 0;
+      --bs-color: rgba(0, 0, 0, 0.6);
+    }
+
+    #companiesTable iframe::-webkit-scrollbar {
+      display: none;
+    }
+
+    #companiesTable iframe html::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+
+    <header class="header">
+      <div class="logo-container">
+        <img src="pixellent.png" class="logo-image">
+        <div class="logo-text"></div>
+      </div>
+
+
+
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="employee-attendance.html" class="active">Attendance</a>
+        <a href="salary_employee.html">Salary</a>
+        <a href="parking.html">Parking</a>
+        <a href="delivery_Employee.html">Delivery</a>
+        <a href="pantry.html">Pantry</a>
+        <a href="employee_appointments.html">Appointments</a>
+        <a href="meeting-room.html">Facilities</a>
+        <a href="visitior-list.html">Visitor</a>
+        <a href="anoucement.html">Insights</a>
+        <a href="employee-chat.html">Chats</a>
+        <a href="maintenance.html">Maintenance</a>
+
+      </nav>
+
+      <div class="header-actions">
+        <a href="AI-assistant.html" class="setting-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+          </svg>
+          <span>AI</span>
+        </a>
+        <button class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+            </path>
+          </svg>
+        </button>
+        <div class="user-profile-btn"></div>
+      </div>
+    </header>
+
+    <div class="wrapper">
+      <div class="tabs">
+        <div role="tablist" aria-label="Programming Languages">
+          <button role="tab" aria-selected="true" id="js">
+            Attendance
+
+          </button>
+
+          <button role="tab" aria-selected="false" id="php">
+            Leaves
+          </button>
+        </div>
+        <div role="tabpanel" aria-labelledby="js">
+          <div class="dashboard-header">
+            <h1>My Attendance</h1>
+          </div>
+
+          <div class="actions-container">
+            <div id="welcomeMessage" class="welcome-message"></div>
+            <div class="clock-actions">
+              <span id="currentTime">0:00:00</span>
+              <span id="statusDisplay" class="status-display"></span>
+              <button id="clockInBtn" class="clock-btn">Clock In</button>
+              <button id="clockOutBtn" class="clock-btn">Clock Out</button>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="card-container" id="table-card">
+              <div class="card-header">
+                <h2>Attendance History</h2>
+                <div class="search-wrap">
+                  <input id="searchInput" class="search-input" type="text" placeholder="Search history..." />
+                  <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table id="attendanceTable">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Date</th>
+                      <th>Clock In</th>
+                      <th>Clock Out</th>
+                      <th>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attendanceBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card-container" id="chart-card">
+              <div class="card-header">
+                <h2>My Hours</h2>
+                <div class="filter-pills">
+                  <button id="dailyBtn">Daily</button>
+                  <button id="weeklyBtn">Weekly</button>
+                  <button id="monthlyBtn">Monthly</button>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="employeeHoursChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div role="tabpanel" aria-labelledby="php" hidden>
+          <iframe src="employeeLeave.html" width="100%" height="600" style="border: none;"></iframe>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // ---- Data Setup --------------------------------------------------------
+      const loggedInEmployeeId = 2; // Assuming Sara Khan is logged in
+      const employees = [
+        {
+          id: 1,
+          name: "Omar Al-Mansouri",
+          email: "omar.mansouri@example.com",
+          image: "https://randomuser.me/api/portraits/men/32.jpg",
+        },
+        {
+          id: 2,
+          name: "Sara Khan",
+          email: "sara.khan@example.com",
+          image: "https://randomuser.me/api/portraits/women/44.jpg",
+        },
+        {
+          id: 3,
+          name: "James Parker",
+          email: "j.parker@example.com",
+          image: "https://randomuser.me/api/portraits/men/12.jpg",
+        },
+      ];
+
+      let attendanceRecords = JSON.parse(
+        localStorage.getItem("attendanceRecords_lexend_v3")
+      ) || [
+          {
+            id: 101,
+            employeeId: 1,
+            clockInTime: "2025-08-11T09:01:00",
+            clockOutTime: "2025-08-11T17:05:00",
+          },
+          {
+            id: 102,
+            employeeId: 2,
+            clockInTime: "2025-08-11T08:55:00",
+            clockOutTime: "2025-08-11T17:15:00",
+          },
+          {
+            id: 103,
+            employeeId: 2,
+            clockInTime: "2025-08-12T09:10:00",
+            clockOutTime: null,
+          },
+        ];
+
+      const parseRecords = (records) =>
+        records.map((rec) => ({
+          ...rec,
+          clockInTime: rec.clockInTime ? new Date(rec.clockInTime) : null,
+          clockOutTime: rec.clockOutTime ? new Date(rec.clockOutTime) : null,
+        }));
+
+      attendanceRecords = parseRecords(attendanceRecords);
+      let clockIntervalId = null;
+
+      // ---- DOM Elements -----------------------------------------------------
+      const $ = (sel) => document.querySelector(sel);
+      const attendanceBody = $("#attendanceBody");
+      const welcomeMessage = $("#welcomeMessage");
+      const statusDisplay = $("#statusDisplay");
+      const clockInBtn = $("#clockInBtn");
+      const clockOutBtn = $("#clockOutBtn");
+      const currentTimeDisplay = $("#currentTime");
+
+      // ---- Core Functions ----------------------------------------------------
+      function saveData() {
+        localStorage.setItem(
+          "attendanceRecords_lexend_v3",
+          JSON.stringify(attendanceRecords)
+        );
+      }
+
+      // MODIFIED: This is now a stopwatch function
+      function updateClock() {
+        const lastRecord = attendanceRecords
+          .filter(
+            (r) => r.employeeId === loggedInEmployeeId && !r.clockOutTime
+          )
+          .sort((a, b) => b.clockInTime - a.clockInTime)[0];
+
+        if (!lastRecord) return; // Safeguard
+
+        const startTime = lastRecord.clockInTime;
+        const now = new Date();
+        const elapsedMs = now - startTime;
+
+        const totalSeconds = Math.floor(elapsedMs / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        currentTimeDisplay.textContent = [
+          String(hours).padStart(2, "0"),
+          String(minutes).padStart(2, "0"),
+          String(seconds).padStart(2, "0"),
+        ].join(":");
+      }
+
+      function updateEmployeeStatus() {
+        const currentUser = employees.find(
+          (e) => e.id === loggedInEmployeeId
+        );
+        welcomeMessage.innerHTML = `Welcome, <strong style="font-weight: 600;">${currentUser.name}</strong>`;
+
+        const lastRecord = attendanceRecords
+          .filter((r) => r.employeeId === loggedInEmployeeId)
+          .sort((a, b) => b.clockInTime - a.clockInTime)[0];
+
+        if (lastRecord && !lastRecord.clockOutTime) {
+          statusDisplay.innerHTML =
+            '<span class="pill green">Clocked In</span>';
+          clockInBtn.disabled = true;
+          clockOutBtn.disabled = false;
+          if (!clockIntervalId) {
+            updateClock();
+            clockIntervalId = setInterval(updateClock, 1000);
+          }
+        } else {
+          statusDisplay.innerHTML =
+            '<span class="pill gray">Clocked Out</span>';
+          clockInBtn.disabled = false;
+          clockOutBtn.disabled = true;
+          if (clockIntervalId) {
+            clearInterval(clockIntervalId);
+            clockIntervalId = null;
+          }
+          currentTimeDisplay.textContent = "0:00:00";
+        }
+      }
+
+      function renderTable(recordsToRender = attendanceRecords) {
+        const myRecords = recordsToRender
+          .filter((r) => r.employeeId === loggedInEmployeeId)
+          .sort((a, b) => b.clockInTime - a.clockInTime);
+
+        if (myRecords.length === 0) {
+          attendanceBody.innerHTML =
+            '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--muted);">No attendance records found.</td></tr>';
+        } else {
+          attendanceBody.innerHTML = myRecords
+            .map((rec) => {
+              const emp = employees.find((e) => e.id === rec.employeeId);
+              const duration = rec.clockOutTime
+                ? calculateDuration(rec.clockInTime, rec.clockOutTime)
+                : "—";
+              return `
+                            <tr>
+                                <td class="profile"><img src="${emp.image
+                }" alt="${emp.name}"/> ${emp.name}</td>
+                                <td>${rec.clockInTime.toLocaleDateString()}</td>
+                                <td>${rec.clockInTime.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}</td>
+                                <td>${rec.clockOutTime
+                  ? rec.clockOutTime.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                  : "—"
+                }</td>
+                                <td><span class="pill gold">${duration}</span></td>
+                            </tr>
+                        `;
+            })
+            .join("");
+        }
+        setTimeout(syncCardHeights, 0);
+      }
+
+      function calculateDuration(start, end) {
+        const diffMs = end - start;
+        const diffHrs = Math.floor(diffMs / 3600000);
+        const diffMins = Math.round((diffMs % 3600000) / 60000);
+        return `${diffHrs}h ${diffMins}m`;
+      }
+
+      // ---- Event Handlers ----------------------------------------------------
+      clockInBtn.addEventListener("click", () => {
+        attendanceRecords.push({
+          id: Date.now(),
+          employeeId: loggedInEmployeeId,
+          clockInTime: new Date(),
+          clockOutTime: null,
+        });
+        saveData();
+        initializeApp();
+      });
+
+      clockOutBtn.addEventListener("click", () => {
+        const lastRecord = attendanceRecords
+          .filter(
+            (r) => r.employeeId === loggedInEmployeeId && !r.clockOutTime
+          )
+          .sort((a, b) => b.clockInTime - a.clockInTime)[0];
+        if (lastRecord) {
+          lastRecord.clockOutTime = new Date();
+          saveData();
+          initializeApp();
+        }
+      });
+
+      $("#searchInput").addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const filtered = attendanceRecords.filter((rec) => {
+          const dateStr = rec.clockInTime.toLocaleDateString().toLowerCase();
+          return dateStr.includes(searchTerm);
+        });
+        renderTable(filtered);
+      });
+
+      // ---- Chart & Layout Logic -------------------------------------------------------
+      let employeeChartInstance = null;
+      let currentPeriod = "weekly";
+      const dailyBtn = $("#dailyBtn"),
+        weeklyBtn = $("#weeklyBtn"),
+        monthlyBtn = $("#monthlyBtn");
+
+      function syncCardHeights() {
+        const tableCard = $("#table-card");
+        const chartCard = $("#chart-card");
+
+        if (window.innerWidth > 1200) {
+          chartCard.style.height = `${tableCard.offsetHeight}px`;
+        } else {
+          chartCard.style.height = "auto";
+        }
+      }
+
+      function setPeriod(period) {
+        currentPeriod = period;
+        [dailyBtn, weeklyBtn, monthlyBtn].forEach((btn) =>
+          btn.classList.remove("active")
+        );
+        if (period === "daily") dailyBtn.classList.add("active");
+        if (period === "weekly") weeklyBtn.classList.add("active");
+        if (period === "monthly") monthlyBtn.classList.add("active");
+        renderEmployeeChart();
+      }
+
+      dailyBtn.addEventListener("click", () => setPeriod("daily"));
+      weeklyBtn.addEventListener("click", () => setPeriod("weekly"));
+      monthlyBtn.addEventListener("click", () => setPeriod("monthly"));
+
+      function renderEmployeeChart() {
+        if (employeeChartInstance) employeeChartInstance.destroy();
+
+        const myRecords = attendanceRecords.filter(
+          (r) => r.employeeId === loggedInEmployeeId && r.clockOutTime
+        );
+        let labels = [],
+          data = [];
+        const today = new Date();
+
+        if (currentPeriod === "daily") {
+          labels = ["Today"];
+          let totalMillis = myRecords
+            .filter(
+              (r) => r.clockInTime.toDateString() === today.toDateString()
+            )
+            .reduce((acc, r) => acc + (r.clockOutTime - r.clockInTime), 0);
+          data.push((totalMillis / 3600000).toFixed(2));
+        } else if (currentPeriod === "monthly") {
+          const daysInMonth = new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+          ).getDate();
+          for (let i = 1; i <= daysInMonth; i++) {
+            labels.push(i);
+            const day = new Date(today.getFullYear(), today.getMonth(), i);
+            let totalMillis = myRecords
+              .filter(
+                (r) => r.clockInTime.toDateString() === day.toDateString()
+              )
+              .reduce((acc, r) => acc + (r.clockOutTime - r.clockInTime), 0);
+            data.push((totalMillis / 3600000).toFixed(2));
+          }
+        } else {
+          // weekly
+          for (let i = 6; i >= 0; i--) {
+            const day = new Date();
+            day.setDate(today.getDate() - i);
+            labels.push(
+              day.toLocaleDateString("en-US", { weekday: "short" })
+            );
+            let totalMillis = myRecords
+              .filter(
+                (r) => r.clockInTime.toDateString() === day.toDateString()
+              )
+              .reduce((acc, r) => acc + (r.clockOutTime - r.clockInTime), 0);
+            data.push((totalMillis / 3600000).toFixed(2));
+          }
+        }
+
+        employeeChartInstance = new Chart($("#employeeHoursChart"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Hours Worked",
+                data: data,
+                backgroundColor: "rgba(252, 211, 77, 0.6)",
+                borderColor: "rgba(252, 211, 77, 1)",
+                borderWidth: 1.5,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { drawBorder: false },
+                ticks: { color: "var(--muted)", font: { family: "Lexend" } },
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: "var(--muted)", font: { family: "Lexend" } },
+              },
+            },
+          },
+        });
+      }
+
+      // ---- Initialization --------------------------------------------------
+      function initializeApp() {
+        updateEmployeeStatus();
+        renderTable();
+        setPeriod(currentPeriod);
+      }
+
+      window.addEventListener("resize", syncCardHeights);
+      initializeApp();
+    });
+  </script>
+  <script>
+    const tab = document.querySelector('.tabs');
+    const tabButtons = tab.querySelectorAll('[role="tab"]');
+    const tabPanels = Array.from(tab.querySelectorAll('[role="tabpanel"]'));
+
+    function tabClickHandler(e) {
+      //Hide All Tabpane
+      tabPanels.forEach(panel => {
+        panel.hidden = 'true';
+      });
+
+      //Deselect Tab Button
+      tabButtons.forEach(button => {
+        button.setAttribute('aria-selected', 'false');
+      });
+
+      //Mark New Tab
+      e.currentTarget.setAttribute('aria-selected', 'true');
+
+      //Show New Tab
+      const { id } = e.currentTarget;
+
+      const currentTab = tabPanels.find(
+        panel => panel.getAttribute('aria-labelledby') === id
+      );
+
+      currentTab.hidden = false;
+    }
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', tabClickHandler);
+    })
+  </script>
+</body>
+
+</html>

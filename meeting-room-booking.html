@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meeting Room Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #111827;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --bg: #f7f7fb;
+      --card: #ffffff;
+      --gold: #D4AF37;
+      --gold-2: #B78F2A;
+      --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: linear-gradient(90deg, #e9e9ee, #fff6cf);
+      color: var(--ink);
+    }
+
+    .container {
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 100;
+      letter-spacing: .2px;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--ink-2);
+      font-weight: 300;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    .chip {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: var(--shadow-2);
+      font-family: 'Poppins';
+      font-weight: 500;
+      color: var(--ink-2);
+    }
+
+    .btn.primary {
+      background: linear-gradient(90deg, var(--gold), var(--gold-2));
+      color: #fff;
+      box-shadow: 0 8px 26px rgba(212, 175, 55, .14);
+    }
+
+    .btn.icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    /* Room grid: fixed 2x2 on desktop */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .media {
+      position: relative;
+      height: 400px;
+      background: #ddd;
+      background-image: var(--room-photo);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, .0), rgba(0, 0, 0, .55));
+    }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, .92);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .content {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .amen {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .amen span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f7f7fb;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .meta {
+      color: var(--ink-2);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* Info strip */
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .info-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-2);
+      font-size: 13px;
+      color: var(--ink-2);
+    }
+
+    @media (max-width: 900px) {
+      .info-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .info-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, .45);
+      display: none;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+
+    .overlay.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    .sheet {
+      width: min(640px, 92vw);
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, .35);
+      transform: translateY(20px) scale(.98);
+      opacity: 0;
+      transition: all .2s ease;
+      pointer-events: auto;
+      overflow: hidden;
+    }
+
+    .overlay.show+.modal .sheet {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .sheet header {
+      padding: 18px 22px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-2));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sheet header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .sheet header .close {
+      background: rgba(255, 255, 255, .2);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .sheet .body {
+      padding: 18px 22px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    form .full {
+      grid-column: 1/-1;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      font-family: 'Poppins';
+      font-size: 14px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      border-top: 1px solid #f1f2f6;
+      background: #fafafa;
+    }
+
+    .footer .right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill {
+      background: #f3f4f6;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #374151;
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 18px;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-1);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all .25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Meeting Room Bookings</h1>
+        <p class="sub">Browse rooms and book in a few clicks.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" id="filterBtn">Vacant Only</button>
+        <button class="btn primary" id="openGeneric">Book a Room</button>
+      </div>
+    </header>
+
+    <!-- Quick info about the meeting rooms/policies -->
+    <section class="info-strip" aria-label="Info">
+      <div class="info-card">⏰ Hours: 8:00–20:00 (Mon–Fri)</div>
+      <div class="info-card">🔄 Changes & cancellations allowed up to 1 hour before start</div>
+      <div class="info-card">🛠 Amenities vary by room: TV/Projector, Whiteboard, AC, HDMI</div>
+      <div class="info-card">📍 Locations: 3rd–5th floors; access with employee badge</div>
+    </section>
+
+    <section class="grid" id="roomGrid" aria-label="Rooms">
+      <!-- Rooms will be injected via script for flexibility -->
+    </section>
+  </div>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay"></div>
+  <div class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <h2 id="modalTitle">Book <span id="roomNameLabel">a Room</span></h2>
+        <button class="close" id="closeModal" aria-label="Close">✕</button>
+      </header>
+      <div class="body">
+        <form id="bookingForm">
+          <input type="hidden" id="roomName" name="roomName" />
+          <div class="full">
+            <label for="guestName">Guest name</label>
+            <input id="guestName" name="guestName" type="text" placeholder="e.g., Alex Johnson" required />
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+          </div>
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="+1 555 123 4567" required />
+          </div>
+          <div>
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" required />
+          </div>
+          <div>
+            <label for="start">Start time</label>
+            <input id="start" name="start" type="time" required />
+          </div>
+          <div>
+            <label for="end">End time</label>
+            <input id="end" name="end" type="time" required />
+          </div>
+          <div class="full">
+            <label for="notes">Notes (optional)</label>
+            <input id="notes" name="notes" type="text" placeholder="Agenda or special requests" />
+          </div>
+        </form>
+      </div>
+      <div class="footer">
+        <span class="pill" id="roomSummary">No room selected</span>
+        <div class="right">
+          <button class="btn" id="cancelBtn">Cancel</button>
+          <button class="btn primary" id="submitBtn">Confirm Booking</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Booking confirmed!</div>
+
+  <script>
+    // ⚠️ Add your local images to ./images/ as shown below
+    // Supported example filenames (replace with your own):
+    //  - images/event-space.jpg
+    //  - images/sunroom.jpg
+    //  - images/loft.jpg
+    //  - images/lawns.jpg
+
+    // 2x2 grid — show exactly four rooms
+    const rooms = [
+      { name: "Event Space", cap: 12, floor: "5th Floor", size: "28 m²", amenities: ["Projector", "Whiteboard", "AC"], photo: "room-1.jpg" },
+      { name: "The Sunroom", cap: 8, floor: "3rd Floor", size: "20 m²", amenities: ["TV", "Conference Phone", "Coffee nearby"], photo: "room-2.jpg" },
+      { name: "The Loft", cap: 10, floor: "4th Floor", size: "24 m²", amenities: ["TV", "HDMI", "AC"], photo: "room-3.jpg" },
+      { name: "The Lawns", cap: 20, floor: "Ground", size: "Outdoor", amenities: ["Outdoor", "Shade", "Power"], photo: "room-4.jpg" }
+    ];
+
+    const grid = document.getElementById('roomGrid');
+    const toAmen = (a) => `<span>• ${a}</span>`;
+
+    function cardMeta(r) {
+      return `<div class="meta">${r.floor}<br>${r.size}</div>`;
+    }
+
+    function renderRooms(list) {
+      grid.innerHTML = list.map((r) => `
+        <article class="card">
+          <a href="meeting-room-details.html">
+          <div class="media" style="--room-photo: url('${r.photo}')">
+            <span class="badge">👤 ${r.cap} <span aria-hidden>•</span> 📍 ${r.floor}</span>
+            <div class="title"><span>${r.name}</span>
+              <button class="btn" style="display:none" data-book="${r.name}">Book</button>
+            </div>
+          </div>
+          <div class="content">
+            <div class="amen">${r.amenities.map(toAmen).join('')} </div>
+            ${cardMeta(r)}
+          </div>
+          </a>
+        </article>
+      `).join('');
+    }
+    renderRooms(rooms);
+
+    // Vacant only demo (toggles a simple filter effect)
+    const filterBtn = document.getElementById('filterBtn');
+    let showVacantOnly = false;
+    filterBtn.addEventListener('click', () => {
+      showVacantOnly = !showVacantOnly;
+      filterBtn.classList.toggle('primary', showVacantOnly);
+      filterBtn.textContent = showVacantOnly ? "Showing Vacant" : "Vacant Only";
+      // In a real app filter by availability; here we just dim alternate cards
+      grid.querySelectorAll('.card').forEach((c, i) => c.style.opacity = showVacantOnly && i % 2 ? .45 : 1);
+    });
+
+    // Booking modal logic
+    const overlay = document.getElementById('overlay');
+    const closeModal = document.getElementById('closeModal');
+    const openGeneric = document.getElementById('openGeneric');
+    const bookingForm = document.getElementById('bookingForm');
+    const roomNameInput = document.getElementById('roomName');
+    const roomNameLabel = document.getElementById('roomNameLabel');
+    const roomSummary = document.getElementById('roomSummary');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const toast = document.getElementById('toast');
+
+    function openModal(roomName = "Any Room") {
+      roomNameInput.value = roomName;
+      roomNameLabel.textContent = roomName;
+      roomSummary.textContent = `Room: ${roomName}`;
+      overlay.classList.add('show');
+      // sensible defaults: today + next hour
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      document.getElementById('date').value ||= `${yyyy}-${mm}-${dd}`;
+      const start = new Date(now.getTime() + 15 * 60000);
+      const end = new Date(start.getTime() + 60 * 60000);
+      document.getElementById('start').value ||= start.toTimeString().slice(0, 5);
+      document.getElementById('end').value ||= end.toTimeString().slice(0, 5);
+    }
+    function close() { overlay.classList.remove('show'); }
+
+    openGeneric.addEventListener('click', () => openModal("Any Room"));
+    closeModal.addEventListener('click', close);
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+    // Delegate book buttons
+    grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-book]');
+      if (!btn) return;
+      openModal(btn.getAttribute('data-book'));
+    });
+
+    // Simple validation + "submit"
+    submitBtn.addEventListener('click', () => {
+      if (!bookingForm.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(bookingForm).entries());
+      // Basic end-after-start validation
+      if (data.start && data.end && data.start >= data.end) {
+        alert("End time must be after start time.");
+        return;
+      }
+      close();
+      // Toast
+      toast.textContent = `Booked ${data.roomName} for ${data.guestName} on ${data.date} from ${data.start} to ${data.end}.`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+      // In a real app, send 'data' to your backend via fetch()
+      console.log("Booking payload:", data);
+      bookingForm.reset();
+    });
+  </script>
+</body>
+
+</html>

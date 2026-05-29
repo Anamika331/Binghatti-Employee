@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticketing System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="style.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-grad-a: #e9e9ee;
+            --selected: #fde68a;
+            --bg-grad-b: #fff6cf;
+            --ink: #1f2937;
+            --ink-2: #374151;
+            --muted: #6b7280;
+            --chip-green-bg: #ecfdf5;
+            --chip-green-fg: #047857;
+            --chip-red-bg: #fef2f2;
+            --chip-red-fg: #b91c1c;
+            --chip-blue-bg: #eff6ff;
+            --chip-blue-fg: #1d4ed8;
+            --chip-gray-bg: #f3f4f6;
+            --chip-gray-fg: #6b7280;
+            --chip-gold-bg: #fef9c3;
+            --chip-gold-fg: #a16207;
+            --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+            --pill-pad: .75rem 2rem;
+            --radius-xl: 1.5rem;
+
+            /* White/Gold modal theme */
+            --lux-bg: #ffffff;
+            --lux-panel: rgba(0, 0, 0, 0.03);
+            --lux-glass: rgba(0, 0, 0, 0.04);
+            --lux-gold: #D4AF37;
+            --lux-gold-2: #b78f2a;
+            --lux-black: #000000;
+            --lux-muted: rgba(0, 0, 0, 0.65);
+            --lux-radius: 14px;
+            --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+        }
+
+        .dashboard-container {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 0rem;
+            padding: 0 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        /* Top row actions  */
+        .progress-container {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 100%;
+            margin: 0 1rem 1.25rem;
+        }
+
+        .dflex-secend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .progress-item {
+            text-align: center;
+        }
+
+        .progress-item p {
+            font-size: .875rem;
+            color: var(--muted);
+            margin: .25rem 0;
+        }
+
+        .progress-bar {
+            font-weight: 500;
+            padding: var(--pill-pad);
+            border-radius: 9999px;
+            box-shadow: var(--shadow-2);
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        .progress-open {
+            background: #fcd34d;
+            color: var(--ink);
+        }
+
+        .progress-closed {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .progress-high-prio {
+            background: var(--chip-red-bg);
+            color: var(--chip-red-fg);
+            border: 1px solid var(--chip-red-fg);
+        }
+
+
+        .add-entity-btn {
+            font-family: 'Lexend';
+            background: #fcd34d;
+            color: var(--ink);
+            font-weight: 400;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow-2);
+            transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+            white-space: nowrap;
+        }
+
+        .add-entity-btn:hover {
+            background: #facc15;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
+        }
+
+        /* Table card */
+        .table-container {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            width: 98%;
+            margin: 20px auto 10px;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            padding: 2rem;
+            padding-top: 90px;
+        }
+
+        @media (max-width:720px) {
+            .table-scroll {
+                padding: 1rem;
+                padding-top: 90px;
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        thead {
+            background: #f9fafb;
+            position: sticky;
+            top: 0;
+            z-index: 0;
+        }
+
+        th {
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .75rem;
+        }
+
+        td {
+            padding: 1rem .75rem;
+            font-size: .9rem;
+            color: var(--ink-2);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            object-fit: cover;
+        }
+
+        .pill {
+            padding: .35rem .75rem;
+            border-radius: 9999px;
+            font-size: .75rem;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .pill.green {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+        }
+
+        .pill.gray {
+            background: var(--chip-gray-bg);
+            color: var(--chip-gray-fg);
+        }
+
+        .pill.gold {
+            background: var(--chip-gold-bg);
+            color: var(--chip-gold-fg);
+        }
+
+        .pill.red {
+            background: var(--chip-red-bg);
+            color: var(--chip-red-fg);
+        }
+
+        .pill.blue {
+            background: var(--chip-blue-bg);
+            color: var(--chip-blue-fg);
+        }
+
+
+        .view-btn {
+            background: var(--ink);
+            color: #fff;
+            padding: .4rem 1rem;
+            font-size: 12px;
+            font-weight: 100;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease;
+            box-shadow: var(--shadow-2);
+            position: relative;
+            font-family: 'Lexend';
+        }
+
+        .view-btn:hover {
+            background: #374151;
+            transform: translateY(-1px);
+        }
+
+        /* Base modal (used by View) */
+        .modal {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, .4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.hidden {
+            display: none !important;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: min(900px, 92vw);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+            position: relative;
+            animation: zoomBounce .4s ease;
+        }
+
+        @keyframes zoomBounce {
+            0% {
+                transform: scale(.8);
+                opacity: 0
+            }
+
+            60% {
+                transform: scale(1.05);
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            font-size: 1.6rem;
+            color: #6b7280;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #111827;
+        }
+
+        /* Search + Sort (table header controls) */
+        .table-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-input {
+            padding: .7rem 1rem .7rem 2.4rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: var(--shadow-2);
+            font-size: .9rem;
+            color: black;
+            font-weight: 100;
+            font-family: 'Lexend', sans-serif;
+            width: min(340px, 58vw);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .filter-pill {
+            background: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.7rem 1.4rem;
+            font-size: 0.9rem;
+            font-family: 'Lexend';
+            font-weight: 100;
+            color: var(--ink-2);
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .filter-pill:hover {
+            background: #f9fafb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+            transform: translateY(-1px);
+        }
+
+        .filter-pill svg {
+            width: 16px;
+            height: 16px;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        /* NEW: Add Ticket Modal (white/gold luxury style) */
+        #addTicketModal {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 28px;
+        }
+
+        #addTicketModal .modal-content {
+            width: 760px;
+            max-width: calc(100% - 48px);
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 22px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: var(--lux-shadow);
+            transform: translateY(12px);
+            animation: pop 260ms ease;
+            overflow: hidden;
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.995)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        #addTicketModal .atm-title {
+            margin: 4px 0 4px 0;
+        }
+
+        #addTicketModal .atm-title h2 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: .2px;
+            font-weight: 100;
+            color: var(--lux-black);
+        }
+
+        #addTicketModal .atm-title p {
+            margin: 6px 0 18px 0;
+            color: var(--lux-muted);
+            font-size: 13px;
+        }
+
+        #addTicketModal .close-btn {
+            all: unset;
+            position: absolute;
+            right: 22px;
+            top: 18px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+
+        #addTicketModal .close-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        #addTicketModal .add-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        #addTicketModal label {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: var(--lux-muted);
+            font-weight: 100;
+        }
+
+        #addTicketModal .input,
+        #addTicketModal .select,
+        #addTicketModal .textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--lux-black);
+            outline: none;
+            font-size: 18px;
+            font-weight: 100;
+            transition: box-shadow .12s ease, border-color .12s ease;
+            font-family: 'Lexend', sans-serif;
+        }
+
+        #addTicketModal .textarea {
+            min-height: 120px;
+            resize: vertical;
+            grid-column: 1 / -1;
+        }
+
+        #addTicketModal .input:focus,
+        #addTicketModal .select:focus,
+        #addTicketModal .textarea:focus {
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.08);
+            border-color: rgba(212, 175, 55, 0.32);
+        }
+
+        #addTicketModal .full {
+            grid-column: 1 / -1;
+        }
+
+        #addTicketModal .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        #addTicketModal .btn-cancel {
+            font-family: "Lexend";
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--lux-muted);
+            cursor: pointer;
+        }
+
+        #addTicketModal .btn-save {
+            font-family: "Lexend";
+            background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 100;
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+        }
+
+        @media (max-width: 900px) {
+            #addTicketModal .modal-content {
+                padding: 16px;
+            }
+
+            #addTicketModal .add-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .subtitle-text {
+            font-weight: 100;
+            font-size: .9rem;
+            color: black;
+            margin: .25rem 0 0;
+        }
+
+        /* View Ticket Modal */
+        .view-card {
+            width: min(720px, 92vw);
+            padding: 28px 24px 22px;
+            border-radius: 18px;
+            border: 1px solid rgba(0, 0, 0, .06);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, .12);
+        }
+
+        .vc-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .vc-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 9999px;
+            object-fit: cover;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .15);
+        }
+
+        .vc-name {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 100;
+            color: var(--ink);
+        }
+
+        .vc-email {
+            margin: 2px 0 0;
+            font-size: 1rem;
+            font-weight: 100;
+            color: var(--muted);
+        }
+
+        .vc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .75rem 1rem;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .vc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .vc-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: .8rem 1rem;
+            background: #fff;
+        }
+
+        .vc-item .label {
+            font-size: .75rem;
+            color: var(--muted);
+            font-weight: 100;
+            margin: 0 0 .2rem;
+        }
+
+        .vc-item .value {
+            font-size: .95rem;
+            color: var(--ink-2);
+            margin: 0;
+            font-weight: 100;
+        }
+
+        .vc-description {
+            grid-column: 1 / -1;
+        }
+
+        .vc-description .value {
+            white-space: pre-wrap;
+        }
+
+        .view-card .close-btn {
+            right: 14px;
+            top: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, .06);
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+            color: var(--ink-2);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: .6rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .btn-dark {
+            font-family: 'Lexend';
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: .55rem 1.2rem;
+            font-weight: 100;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            font-family: 'Lexend';
+            background: #fcd34d;
+            color: var(--ink);
+            border: none;
+            border-radius: 9999px;
+            padding: .55rem 1.2rem;
+            font-weight: 100;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="pixellent.png" class="logo-image">
+                <div class="logo-text"></div>
+            </div>
+
+
+            <nav class="main-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="employee-attendance.html">Attendance</a>
+                <a href="salary_employee.html">Salary</a>
+                <a href="parking.html">Parking</a>
+                <a href="delivery_Employee.html">Delivery</a>
+                <a href="pantry.html">Pantry</a>
+                <a href="employee_appointments.html">Appointments</a>
+                <a href="meeting-room.html">Facilities</a>
+                <a href="visitior-list.html">Visitor</a>
+                <a href="anoucement.html">Insights</a>
+                <a href="employee-chat.html">Chats</a>
+                <a href="maintenance.html" class="active">Maintenance</a>
+
+            </nav>
+
+            <div class="header-actions">
+                <a href="AI-assistant.html" class="setting-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
+                        height="20">
+                        <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+                    </svg>
+                    <span>AI</span>
+                </a>
+                <button class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+                        </path>
+                    </svg>
+                </button>
+                <div class="user-profile-btn"></div>
+            </div>
+        </header>
+        <div class="dashboard-header">
+            <h1>Maintenance Request And Feedback</h1>
+        </div>
+
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 1rem 1.25rem;">
+            <div>
+                <p class="subtitle-text">Manage all support tickets. Assign, track, and resolve issues efficiently.</p>
+            </div>
+            <!-- <button class="add-entity-btn" id="openAddTicket">Create Ticket</button> -->
+        </div>
+        <div class="progress-container">
+            <div class="dflex-secend">
+                <div class="progress-item">
+                    <p>Open Tickets</p>
+                    <div class="progress-bar progress-open" id="stat-open">—</div>
+                </div>
+                <div class="progress-item">
+                    <p>Closed Today</p>
+                    <div class="progress-bar progress-closed" id="stat-closed">—</div>
+                </div>
+                <div class="progress-item">
+                    <p>High Priority</p>
+                    <div class="progress-bar progress-high-prio" id="stat-high-prio">—</div>
+                </div>
+
+            </div>
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin: 0 1rem 1.25rem; float: right">
+                <button class="add-entity-btn" id="openAddTicket">Create Ticket</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="search-wrap">
+                    <input id="searchInput" class="search-input" type="text"
+                        placeholder="Search by subject or customer" />
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+                    </svg>
+                </div>
+                <button class="filter-pill" id="filterStatus">Status
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <button class="filter-pill" id="filterPriority">Priority
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+
+            <table id="ticketsTable">
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Employee</th>
+                        <th>Subject</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Date Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsBody"></tbody>
+            </table>
+        </div>
+
+        <!-- View Ticket Modal -->
+        <div id="viewModal" class="modal hidden">
+            <div class="modal-content view-card">
+                <span class="close-btn" data-close>&times;</span>
+
+                <div class="vc-header">
+                    <img id="vmPhoto" class="vc-avatar" src="" alt="Avatar" />
+                    <div>
+                        <h2 id="vmName" class="vc-name">—</h2>
+                        <p id="vmEmail" class="vc-email">—</p>
+                    </div>
+                </div>
+
+                <div class="vc-grid">
+                    <div class="vc-item">
+                        <p class="label">Ticket ID</p>
+                        <p class="value" id="vmTicketId">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">Date Created</p>
+                        <p class="value" id="vmDate">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">Status</p>
+                        <p class="value" id="vmStatus">—</p>
+                    </div>
+                    <div class="vc-item">
+                        <p class="label">Priority</p>
+                        <p class="value" id="vmPriority">—</p>
+                    </div>
+                    <div class="vc-item vc-description">
+                        <p class="label">Subject</p>
+                        <p class="value" id="vmSubject">—</p>
+                    </div>
+                    <div class="vc-item vc-description">
+                        <p class="label">Description</p>
+                        <p class="value" id="vmDescription">—</p>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-dark">Reply</button>
+                    <button class="btn-gold" id="updateStatusBtn">Update Status</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Add Ticket Modal -->
+        <div id="addTicketModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="atmTitle">
+            <div class="modal-content" role="document">
+                <button class="close-btn" data-close aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="rgba(0,0,0,0.85)" stroke-width="1.6"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+
+                <div class="atm-title">
+                    <h2 id="atmTitle">Create New Ticket</h2>
+                    <p>Fill in the details to create a new support ticket.</p>
+                </div>
+
+                <form id="addTicketForm">
+                    <div class="add-form-grid">
+                        <div>
+                            <label for="atm_customerName">Customer Name</label>
+                            <input id="atm_customerName" name="customerName" type="text" class="input"
+                                placeholder="Full Name" required />
+                        </div>
+                        <div>
+                            <label for="atm_customerEmail">Customer Email</label>
+                            <input id="atm_customerEmail" name="customerEmail" type="email" class="input"
+                                placeholder="you@example.com" required />
+                        </div>
+                        <div class="full">
+                            <label for="atm_subject">Subject</label>
+                            <input id="atm_subject" name="subject" type="text" class="input"
+                                placeholder="e.g., Billing issue" required />
+                        </div>
+                        <div class="full">
+                            <label for="atm_description">Description</label>
+                            <textarea id="atm_description" name="description" class="textarea"
+                                placeholder="Describe the issue in detail..."></textarea>
+                        </div>
+                        <div>
+                            <label for="atm_priority">Priority</label>
+                            <select id="atm_priority" name="priority" class="select" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="atm_assignedTo">Assign To</label>
+                            <select id="atm_assignedTo" name="assignedTo" class="select" required>
+                                <option value="Unassigned">Unassigned</option>
+                                <option value="Alice">Alice</option>
+                                <option value="Bob">Bob</option>
+                                <option value="Charlie">Charlie</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn-cancel" data-close>Cancel</button>
+                        <button type="submit" class="btn-save">Create Ticket</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---- Demo Data ---------------------------------------------------------
+        let tickets = [
+            { id: "TKT-001", customerName: "Omar Al-Mansouri", customerEmail: "omar.mansouri@example.com", subject: "Cannot login to my account", assignedTo: "Alice", status: "Open", priority: "High", dateCreated: "2025-08-12", description: "I've tried resetting my password multiple times but I'm still unable to access my account dashboard. The error message says 'Invalid Credentials'." },
+            { id: "TKT-002", customerName: "Sara Khan", customerEmail: "sara.khan@example.com", subject: "Question about my recent invoice", assignedTo: "Bob", status: "In Progress", priority: "Medium", dateCreated: "2025-08-12", description: "Hi, I just received my invoice for August and I see a charge I don't recognize. Can you please clarify what 'Service Adjustment Fee' is?" },
+            { id: "TKT-003", customerName: "James Parker", customerEmail: "j.parker@example.com", subject: "Feature Request: Dark Mode", assignedTo: "Charlie", status: "Open", priority: "Low", dateCreated: "2025-08-11", description: "The application is great, but it would be even better with a dark mode option. It would be much easier on the eyes, especially at night." },
+            { id: "TKT-004", customerName: "Aisha Al Suwaidi", customerEmail: "aisha.suwaidi@example.com", subject: "My order hasn't arrived yet", assignedTo: "Alice", status: "Closed", priority: "High", dateCreated: "2025-08-10", description: "My order #12345 was supposed to be delivered yesterday but the tracking information hasn't updated. Can you please check on this?" },
+            { id: "TKT-005", customerName: "John Doe", customerEmail: "john.doe@example.com", subject: "Website is loading very slowly", assignedTo: "Unassigned", status: "Open", priority: "Medium", dateCreated: "2025-08-13", description: "For the past hour, your website has been extremely slow to load pages. Is there an ongoing issue?" },
+        ];
+
+        // ---- DOM Helpers -------------------------------------------------------
+        const $ = (sel, root = document) => root.querySelector(sel);
+        const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+        const tbody = $('#ticketsBody');
+
+        function statusPill(status) {
+            const pills = {
+                'Open': pill('Open', 'green'),
+                'In Progress': pill('In Progress', 'blue'),
+                'Closed': pill('Closed', 'gray')
+            };
+            return pills[status] || pill(status, 'gray');
+        }
+
+        function priorityPill(priority) {
+            const pills = {
+                'High': pill('High', 'red'),
+                'Medium': pill('Medium', 'gold'),
+                'Low': pill('Low', 'gray')
+            };
+            return pills[priority] || pill(priority, 'gray');
+        }
+
+        function pill(html, cls) { return `<span class="pill ${cls}">${html}</span>`; }
+
+        function formatDateISOToMed(iso) {
+            const d = new Date(iso);
+            if (Number.isNaN(d.valueOf())) return iso;
+            return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+        }
+
+        function renderRows(ticketList = tickets) {
+            tbody.innerHTML = ticketList.map((t, idx) => `
+                <tr data-id="${t.id}">
+                  <td>${t.id}</td>
+                  <td class="profile">
+                    <img src="https://i.pravatar.cc/100?u=${encodeURIComponent(t.customerEmail)}" alt="${t.customerName}"/> 
+                    <div>
+                        <div>${t.customerName}</div>
+                        <div style="font-size: 0.8em; color: var(--muted);">${t.customerEmail}</div>
+                    </div>
+                  </td>
+                  <td>${t.subject}</td>
+                  <td>${t.assignedTo}</td>
+                  <td>${statusPill(t.status)}</td>
+                  <td>${priorityPill(t.priority)}</td>
+                  <td>${formatDateISOToMed(t.dateCreated)}</td>
+                  <td><button class="view-btn" data-view>View</button></td>
+                </tr>
+            `).join('');
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = tickets.length;
+            const open = tickets.filter(t => t.status === 'Open' || t.status === 'In Progress').length;
+            const today = new Date().toISOString().slice(0, 10);
+            const closedToday = tickets.filter(t => t.status === 'Closed' && t.dateCreated === today).length;
+            const highPrio = tickets.filter(t => t.priority === 'High' && t.status !== 'Closed').length;
+
+            $('#stat-open').textContent = open;
+            $('#stat-closed').textContent = closedToday;
+            $('#stat-high-prio').textContent = highPrio;
+        }
+
+        // ---- View modal --------------------------------------------------------
+        const viewModal = $('#viewModal');
+        let currentTicketId = null;
+
+        function openView(ticketId) {
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+            currentTicketId = ticketId;
+
+            $('#vmPhoto').src = `https://i.pravatar.cc/120?u=${encodeURIComponent(ticket.customerEmail)}`;
+            $('#vmName').textContent = ticket.customerName;
+            $('#vmEmail').textContent = ticket.customerEmail;
+
+            $('#vmTicketId').textContent = ticket.id;
+            $('#vmDate').textContent = formatDateISOToMed(ticket.dateCreated);
+            $('#vmStatus').innerHTML = statusPill(ticket.status);
+            $('#vmPriority').innerHTML = priorityPill(ticket.priority);
+            $('#vmSubject').textContent = ticket.subject;
+            $('#vmDescription').textContent = ticket.description;
+
+            viewModal.classList.remove('hidden');
+        }
+
+        function closeModals() {
+            $$('.modal').forEach(m => m.classList.add('hidden'));
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-close]') || (e.target.classList.contains('modal') && !e.target.closest('.modal-content'))) {
+                closeModals();
+            }
+        });
+
+        tbody.addEventListener('click', (e) => {
+            if (e.target.matches('[data-view]')) {
+                const tr = e.target.closest('tr');
+                openView(tr.dataset.id);
+            }
+        });
+
+        // ---- Add Ticket modal --------------------------------------------------
+        const addModal = $('#addTicketModal');
+        $('#openAddTicket').addEventListener('click', () => addModal.classList.remove('hidden'));
+
+        $('#addTicketForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const newTicket = Object.fromEntries(fd.entries());
+
+            const newIdNumber = Math.max(...tickets.map(t => parseInt(t.id.split('-')[1]))) + 1;
+
+            tickets.unshift({
+                id: `TKT-${String(newIdNumber).padStart(3, '0')}`,
+                customerName: newTicket.customerName.trim(),
+                customerEmail: newTicket.customerEmail.trim(),
+                subject: newTicket.subject.trim(),
+                description: newTicket.description.trim(),
+                assignedTo: newTicket.assignedTo,
+                status: 'Open',
+                priority: newTicket.priority,
+                dateCreated: new Date().toISOString().slice(0, 10)
+            });
+            renderRows();
+            e.target.reset();
+            addModal.classList.add('hidden');
+        });
+
+        // ---- Search and Filter -------------------------------------------------
+        $('#searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredTickets = tickets.filter(t =>
+                t.subject.toLowerCase().includes(searchTerm) ||
+                t.customerName.toLowerCase().includes(searchTerm) ||
+                t.id.toLowerCase().includes(searchTerm)
+            );
+            renderRows(filteredTickets);
+        });
+
+
+        // ---- Init --------------------------------------------------------------
+        renderRows();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModals();
+        });
+    </script>
+</body>
+
+</html>

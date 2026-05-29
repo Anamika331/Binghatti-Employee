@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meeting Room Scheduler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="style.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-grad-a: #e9e9ee;
+            --bg-grad-b: #fff6cf;
+            --selected: #fde68a;
+            --ink: #1f2937;
+            --ink-2: #374151;
+            --muted: #6b7280;
+            --chip-gray-bg: #f3f4f6;
+            --chip-gray-fg: #6b7280;
+            --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+            --radius-xl: 0.5rem;
+            --pill-pad: .75rem 2rem;
+            /* White/Gold accents */
+            --lux-bg: #fff;
+            --lux-gold: #D4AF37;
+            --lux-gold-2: #b78f2a;
+            --lux-muted: rgba(0, 0, 0, .65);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(90deg, var(--bg-grad-a), var(--bg-grad-b));
+            color: var(--ink)
+        }
+
+        /* Top App Bar */
+        .app {
+            margin: 0 auto;
+            padding: 16px 10px 28px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 18px;
+            align-items: center
+        }
+
+        .tab {
+            padding: 10px 14px;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: var(--shadow-2);
+            color: var(--ink-2);
+            font-weight: 500
+        }
+
+        .tab.is-active {
+            background: var(--ink);
+            color: #fff
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 14px 0
+        }
+
+        .toolbar .btn,
+        .toolbar .chip {
+            background: #fff;
+            border: none;
+            border-radius: 9999px;
+            box-shadow: var(--shadow-2);
+            padding: 10px 14px;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            cursor: pointer;
+            font-family: 'Poppins'
+        }
+
+        .toolbar .chip {
+            font-weight: 100;
+            color: var(--ink-2)
+        }
+
+        .toolbar .btn.icon {
+            width: 38px;
+            height: 38px;
+            justify-content: center
+        }
+
+        .toolbar input[type="time"],
+        .toolbar input[type="date"],
+        .toolbar select {
+            appearance: none;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            padding: 10px 14px;
+            background: #fff;
+            box-shadow: var(--shadow-2);
+            font-family: 'Poppins';
+            font-weight: 100;
+            color: var(--ink)
+        }
+
+        .spacer {
+            flex: 1
+        }
+
+        /* Rooms scroller */
+        .rooms-strip {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(220px, 1fr);
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 2px 0
+        }
+
+        .room-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: var(--shadow-2);
+            overflow: hidden
+        }
+
+        .room-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block
+        }
+
+        .room-meta {
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .room-meta h4 {
+            margin: 0;
+            font-weight: 100
+        }
+
+        .meta-sub {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        /* Schedule grid */
+        .schedule {
+            margin-top: 14px;
+            background: #fff;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-1);
+            overflow: hidden
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 120px repeat(5, 1fr);
+            /* time gutter + 5 rooms */
+            grid-template-rows: [t8] 64px [t9] 64px [t10] 64px [t11] 64px [t12] 64px [t13] 64px [t14] 64px [end];
+            position: relative
+        }
+
+        .time {
+            background: #fafafa;
+            border-right: 1px solid #eef0f3
+        }
+
+        .time div {
+            height: 64px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 8px 10px;
+            color: var(--muted);
+            font-size: 12px;
+            border-bottom: 1px dashed #eef0f3
+        }
+
+        .col-head {
+            grid-column: 2 / -1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr)
+        }
+
+        .col-head .h {
+            padding: 12px;
+            border-bottom: 1px solid #eef0f3;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            background: #fafafa
+        }
+
+        .grid .cell {
+            border-left: 1px solid #f0f1f4;
+            border-bottom: 1px dashed #f0f1f4
+        }
+
+        .room-col {
+            display: grid;
+            grid-template-rows: subgrid;
+            grid-row: 1 / -1;
+            position: relative
+        }
+
+        /* Booking blocks */
+        .block {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 12px;
+            box-shadow: var(--shadow-2);
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .block.oneoff {
+            background: #f3fff3;
+            border: 1px solid #c9e7cc
+        }
+
+        .block.unavail {
+            background: repeating-linear-gradient(135deg, #f5f6f8, #f5f6f8 10px, #eef0f4 10px, #eef0f4 20px);
+            border: 1px solid #e6e8ee;
+            color: #6b7280
+        }
+
+        .block .title {
+            font-weight: 600;
+            color: var(--ink-2);
+            font-size: 12px
+        }
+
+        .block .sub {
+            color: #6b7280
+        }
+
+        /* Helpers to place blocks using CSS variables set per item */
+        .block {
+            top: calc(var(--row-start)*64px + 52px);
+            height: calc(var(--row-span)*64px - 16px)
+        }
+
+        /* 52px accounts for header rows in the grid container */
+
+        /* Toggle */
+        .switch {
+            position: relative;
+            width: 56px;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: var(--shadow-2)
+        }
+
+        .switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 9999px;
+            transition: transform .2s ease
+        }
+
+        .switch.is-on {
+            background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2))
+        }
+
+        .switch.is-on::after {
+            transform: translateX(26px)
+        }
+
+        @media (max-width: 980px) {
+            .grid {
+                grid-template-columns: 80px repeat(3, 1fr)
+            }
+
+            .col-head {
+                grid-template-columns: repeat(3, 1fr)
+            }
+
+            .rooms-strip {
+                grid-auto-columns: minmax(180px, 1fr)
+            }
+        }
+
+        .btn-save {
+            font-family: "Poppins";
+            background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 100;
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+        }
+
+
+
+
+
+
+
+        .wrapper {}
+
+
+
+        .wrapper .tabs {
+            display: grid;
+            padding-left: 20px;
+        }
+
+        .wrapper [role="tablist"] {
+            display: flex;
+            gap: 10px;
+        }
+
+        .wrapper [role="tabpanel"] {
+
+            padding: 0rem 0rem 2rem;
+        }
+
+
+        .wrapper button[aria-selected=true] {
+            background: #fcd34d;
+            box-shadow: none;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .wrapper button {
+            background: #fff;
+            border: 0;
+            color: black;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 15px;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .wrapper button[aria-selected="true"] {
+            background: #fcd34d;
+            box-shadow: none;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        button:focus {
+            outline: 0;
+            --bs-color: rgba(0, 0, 0, 0.6);
+        }
+
+        #companiesTable iframe::-webkit-scrollbar {
+            display: none;
+        }
+
+        #companiesTable iframe html::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="AI-assistant.html" class="floating-ai-btn" id="aiToggle">
+        <svg class="svg-inline--fa fa-robot fa-w-20" aria-hidden="true" data-prefix="fas" data-icon="robot" role="img"
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="">
+            <path fill="currentColor"
+                d="M0 256v128c0 17.7 14.3 32 32 32h32V224H32c-17.7 0-32 14.3-32 32zM464 96H352V32c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H176c-44.2 0-80 35.8-80 80v272c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V176c0-44.2-35.8-80-80-80zM256 416h-64v-32h64v32zm-32-120c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm128 120h-64v-32h64v32zm96 0h-64v-32h64v32zm-32-120c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm192-72h-32v192h32c17.7 0 32-14.3 32-32V256c0-17.7-14.3-32-32-32z">
+            </path>
+        </svg>
+    </a>
+    <div class="app">
+        <header class="header">
+            <div class="logo-container">
+                <img src="pixellent.png" class="logo-image">
+                <div class="logo-text"></div>
+            </div>
+
+
+            <nav class="main-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="employee-attendance.html">Attendance</a>
+                <a href="salary_employee.html">Salary</a>
+                <a href="parking.html">Parking</a>
+                <a href="delivery_Employee.html">Delivery</a>
+                <a href="pantry.html">Pantry</a>
+                <a href="employee_appointments.html">Appointments</a>
+                <a href="meeting-room.html" class="active">Facilities</a>
+                <a href="visitior-list.html">Visitor</a>
+                <a href="anoucement.html">Insights</a>
+                <a href="employee-chat.html">Chats</a>
+                <a href="maintenance.html">Maintenance</a>
+
+            </nav>
+
+            <div class="header-actions">
+                <a href="AI-assistant.html" class="setting-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
+                        height="20">
+                        <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+                    </svg>
+                    <span>AI</span>
+                </a>
+                <button class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+                        </path>
+                    </svg>
+                </button>
+                <div class="user-profile-btn"></div>
+            </div>
+        </header>
+        <!-- Top tabs -->
+
+
+        <div class="wrapper">
+            <div class="tabs">
+                <div role="tablist" aria-label="Programming Languages">
+                    <button role="tab" aria-selected="true" id="js">
+                        Meeting room Booking
+
+                    </button>
+
+                    <button role="tab" aria-selected="false" id="php">
+                        Gym Booking
+                    </button>
+                </div>
+                <div role="tabpanel" aria-labelledby="js">
+                    <div style="display: flex; justify-content:space-between; margin-bottom:20px;align-items:end;">
+                        <div>
+                            <h1 style="font-weight: 100;font-size: 2.5rem;padding: 0;margin: 0;">Meeting Room Bookings
+                            </h1>
+                            <p style="font-weight: 100; color:#000; margin-top:0px;margin-bottom: 0;">View all available
+                                bookings in
+                                a
+                                single space</p>
+                        </div>
+
+                        <div style=" justify-content:flex-end">
+                            <a href="office-view.html" class="btn-save" id="bookBtn"
+                                style="width:100%;text-decoration: none;margin-right: 5px;background: linear-gradient(90deg, #ccc, #000);">Smart
+                                Meeting
+                                Room</a>
+                            <a href="meeting-room-booking.html" class="btn-save" id="bookBtn"
+                                style="width:100%;text-decoration: none;">Book Meeting
+                                Room</a>
+                        </div>
+                    </div>
+
+                    <!-- Rooms row (thumbnails) -->
+                    <div class="rooms-strip" aria-label="Rooms">
+                        <div class="room-card"><img src="room-1.jpg" alt="Event Space" />
+                            <div class="room-meta">
+                                <h4>Event Space</h4><span class="meta-sub">6 Amenities · 👤 10</span>
+                            </div>
+                        </div>
+                        <div class="room-card"><img src="room-2.jpg" alt="The Sunroom" />
+                            <div class="room-meta">
+                                <h4>The Sunroom</h4><span class="meta-sub">6 Amenities · 👤 10</span>
+                            </div>
+                        </div>
+                        <div class="room-card"><img src="room-3.jpg" alt="The Loft" />
+                            <div class="room-meta">
+                                <h4>The Loft</h4><span class="meta-sub">6 Amenities · 👤 10</span>
+                            </div>
+                        </div>
+                        <div class="room-card"><img src="room-4.jpg" alt="The Lawns" />
+                            <div class="room-meta">
+                                <h4>The Lawns</h4><span class="meta-sub">6 Amenities · 👤 10</span>
+                            </div>
+                        </div>
+                        <div class="room-card"><img src="room-5.jpg" alt="Team Loft" />
+                            <div class="room-meta">
+                                <h4>Team Loft</h4><span class="meta-sub">6 Amenities · 👤 10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="schedule">
+                        <!-- column headers -->
+                        <div class="col-head">
+                            <div class="h">Event Space</div>
+                            <div class="h">The Sunroom</div>
+                            <div class="h">The Loft</div>
+                            <div class="h">The Lawns</div>
+                            <div class="h">Team Loft</div>
+                        </div>
+
+                        <div class="grid">
+                            <!-- time gutter -->
+                            <div class="time" style="grid-column:1">
+                                <div>8:00 AM</div>
+                                <div>9:00 AM</div>
+                                <div>10:00 AM</div>
+                                <div>11:00 AM</div>
+                                <div>12:00 PM</div>
+                                <div>1:00 PM</div>
+                                <div>2:00 PM</div>
+                            </div>
+
+                            <!-- five room columns using subgrid rows -->
+                            <div class="room-col" style="grid-column:2">
+                                <!-- 9-10 one-off -->
+                                <div class="block oneoff" style="--row-start:1; --row-span:1;" title="9–10am">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 10AM</div>
+                                </div>
+                                <!-- 12–1 unavailable -->
+                                <div class="block unavail" style="--row-start:4; --row-span:1;" title="12–1pm">
+                                    Unavailable<br /><span class="sub">9AM - 12PM</span></div>
+                                <!-- 1–3 one-off (2h) -->
+                                <div class="block oneoff" style="--row-start:5; --row-span:2;" title="1–3pm">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 12PM</div>
+                                </div>
+                            </div>
+
+                            <div class="room-col" style="grid-column:3">
+                                <div class="block oneoff" style="--row-start:1; --row-span:1">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 10AM</div>
+                                </div>
+                                <div class="block unavail" style="--row-start:3; --row-span:2">Unavailable<div
+                                        class="sub">9AM -
+                                        12PM</div>
+                                </div>
+                                <div class="block oneoff" style="--row-start:5; --row-span:2">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 12PM</div>
+                                </div>
+                            </div>
+
+                            <div class="room-col" style="grid-column:4">
+                                <div class="block unavail" style="--row-start:3; --row-span:2">Unavailable<div
+                                        class="sub">9AM -
+                                        12PM</div>
+                                </div>
+                            </div>
+
+                            <div class="room-col" style="grid-column:5">
+                                <div class="block oneoff" style="--row-start:1; --row-span:1">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 10AM</div>
+                                </div>
+                                <div class="block unavail" style="--row-start:4; --row-span:1">Unavailable<div
+                                        class="sub">9AM -
+                                        12PM</div>
+                                </div>
+                                <div class="block oneoff" style="--row-start:5; --row-span:2">
+                                    <div class="title">One-off</div>
+                                    <div class="sub">9AM - 12PM</div>
+                                </div>
+                            </div>
+
+                            <div class="room-col" style="grid-column:6">
+                                <div class="block unavail" style="--row-start:3; --row-span:2">Unavailable<div
+                                        class="sub">9AM -
+                                        12PM</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" aria-labelledby="php" hidden>
+                    <iframe src="office-gym-booking.html" width="100%" height="600" style="border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        // Vacant only toggle: dim/undim unavailable blocks
+        const sw = document.getElementById('vacantSwitch');
+        sw.addEventListener('click', () => {
+            sw.classList.toggle('is-on');
+            document.querySelectorAll('.block.unavail').forEach(b => {
+                b.style.display = sw.classList.contains('is-on') ? 'none' : 'block';
+            });
+        });
+    </script>
+
+
+    <script>
+        const tab = document.querySelector('.tabs');
+        const tabButtons = tab.querySelectorAll('[role="tab"]');
+        const tabPanels = Array.from(tab.querySelectorAll('[role="tabpanel"]'));
+
+        function tabClickHandler(e) {
+            //Hide All Tabpane
+            tabPanels.forEach(panel => {
+                panel.hidden = 'true';
+            });
+
+            //Deselect Tab Button
+            tabButtons.forEach(button => {
+                button.setAttribute('aria-selected', 'false');
+            });
+
+            //Mark New Tab
+            e.currentTarget.setAttribute('aria-selected', 'true');
+
+            //Show New Tab
+            const { id } = e.currentTarget;
+
+            const currentTab = tabPanels.find(
+                panel => panel.getAttribute('aria-labelledby') === id
+            );
+
+            currentTab.hidden = false;
+        }
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', tabClickHandler);
+        })
+    </script>
+</body>
+
+</html>

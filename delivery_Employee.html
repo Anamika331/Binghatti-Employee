@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="style.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-grad-a: #e9e9ee;
+      --selected: #fde68a;
+      --bg-grad-b: #fff6cf;
+      --ink: #1f2937;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --chip-green-bg: #ecfdf5;
+      --chip-green-fg: #047857;
+      --chip-gray-bg: #f3f4f6;
+      --chip-gray-fg: #6b7280;
+      --chip-gold-bg: #fef9c3;
+      --chip-gold-fg: #a16207;
+      --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --pill-pad: 0.75rem 2rem;
+      --radius-xl: 1.5rem;
+
+      /* White/Gold modal theme */
+      --lux-bg: #ffffff;
+      --lux-panel: rgba(0, 0, 0, 0.03);
+      --lux-glass: rgba(0, 0, 0, 0.04);
+      --lux-gold: #d4af37;
+      --lux-gold-2: #b78f2a;
+      --lux-black: #000000;
+      --lux-muted: rgba(0, 0, 0, 0.65);
+      --lux-radius: 14px;
+      --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+      /* Delivery Status Colors */
+      --status-pending-bg: #fffbe6;
+      --status-pending-fg: #a16207;
+      --status-delivered-bg: #d1fae5;
+      --status-delivered-fg: #065f46;
+      --status-out-for-delivery-bg: #e0f2f1;
+      --status-out-for-delivery-fg: #0f766e;
+      --status-received-bg: #cffafe;
+      --status-received-fg: #0891b2;
+      --status-in-transit-bg: #dbeafe;
+      --status-in-transit-fg: #1d4ed8;
+      --status-receptionist-pickup-bg: #fef2f2;
+      --status-receptionist-pickup-fg: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+    }
+
+    .dashboard-container {
+      background: linear-gradient(90deg,
+          var(--bg-grad-a) 0%,
+          var(--bg-grad-b) 100%);
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0 0rem;
+      padding: 0 1rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* Table card */
+    .table-container {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      width: 98%;
+      margin: 20px auto 10px;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 20px 20px 20px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      padding: 2rem;
+      padding-top: 90px;
+    }
+
+    @media (max-width: 720px) {
+      .table-scroll {
+        padding: 1rem;
+        padding-top: 90px;
+      }
+    }
+
+    .table-top-btn-boxes {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .btn-tble1 {
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: none;
+      box-shadow: var(--shadow-2);
+      cursor: pointer;
+    }
+
+    .btn-tble2 {
+      min-width: 110px;
+      height: 40px;
+      padding: 0 14px;
+      background: #fff;
+      border-radius: 30px;
+      border: none;
+      box-shadow: var(--shadow-2);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Poppins";
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    thead {
+      background: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 0;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem;
+    }
+
+    td {
+      padding: 1rem 0.75rem;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .checkbox-cell input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .checkbox-cell input[type="checkbox"]:checked {
+      background-color: #111;
+      border-color: #111;
+    }
+
+    .checkbox-cell input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      width: 4px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* SELECTED ROW */
+    tbody tr.selected td {
+      background-color: var(--selected);
+    }
+
+    tbody tr.selected td:first-child {
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
+    }
+
+    tbody tr.selected td:last-child {
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
+    tbody tr.selected::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 2px;
+      bottom: 2px;
+      border-radius: 14px;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    tbody tr[aria-selected="true"] {
+      outline: 2px solid transparent;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .profile img {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      object-fit: cover;
+    }
+
+    .pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .pill.pending {
+      background: var(--status-pending-bg);
+      color: var(--status-pending-fg);
+    }
+
+    .pill.delivered {
+      background: var(--status-delivered-bg);
+      color: var(--status-delivered-fg);
+    }
+
+    .pill.in-transit {
+      background: var(--status-in-transit-bg);
+      color: var(--status-in-transit-fg);
+    }
+
+    .pill.received {
+      background: var(--status-received-bg);
+      color: var(--status-received-fg);
+    }
+
+    .pill.awaiting-receptionist-pickup {
+      background: var(--status-receptionist-pickup-bg);
+      color: var(--status-receptionist-pickup-fg);
+    }
+
+    .view-btn {
+      background: var(--ink);
+      color: #fff;
+      padding: 0.4rem 1rem;
+      font-size: 12px;
+      font-weight: 100;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: var(--shadow-2);
+      position: relative;
+      font-family: "Poppins";
+    }
+
+    .view-btn:hover {
+      background: #374151;
+      transform: translateY(-1px);
+    }
+
+    .view-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle,
+          rgba(255, 255, 255, 0.28),
+          transparent);
+      opacity: 0;
+      border-radius: 9999px;
+      transition: opacity 0.3s ease;
+    }
+
+    .view-btn:hover::before {
+      opacity: 1;
+    }
+
+    /* Base modal (used by View) */
+    .modal {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.hidden {
+      display: none !important;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      width: min(900px, 92vw);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: zoomBounce 0.4s ease;
+    }
+
+    @keyframes zoomBounce {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      60% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .close-btn {
+      font-family: "Poppins";
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--lux-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      position: absolute;
+      top: 14px;
+      right: 14px;
+    }
+
+    .close-btn:hover {
+      color: var(--ink);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.6rem;
+      margin: 0;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .modal-header-text p {
+      margin: 0.15rem 0 0;
+      color: var(--muted);
+    }
+
+    .modal-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1.25rem;
+      margin-top: 0.75rem;
+    }
+
+    .modal-detail {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .modal-detail .label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin: 0 0 0.15rem;
+      font-weight: 600;
+    }
+
+    .modal-detail .value {
+      font-size: 0.95rem;
+      color: var(--ink-2);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    .btn-dark {
+      font-family: "Poppins";
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 0.55rem 1.2rem;
+      font-weight: 100;
+      cursor: pointer;
+    }
+
+    .btn-gold {
+      font-family: "Poppins";
+      background: #fcd34d;
+      color: var(--ink);
+      border: none;
+      border-radius: 9999px;
+      padding: 0.55rem 1.2rem;
+      font-weight: 100;
+      cursor: pointer;
+    }
+
+    /* Row entrance */
+    tbody tr {
+      animation: fadeSlideIn 0.45s ease forwards;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    tbody tr:nth-child(even) {
+      animation-delay: 0.05s;
+    }
+
+    tbody tr:nth-child(odd) {
+      animation-delay: 0.1s;
+    }
+
+    @keyframes fadeSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive niceties */
+    @media (max-width: 720px) {
+      .table-scroll {
+        padding: 1rem;
+        padding-top: 90px;
+      }
+
+      table {
+        min-width: 900px;
+      }
+    }
+
+    /* Search + Sort (table header controls) */
+    .table-controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-input {
+      padding: 0.7rem 1rem 0.7rem 2.4rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      background: #fff;
+      box-shadow: var(--shadow-2);
+      font-size: 0.9rem;
+      color: black;
+      font-weight: 100;
+      font-family: "Poppins", sans-serif;
+      width: min(340px, 58vw);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+      .search-input {
+        width: 56vw;
+      }
+    }
+
+    /* Pill-style filter buttons */
+    .filter-pill {
+      background: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 0.7rem 1.4rem;
+      font-size: 0.9rem;
+      font-family: "Poppins";
+      font-weight: 100;
+      color: var(--ink-2);
+      box-shadow: var(--shadow-2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease, box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .filter-pill:hover {
+      background: #f9fafb;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .filter-pill svg {
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* Selected row highlight */
+    tr.selected {
+      background-color: #fde68a;
+    }
+
+    tbody tr.selected td:first-child {
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
+    }
+
+    tbody tr.selected td:last-child {
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
+    .subtitle-text {
+      font-weight: 100;
+      font-size: 0.9rem;
+      color: black;
+      margin: 0.25rem 0 0;
+    }
+
+    /* --- View Modal --- */
+    .view-card {
+      width: min(720px, 92vw);
+      padding: 28px 24px 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.12);
+    }
+
+    .vc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .vc-name {
+      margin: 8px 0 2px;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .vc-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.4rem 0.7rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #f3f4f6;
+      color: #374151;
+      box-shadow: var(--shadow-2);
+    }
+
+    .badge.pending {
+      background: var(--status-pending-bg);
+      color: var(--status-pending-fg);
+    }
+
+    .badge.delivered {
+      background: var(--status-delivered-bg);
+      color: var(--status-delivered-fg);
+    }
+
+    .badge.in-transit {
+      background: var(--status-in-transit-bg);
+      color: var(--status-in-transit-fg);
+    }
+
+    .badge.received {
+      background: var(--status-received-bg);
+      color: var(--status-received-fg);
+    }
+
+    .badge.awaiting-receptionist-pickup {
+      background: var(--status-receptionist-pickup-bg);
+      color: var(--status-receptionist-pickup-fg);
+    }
+
+    .vc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .vc-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .vc-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      background: #fff;
+    }
+
+    .vc-item .label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin: 0 0 0.2rem;
+    }
+
+    .vc-item .value {
+      font-size: 0.95rem;
+      color: var(--ink-2);
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .ping-btn {
+      background: #fcd34d;
+      color: var(--ink);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .ping-btn.received {
+      background: var(--chip-green-bg);
+      color: var(--chip-green-fg);
+      cursor: not-allowed;
+    }
+
+    /* Global Ping Button */
+    #openBulkActionsModal {
+      background: #fcd34d;
+      color: var(--ink);
+      font-weight: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: var(--shadow-2);
+      transition: background 0.2s ease, transform 0.2s ease,
+        box-shadow 0.2s ease;
+      white-space: nowrap;
+      font-family: "Poppins";
+    }
+
+    #openBulkActionsModal:hover {
+      background: #facc15;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    /* New button styles from customer.html */
+    .modal-button-container {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 2rem;
+    }
+
+    .btn-green {
+      font-family: "Poppins";
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(34, 197, 94, 0.14);
+    }
+
+    .btn-default {
+      font-family: "Poppins";
+      background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 100;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+    }
+
+    .btn-cancel {
+      font-family: "Poppins";
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--lux-muted);
+      cursor: pointer;
+    }
+
+    .btn-tble2 {
+      min-width: 110px;
+      height: 40px;
+      padding: 0 14px;
+      background: #fff;
+      border-radius: 30px;
+      border: none;
+      box-shadow: var(--shadow-2);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Poppins";
+      color: var(--muted);
+    }
+
+    .view-modal-header-content {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .view-modal-header-content h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .view-modal-header-content h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+
+    .bulk-actions-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+
+    <header class="header">
+      <div class="logo-container">
+        <img src="pixellent.png" class="logo-image">
+        <div class="logo-text"></div>
+      </div>
+
+
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="employee-attendance.html">Attendance</a>
+        <a href="salary_employee.html">Salary</a>
+        <a href="parking.html">Parking</a>
+        <a href="delivery_Employee.html" class="active">Delivery</a>
+        <a href="pantry.html">Pantry</a>
+        <a href="employee_appointments.html">Appointments</a>
+        <a href="meeting-room.html">Facilities</a>
+        <a href="visitior-list.html">Visitor</a>
+        <a href="anoucement.html">Insights</a>
+        <a href="employee-chat.html">Chats</a>
+        <a href="maintenance.html">Maintenance</a>
+
+      </nav>
+
+      <div class="header-actions">
+        <a href="AI-assistant.html" class="setting-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+          </svg>
+          <span>AI</span>
+        </a>
+        <button class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+            </path>
+          </svg>
+        </button>
+        <div class="user-profile-btn"></div>
+      </div>
+    </header>
+
+    <div id="adminDashboard">
+      <div class="dashboard-header">
+        <h1>Delivery Management</h1>
+      </div>
+
+      <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 1rem 1.25rem;
+          ">
+        <div>
+          <p class="subtitle-text">
+            Manage all incoming deliveries. Ping employees when their parcels
+            arrive.
+          </p>
+        </div>
+        <button id="openBulkActionsModal">Manage Deliveries</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-controls">
+          <div class="search-wrap">
+            <input id="searchInput" class="search-input" type="text" placeholder="Search deliveries" />
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+            </svg>
+          </div>
+          <select id="statusFilter" class="filter-pill">
+            <option value="all">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In-transit">In-transit</option>
+            <option value="Received">Received</option>
+          </select>
+          <button class="filter-pill" id="exportBtn" title="Export CSV">
+            Export
+          </button>
+        </div>
+
+        <div class="table-top-btn-boxes"></div>
+
+        <table id="deliveriesTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Tracking ID</th>
+              <th>Recipient</th>
+              <th>Sender</th>
+              <th>Status</th>
+              <th>Received Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="deliveriesBody"></tbody>
+        </table>
+      </div>
+
+      <div id="viewModal" class="modal hidden">
+        <div class="modal-content view-card">
+          <button class="close-btn" data-close>&times;</button>
+          <div class="view-modal-header-content">
+            <h2>Order Details</h2>
+            <h3 id="vmTrackingId"></h3>
+          </div>
+          <div class="vc-badges">
+            <span id="vmStatusBadge" class="badge pending">Pending</span>
+          </div>
+          <div class="vc-grid">
+            <div class="vc-item">
+              <p class="label">Recipient Name</p>
+              <p class="value" id="vmRecipientName">—</p>
+            </div>
+            <div class="vc-item">
+              <p class="label">Recipient Email</p>
+              <p class="value" id="vmRecipientEmail">—</p>
+            </div>
+            <div class="vc-item">
+              <p class="label">Sender Name</p>
+              <p class="value" id="vmSenderName">—</p>
+            </div>
+            <div class="vc-item">
+              <p class="label">Received Date</p>
+              <p class="value" id="vmReceivedDate">—</p>
+            </div>
+            <div class="vc-item full">
+              <p class="label">Notes</p>
+              <p class="value" id="vmNotes">—</p>
+            </div>
+          </div>
+          <div class="modal-button-container" id="viewModalButtons">
+            <button class="btn-default" id="markAsReceivedBtn">
+              Mark as Received
+            </button>
+            <button class="btn-green" id="askReceptionistBtn">
+              Ask Receptionist to Collect
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="bulkActionsModal" class="modal hidden">
+        <div class="modal-content view-card">
+          <button class="close-btn" data-close>&times;</button>
+          <div class="modal-header">
+            <h2 class="vc-name">Bulk Actions</h2>
+          </div>
+          <p style="text-align: center; color: var(--muted)">
+            Select deliveries to perform bulk actions on.
+          </p>
+          <div id="bulkDeliveriesList" style="max-height: 300px; overflow-y: auto; padding: 1rem"></div>
+          <div class="modal-button-container">
+            <button class="btn-cancel" data-close>Cancel</button>
+            <div class="bulk-actions-buttons">
+              <button class="btn-default" id="bulkMarkReceivedBtn">
+                Mark Selected as Received
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Demo Data ---------------------------------------------------------
+    const deliveries = [
+      {
+        id: 1,
+        tracking_id: "#23456-A",
+        recipient_name: "John Doe",
+        recipient_email: "john.doe@example.com",
+        sender_name: "Amazon",
+        status: "Pending",
+        received_date: "2025-08-12",
+        notes: "Fragile item",
+      },
+      {
+        id: 2,
+        tracking_id: "#78910-B",
+        recipient_name: "Jane Smith",
+        recipient_email: "jane.smith@example.com",
+        sender_name: "DHL",
+        status: "Received",
+        received_date: "2025-08-10",
+        notes: "",
+      },
+      {
+        id: 3,
+        tracking_id: "#11223-C",
+        recipient_name: "John Doe",
+        recipient_email: "john.doe@example.com",
+        sender_name: "FedEx",
+        status: "Transit",
+        received_date: "2025-08-11",
+        notes: "Needs signature",
+      },
+      {
+        id: 4,
+        tracking_id: "#11223-D",
+        recipient_name: "Aisha Al Suwaidi",
+        recipient_email: "aisha.suwaidi@example.com",
+        sender_name: "Aramex",
+        status: "Pending",
+        received_date: "2025-08-13",
+        notes: "",
+      },
+      {
+        id: 5,
+        tracking_id: "#55667-E",
+        recipient_name: "James Parker",
+        recipient_email: "j.parker@example.com",
+        sender_name: "UPS",
+        status: "Received",
+        received_date: "2025-08-08",
+        notes: "",
+      },
+    ];
+    let filteredDeliveries = [...deliveries];
+
+    // ---- DOM Helpers -------------------------------------------------------
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) =>
+      Array.from(root.querySelectorAll(sel));
+
+    const deliveriesBody = $("#deliveriesBody");
+    const viewModal = $("#viewModal");
+    const bulkActionsModal = $("#bulkActionsModal");
+    const bulkDeliveriesList = $("#bulkDeliveriesList");
+    const searchInput = $("#searchInput");
+    const statusFilter = $("#statusFilter");
+    const viewModalButtons = $("#viewModalButtons");
+    let currentIndex = -1;
+
+    function statusPill(status) {
+      let cls = "";
+      switch (status) {
+        case "Pending":
+          cls = "pending";
+          break;
+        case "Received":
+          cls = "received";
+          break;
+        case "In-transit":
+          cls = "in-transit";
+          break;
+        case "Awaiting Receptionist Pickup":
+          cls = "awaiting-receptionist-pickup";
+          break;
+        default:
+          cls = "in-transit";
+          break;
+      }
+      return `<span class="pill ${cls}">${status}</span>`;
+    }
+
+    function formatDateISOToMed(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.valueOf())) return iso;
+      return d.toLocaleDateString(undefined, {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      });
+    }
+
+    function renderAdminDashboard() {
+      deliveriesBody.innerHTML = filteredDeliveries
+        .map(
+          (d) => `
+                <tr data-id="${d.id}">
+                    <td class="checkbox-cell"><input type="checkbox" /></td>
+                    <td>${d.tracking_id}</td>
+                    <td>${d.recipient_name}</td>
+                    <td>${d.sender_name}</td>
+                    <td>${statusPill(d.status)}</td>
+                    <td>${formatDateISOToMed(d.received_date)}</td>
+                    <td><button class="view-btn" data-view>View</button></td>
+                </tr>
+            `
+        )
+        .join("");
+    }
+
+    function filterAndRender() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedStatus = statusFilter.value;
+
+      filteredDeliveries = deliveries.filter((d) => {
+        const searchMatch = Object.values(d).some((val) =>
+          String(val).toLowerCase().includes(searchTerm)
+        );
+        const statusMatch =
+          selectedStatus === "all" || d.status === selectedStatus;
+        return searchMatch && statusMatch;
+      });
+      renderAdminDashboard();
+    }
+
+    function closeModals() {
+      $$(".modal").forEach((m) => m.classList.add("hidden"));
+    }
+
+    document.addEventListener("click", (e) => {
+      if (
+        e.target.matches("[data-close]") ||
+        (e.target.classList.contains("modal") &&
+          !e.target.closest(".modal-content"))
+      ) {
+        closeModals();
+      }
+    });
+
+    // ---- View modal functionality
+    deliveriesBody.addEventListener("click", (e) => {
+      if (e.target.matches("[data-view]")) {
+        const tr = e.target.closest("tr");
+        const deliveryId = parseInt(tr.dataset.id, 10);
+        openView(deliveryId);
+      }
+    });
+
+    function openView(deliveryId) {
+      const d = deliveries.find((del) => del.id === deliveryId);
+      if (!d) return;
+      currentIndex = d.id;
+
+      $(".view-modal-header-content h2").textContent = "Order Details";
+      $("#vmTrackingId").textContent = d.tracking_id;
+
+      const statusBadge = $("#vmStatusBadge");
+      statusBadge.textContent = d.status;
+      statusBadge.className =
+        "badge " +
+        (d.status.toLowerCase().replace(/\s/g, "-") || "in-transit");
+
+      $("#vmRecipientName").textContent = d.recipient_name;
+      $("#vmRecipientEmail").textContent = d.recipient_email;
+      $("#vmSenderName").textContent = d.sender_name;
+      $("#vmReceivedDate").textContent = formatDateISOToMed(d.received_date);
+      $("#vmNotes").textContent = d.notes;
+
+      const markAsReceivedBtn = $("#markAsReceivedBtn");
+      const askReceptionistBtn = $("#askReceptionistBtn");
+
+      if (d.status === "Received") {
+        viewModalButtons.style.display = "none";
+      } else {
+        viewModalButtons.style.display = "flex";
+        markAsReceivedBtn.style.display = "inline-block";
+        askReceptionistBtn.style.display = "inline-block";
+
+        if (d.status === "In-transit") {
+          askReceptionistBtn.disabled = true;
+          askReceptionistBtn.className = "btn-green";
+          markAsReceivedBtn.disabled = false;
+          markAsReceivedBtn.className = "btn-green";
+        } else {
+          askReceptionistBtn.disabled = false;
+          askReceptionistBtn.className = "btn-default";
+          markAsReceivedBtn.disabled = false;
+          markAsReceivedBtn.className = "btn-green";
+        }
+      }
+      viewModal.classList.remove("hidden");
+    }
+
+    $("#markAsReceivedBtn").addEventListener("click", () => {
+      if (currentIndex < 0) return;
+      const delivery = deliveries.find((del) => del.id === currentIndex);
+      if (delivery && delivery.status !== "Received") {
+        // alert(`You have successfully marked the parcel for ${delivery.recipient_name} (${delivery.tracking_id}) as received.`);
+        delivery.status = "Received";
+        filterAndRender();
+        closeModals();
+      }
+    });
+
+    $("#askReceptionistBtn").addEventListener("click", () => {
+      if (currentIndex < 0) return;
+      const delivery = deliveries.find((del) => del.id === currentIndex);
+      if (
+        delivery &&
+        delivery.status !== "Received" &&
+        delivery.status !== "In-transit"
+      ) {
+        // alert(`The receptionist has been notified to collect the parcel for ${delivery.recipient_name} (${delivery.tracking_id}).`);
+        delivery.status = "In-transit";
+        filterAndRender();
+        closeModals();
+      }
+    });
+
+    // ---- Bulk Actions Modal functionality
+    $("#openBulkActionsModal").addEventListener("click", () => {
+      const allPending = deliveries.filter(
+        (d) => d.status === "Pending" || d.status === "In-transit"
+      );
+      if (allPending.length === 0) {
+        //   alert("No deliveries are pending pickup.");
+        return;
+      }
+
+      bulkDeliveriesList.innerHTML = allPending
+        .map(
+          (d) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f3f4f6;">
+                    <label style="display:flex; gap:10px; cursor:pointer; align-items:center;">
+                        <input type="checkbox" name="bulk_delivery" value="${d.id
+            }" />
+                        <span>${d.recipient_name} - ${d.sender_name} (${d.tracking_id
+            })</span>
+                    </label>
+                    ${statusPill(d.status)}
+                </div>
+            `
+        )
+        .join("");
+      bulkActionsModal.classList.remove("hidden");
+    });
+
+    function performBulkAction(status) {
+      const selectedIds = $$(
+        '#bulkDeliveriesList input[type="checkbox"]:checked'
+      ).map((el) => parseInt(el.value, 10));
+      if (selectedIds.length === 0) {
+        //   alert("Please select at least one delivery to update.");
+        return;
+      }
+
+      const actions = selectedIds
+        .map((id) => {
+          const delivery = deliveries.find((d) => d.id === id);
+          if (delivery) {
+            delivery.status = status;
+            return `Updating parcel for ${delivery.recipient_name} (${delivery.tracking_id}) to '${status}'`;
+          }
+        })
+        .filter(Boolean);
+
+      // alert(`Performing bulk action:\n\n${actions.join("\n")}`);
+
+      filterAndRender();
+      closeModals();
+    }
+
+    $("#bulkMarkReceivedBtn").addEventListener("click", () => {
+      performBulkAction("Received");
+    });
+
+    // ---- Search and Filter
+    searchInput.addEventListener("input", filterAndRender);
+    statusFilter.addEventListener("change", filterAndRender);
+
+    // ---- Init
+    filterAndRender();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModals();
+    });
+  </script>
+</body>
+
+</html>

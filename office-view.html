@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live 3D OfficeSpace View - Enhanced</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Import three.js and OrbitControls -->
+    <script
+      async
+      src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        --bg-grad-a: #e9e9ee;
+        --bg-grad-b: #fff6cf;
+        --bg-primary: #f0f2f8;
+        --bg-secondary: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --accent-primary: #6366f1;
+        --accent-secondary: #ede9fe;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        background: linear-gradient(
+          90deg,
+          var(--bg-grad-a) 0%,
+          var(--bg-grad-b) 100%
+        );
+        min-height: 100vh;
+      }
+      .dashboard-container {
+        display: flex;
+        height: 100vh;
+      }
+      /* Sidebar */
+      .sidebar {
+        width: 80px;
+        background-color: var(--bg-secondary);
+        padding: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-right: 1px solid var(--border-color);
+        flex-shrink: 0;
+      }
+      .sidebar .logo {
+        margin-bottom: 3rem;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .sidebar .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.75rem;
+      }
+      .sidebar .nav-item.active {
+        color: var(--accent-primary);
+      }
+      .sidebar .nav-item .icon {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+      }
+      .sidebar .nav-item.active .icon {
+        background-color: var(--accent-secondary);
+      }
+      /* Main Content */
+      .main-content {
+        flex-grow: 1;
+        padding: 1dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      .main-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-shrink: 0;
+      }
+      .main-header h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin: 0;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .add-device-btn {
+        font-family: "Poppins";
+        background: #fcd34d;
+        color: var(--text-primary);
+        font-weight: 500;
+        padding: 10px 40px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: background 0.2s ease, transform 0.2s ease,
+          box-shadow 0.2s ease;
+        white-space: nowrap;
+      }
+      .add-device-btn:hover {
+        background: #facc15;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      }
+      .user-profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr 280px;
+        gap: 2rem;
+        flex-grow: 1;
+        height: 0; /* Allow grid to fill space */
+      }
+      .side-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        overflow-y: auto;
+      }
+      .office-view-container {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+      }
+      #office-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      /* Panels */
+      .panel {
+        background-color: var(--bg-secondary);
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+      }
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .panel-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+      .panel-header .meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 22px;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 22px;
+        padding-right: 40px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: #fcd34d;
+      }
+      input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+      /* Specific Panel Styles */
+      .cctv-list .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+      }
+      .cctv-list .item:last-child {
+        margin-bottom: 0;
+      }
+      .cctv-list .item img {
+        width: 60px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+      .cctv-list .item .info {
+        flex-grow: 1;
+        margin: 0 1rem;
+      }
+      .cctv-list .item .info p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+      .cctv-list .item .info .status {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+      .doorbell-panel .content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .doorbell-panel .info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .doorbell-panel h4 {
+        margin: 0;
+        font-weight: 500;
+      }
+      .lighting-panel .content {
+        text-align: center;
+      }
+      .lighting-panel img {
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .lighting-panel .slider-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .lighting-panel input[type="range"] {
+        flex-grow: 1;
+      }
+      .vacuum-panel .content {
+        text-align: center;
+      }
+      .vacuum-panel img {
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .vacuum-panel .status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+      }
+      .climate-panel .content {
+        text-align: center;
+      }
+      .climate-panel .temp-display {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 1rem auto;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(145deg, #e6e8ee, #ffffff);
+        box-shadow: inset 5px 5px 10px #d8dae0, inset -5px -5px 10px #ffffff;
+      }
+      .climate-panel .temp-display span {
+        font-size: 2.5rem;
+        font-weight: 600;
+      }
+      /* NEW/MODIFIED STYLES for Thermometer Slider */
+      .climate-panel .slider-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .climate-panel input[type="range"] {
+        flex-grow: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(to right, #3b82f6, #fbbf24, #ef4444);
+        border-radius: 5px;
+        outline: none;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+      .climate-panel input[type="range"]:hover {
+        opacity: 1;
+      }
+      .climate-panel input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        background: white;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid var(--accent-primary);
+        box-shadow: var(--shadow-sm);
+      }
+      .climate-panel input[type="range"]::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        background: white;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid var(--accent-primary);
+        box-shadow: var(--shadow-sm);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <main class="main-content">
+        <header class="main-header">
+          <h1>Live 3D OfficeSpace View</h1>
+          <div class="header-actions">
+            <button class="add-device-btn">Add Device</button>
+          </div>
+        </header>
+        <div class="content-grid">
+          <div class="side-column">
+            <!-- CCTV Panel -->
+            <div class="panel cctv-panel">
+              <div class="panel-header">
+                <h3>CCTVs</h3>
+                <span class="meta">4 Devices</span>
+              </div>
+              <div class="cctv-list">
+                <div class="item">
+                  <img
+                    src="https://www.bromic.co.uk/wp-content/uploads/sites/4/2021/12/Crown-Towers-Perth-Bromic-Tungsten-Electric-1600x1067.jpg"
+                    alt="Outdoor Camera"
+                  />
+                  <div class="info">
+                    <p>Outdoor Camera 1</p>
+                    <span class="status">Outdoor view</span>
+                  </div>
+                  <label class="toggle-switch"
+                    ><input type="checkbox" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="item">
+                  <img
+                    src="https://skootrfinsave.com/blog/wp-content/uploads/2018/11/Skootr-Office-Space-common-mistakes.jpg"
+                    alt="Workspace Design"
+                  />
+                  <div class="info">
+                    <p>Workspace Design</p>
+                    <span class="status">Live</span>
+                  </div>
+                  <label class="toggle-switch"
+                    ><input type="checkbox" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+              </div>
+            </div>
+            <!-- Doorbell Panel -->
+            <div class="panel doorbell-panel">
+              <div class="content">
+                <div class="info">
+                  <span>...</span>
+                  <h4>Door Bell</h4>
+                </div>
+                <label class="toggle-switch"
+                  ><input type="checkbox" /><span class="slider"></span
+                ></label>
+              </div>
+            </div>
+          </div>
+          <div class="office-view-container">
+            <canvas id="office-canvas"></canvas>
+          </div>
+          <div class="side-column">
+            <!-- Lighting Panel -->
+            <div class="panel lighting-panel">
+              <div class="panel-header">
+                <h3>Lighting</h3>
+                <label class="toggle-switch"
+                  ><input type="checkbox" id="lighting-toggle" checked /><span
+                    class="slider"
+                  ></span
+                ></label>
+              </div>
+              <div class="content">
+                <img
+                  src="https://media.istockphoto.com/id/1356916206/vector/pendant-lamp-with-a-ray-of-light-interior-design-element-vector-illustration.jpg?s=612x612&w=0&k=20&c=olocgJ2Iuu8OOSWrYxhtIl_ICqZGpHnuCTH0HOFoAUs="
+                  alt="Lamp"
+                />
+                <div class="slider-control">
+                  <span>🔆</span>
+                  <input
+                    type="range"
+                    id="lighting-slider"
+                    min="0"
+                    max="100"
+                    value="75"
+                  />
+                  <span id="lighting-percentage">75%</span>
+                </div>
+              </div>
+            </div>
+            <!-- Vacuum Panel -->
+            <div class="panel vacuum-panel">
+              <div class="panel-header">
+                <h3>Robot Vacuum Cleaner</h3>
+                <span class="meta">4 Devices</span>
+              </div>
+              <div class="content">
+                <img
+                  src="https://media.istockphoto.com/id/1936830995/vector/vacuum-cleaner-on-white-background.jpg?s=612x612&w=0&k=20&c=8Q-bTvKRWNr4xc3zMVs2QdpHaCVuxvkzMmWp5h44RoA="
+                  alt="Robot Vacuum"
+                />
+                <div class="status">
+                  <span>Next Cleaning: 09:00 AM</span>
+                  <span>Battery: 64%</span>
+                </div>
+              </div>
+            </div>
+            <!-- Climate Panel -->
+            <div class="panel climate-panel">
+              <div class="panel-header">
+                <h3>Climate Control</h3>
+                <label class="toggle-switch"
+                  ><input type="checkbox" checked /><span class="slider"></span
+                ></label>
+              </div>
+              <div class="content">
+                <div class="temp-display">
+                  <span id="temp-value">24°</span>
+                </div>
+                <!-- NEW Slider for Temp Control -->
+                <div class="slider-control">
+                  <span>❄️</span>
+                  <input
+                    type="range"
+                    id="climate-slider"
+                    min="16"
+                    max="30"
+                    value="24"
+                  />
+                  <span>🔥</span>
+                </div>
+                <p style="margin-top: 1rem">5 Air Conditions</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      // --- Basic Setup ---
+      const container = document.querySelector(".office-view-container");
+      const canvas = document.getElementById("office-canvas");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xdee2f0);
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(15, 15, 15);
+      const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+      });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      // --- Controls ---
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.screenSpacePanning = false;
+      controls.maxPolarAngle = Math.PI / 2.1;
+      controls.minDistance = 5;
+      controls.maxDistance = 50;
+      // --- Lighting ---
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(20, 30, 15);
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      directionalLight.shadow.camera.left = -20;
+      directionalLight.shadow.camera.right = 20;
+      directionalLight.shadow.camera.top = 20;
+      directionalLight.shadow.camera.bottom = -20;
+      directionalLight.shadow.bias = -0.001;
+      scene.add(directionalLight);
+      // --- Materials ---
+      const floorMaterial = new THREE.MeshStandardMaterial({ color: 0xf0f0f0 });
+      const wallMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.DoubleSide,
+      });
+      const furnitureMaterial = new THREE.MeshStandardMaterial({
+        color: 0x966f33,
+        roughness: 0.7,
+      });
+      const personMaterial = new THREE.MeshStandardMaterial({
+        color: 0x4b5563,
+        roughness: 0.5,
+      });
+      const skinMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffdbac,
+        roughness: 0.6,
+      });
+      const plantMaterial = new THREE.MeshStandardMaterial({
+        color: 0x228b22,
+      });
+      const wallLightMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xffd580,
+        emissiveIntensity: 1,
+      });
+      const acMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.2,
+      });
+      const monitorMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111827,
+      });
+      // --- Geometry Creation Functions ---
+      const wallHeight = 4;
+      const wallThickness = 0.2;
+      const pointLights = []; // Array to hold point lights
+      function createWall(width, height, depth, x, y, z, rotation = 0) {
+        const wall = new THREE.Mesh(
+          new THREE.BoxGeometry(width, height, depth),
+          wallMaterial
+        );
+        wall.position.set(x, y, z);
+        wall.rotation.y = rotation;
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        scene.add(wall);
+      }
+      function createMonitor(x, y, z, rotation = 0) {
+        const monitor = new THREE.Mesh(
+          new THREE.BoxGeometry(0.8, 0.5, 0.05),
+          monitorMaterial
+        );
+        monitor.position.set(x, y, z);
+        monitor.rotation.y = rotation;
+        monitor.castShadow = true;
+        scene.add(monitor);
+      }
+      function createDesk(x, z, rotation = 0) {
+        const desk = new THREE.Mesh(
+          new THREE.BoxGeometry(2, 0.1, 1),
+          furnitureMaterial
+        );
+        desk.position.set(x, 1, z);
+        desk.rotation.y = rotation;
+        desk.castShadow = true;
+        desk.receiveShadow = true;
+        scene.add(desk);
+      }
+      function createChair(x, z, rotation = 0) {
+        const chair = new THREE.Group();
+        const seat = new THREE.Mesh(
+          new THREE.BoxGeometry(0.7, 0.2, 0.7),
+          furnitureMaterial
+        );
+        seat.position.y = 0.5;
+        const back = new THREE.Mesh(
+          new THREE.BoxGeometry(0.7, 0.8, 0.1),
+          furnitureMaterial
+        );
+        back.position.y = 1;
+        back.position.z = -0.3;
+        chair.add(seat, back);
+        chair.position.set(x, 0, z);
+        chair.rotation.y = rotation;
+        chair.castShadow = true;
+        scene.add(chair);
+        return chair;
+      }
+      function createHuman(x, z, rotation = 0) {
+        const group = new THREE.Group();
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2),
+          skinMaterial
+        );
+        head.position.y = 1.6;
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.25, 0.2, 0.8),
+          personMaterial
+        );
+        body.position.y = 1;
+        const leg1 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.1, 0.08, 0.8),
+          personMaterial
+        );
+        leg1.position.set(-0.1, 0.4, 0);
+        const leg2 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.1, 0.08, 0.8),
+          personMaterial
+        );
+        leg2.position.set(0.1, 0.4, 0);
+        const arm1 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.06, 0.7),
+          personMaterial
+        );
+        arm1.position.set(-0.3, 1.1, 0);
+        arm1.rotation.z = Math.PI / 6;
+        const arm2 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.06, 0.7),
+          personMaterial
+        );
+        arm2.position.set(0.3, 1.1, 0);
+        arm2.rotation.z = -Math.PI / 6;
+        group.add(head, body, leg1, leg2, arm1, arm2);
+        group.position.set(x, 0, z);
+        group.rotation.y = rotation;
+        group.castShadow = true;
+        scene.add(group);
+      }
+      function createSeatedHuman(chair) {
+        const group = new THREE.Group();
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2),
+          skinMaterial
+        );
+        head.position.y = 1.3;
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.25, 0.2, 0.6),
+          personMaterial
+        );
+        body.position.y = 0.8;
+        const arm1 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.06, 0.5),
+          personMaterial
+        );
+        arm1.position.set(-0.2, 0.9, 0.2);
+        arm1.rotation.z = Math.PI / 4;
+        arm1.rotation.x = -Math.PI / 4;
+        const arm2 = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.06, 0.5),
+          personMaterial
+        );
+        arm2.position.set(0.2, 0.9, 0.2);
+        arm2.rotation.z = -Math.PI / 4;
+        arm2.rotation.x = -Math.PI / 4;
+        group.add(head, body, arm1, arm2);
+        group.castShadow = true;
+        chair.add(group);
+      }
+      function createWallLight(x, y, z, rotation = 0) {
+        const group = new THREE.Group();
+        const base = new THREE.Mesh(
+          new THREE.BoxGeometry(0.2, 0.4, 0.1),
+          new THREE.MeshStandardMaterial({ color: 0x555555 })
+        );
+        const lightBulb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1),
+          wallLightMaterial
+        );
+        lightBulb.position.y = 0.1;
+        const light = new THREE.PointLight(0xffdcb4, 0.8, 8);
+        light.position.y = 0.1;
+        light.castShadow = true;
+        group.add(base, lightBulb, light);
+        group.position.set(x, y, z);
+        group.rotation.y = rotation;
+        scene.add(group);
+        pointLights.push(light);
+      }
+      function createACUnit(x, y, z, rotation = 0) {
+        const ac = new THREE.Mesh(
+          new THREE.BoxGeometry(1.5, 0.4, 0.3),
+          acMaterial
+        );
+        ac.position.set(x, y, z);
+        ac.rotation.y = rotation;
+        ac.castShadow = true;
+        scene.add(ac);
+      }
+      function createSofa(x, z, rotation = 0) {
+        const sofa = new THREE.Group();
+        const base = new THREE.Mesh(
+          new THREE.BoxGeometry(2.5, 0.5, 1),
+          furnitureMaterial
+        );
+        base.position.y = 0.25;
+        const back = new THREE.Mesh(
+          new THREE.BoxGeometry(2.5, 0.5, 0.2),
+          furnitureMaterial
+        );
+        back.position.y = 0.75;
+        back.position.z = -0.4;
+        sofa.add(base, back);
+        sofa.position.set(x, 0, z);
+        sofa.rotation.y = rotation;
+        sofa.castShadow = true;
+        scene.add(sofa);
+      }
+      function createPlant(x, z) {
+        const group = new THREE.Group();
+        const pot = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.4, 0.3, 0.6),
+          furnitureMaterial
+        );
+        pot.receiveShadow = true;
+        const soil = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.35, 0.25, 0.1),
+          new THREE.MeshStandardMaterial({ color: 0x5c4033 })
+        );
+        soil.position.y = 0.3;
+        const stem = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.05, 0.5),
+          plantMaterial
+        );
+        stem.position.y = 0.6;
+        const leaves = new THREE.Mesh(
+          new THREE.SphereGeometry(0.4),
+          plantMaterial
+        );
+        leaves.position.y = 1;
+        group.add(pot, soil, stem, leaves);
+        group.position.set(x, 0.3, z);
+        group.castShadow = true;
+        scene.add(group);
+      }
+      // --- Scene Construction ---
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(28, 28),
+        floorMaterial
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      scene.add(floor);
+      const ceiling = new THREE.Mesh(
+        new THREE.PlaneGeometry(28, 28),
+        new THREE.MeshStandardMaterial({ color: 0xe0e0e0 })
+      );
+      ceiling.rotation.x = Math.PI / 2;
+      ceiling.position.y = wallHeight;
+      scene.add(ceiling);
+      // --- Existing Layout ---
+      createWall(20, wallHeight, wallThickness, 0, wallHeight / 2, -10);
+      createWall(20, wallHeight, wallThickness, 0, wallHeight / 2, 10);
+      createWall(wallThickness, wallHeight, 20, -10, wallHeight / 2, 0);
+      createWall(wallThickness, wallHeight, 20, 10, wallHeight / 2, 0);
+      createWall(10, wallHeight, wallThickness, -5, wallHeight / 2, 0);
+      createWall(wallThickness, wallHeight, 6, 0, wallHeight / 2, -7);
+      createWall(wallThickness, wallHeight, 6, 0, wallHeight / 2, 3);
+      createWall(
+        wallThickness,
+        wallHeight,
+        6,
+        5,
+        wallHeight / 2,
+        7,
+        -Math.PI / 2
+      );
+      // Rooms and Furniture...
+      createDesk(-7, -8);
+      const seatedChair1 = createChair(-7, -7);
+      createSeatedHuman(seatedChair1);
+      createPlant(-9, -9);
+      createACUnit(-7, wallHeight - 0.5, -9.9);
+      createDesk(-7, 5);
+      createChair(-7, 6);
+      createHuman(-4, 8, Math.PI / 2);
+      createACUnit(-7, wallHeight - 0.5, 9.9, Math.PI);
+      createSofa(-7, 2, Math.PI / 2);
+      createPlant(-9, 4);
+      const table = new THREE.Mesh(
+        new THREE.BoxGeometry(4, 0.1, 2),
+        furnitureMaterial
+      );
+      table.position.set(5, 1, 5);
+      table.castShadow = true;
+      table.receiveShadow = true;
+      scene.add(table);
+      createChair(3, 5);
+      createChair(7, 5);
+      createChair(5, 3.5, Math.PI / 2);
+      createChair(5, 6.5, -Math.PI / 2);
+      createACUnit(9.9, wallHeight - 0.5, 5, -Math.PI / 2);
+      createWallLight(-9.9, 2.5, -2, Math.PI / 2);
+      createWallLight(9.9, 2.5, -5, -Math.PI / 2);
+      createWallLight(2, 2.5, -9.9);
+      const startX = 2;
+      const startZ = -8;
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          const x = startX + i * 4;
+          const z = startZ + j * 3;
+          createDesk(x, z);
+          createMonitor(x, 1.3, z - 0.3);
+          const seatedChair = createChair(x, z + 1, Math.PI);
+          createSeatedHuman(seatedChair);
+        }
+      }
+      createChair(2, 2, Math.PI / 4);
+      createChair(3, 1, -Math.PI / 4);
+      const sideTable = new THREE.Mesh(
+        new THREE.BoxGeometry(0.8, 0.5, 0.8),
+        furnitureMaterial
+      );
+      sideTable.position.set(-9, 0.25, 1);
+      sideTable.castShadow = true;
+      scene.add(sideTable);
+      createWallLight(9.9, 2.5, 2, -Math.PI / 2);
+      // --- Lighting Controls ---
+      const lightingToggle = document.getElementById("lighting-toggle");
+      const lightingSlider = document.getElementById("lighting-slider");
+      const lightingPercentageSpan = document.getElementById(
+        "lighting-percentage"
+      );
+      const originalAmbientIntensity = ambientLight.intensity;
+      const originalDirectionalIntensity = directionalLight.intensity;
+      const originalWallLightEmissiveIntensity =
+        wallLightMaterial.emissiveIntensity;
+      const originalPointLightIntensity = 0.8;
+      function updateLighting() {
+        const isEnabled = lightingToggle.checked;
+        const percentage = parseInt(lightingSlider.value);
+        const factor = percentage / 100;
+        lightingPercentageSpan.textContent = `${percentage}%`;
+        // Determine target intensities based on both toggle and slider
+        const targetAmbient = isEnabled
+          ? originalAmbientIntensity * factor
+          : 0.05;
+        const targetDirectional = isEnabled
+          ? originalDirectionalIntensity * factor
+          : 0.05;
+        const targetEmissive = isEnabled
+          ? originalWallLightEmissiveIntensity * factor
+          : 0;
+        const targetPoint = isEnabled ? originalPointLightIntensity * factor : 0;
+        // Apply new intensities directly
+        ambientLight.intensity = targetAmbient;
+        directionalLight.intensity = targetDirectional;
+        wallLightMaterial.emissiveIntensity = targetEmissive;
+        pointLights.forEach((light) => {
+          light.intensity = targetPoint;
+        });
+      }
+      lightingToggle.addEventListener("change", updateLighting);
+      lightingSlider.addEventListener("input", updateLighting);
+      updateLighting();
+
+      // --- NEW: Climate Control Slider ---
+      const climateSlider = document.getElementById("climate-slider");
+      const tempValueSpan = document.getElementById("temp-value");
+
+      function updateClimateDisplay() {
+        tempValueSpan.textContent = `${climateSlider.value}°`;
+      }
+      climateSlider.addEventListener("input", updateClimateDisplay);
+      updateClimateDisplay();
+
+      // --- Animation Loop ---
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      // --- Handle Resize ---
+      function onWindowResize() {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+      window.addEventListener("resize", onWindowResize);
+      // Start animation
+      animate();
+    </script>
+  </body>
+</html>

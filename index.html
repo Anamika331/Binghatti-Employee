@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crextio - Modern Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="style.css" rel="stylesheet">
+    <style>
+        /* ================================================
+        --- 1. FONT & GLOBAL STYLES
+        ================================================ */
+
+        /* --- Google Fonts: Poppins --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+        /* --- CSS Variables for Theming --- */
+        :root {
+            --bg-main: linear-gradient(90deg, #e9e9ee 0%, #fff6cf 100%);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-dark: #2D2D2D;
+            --bg-card-dark-secondary: #424242;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-light: #FFFFFF;
+            --accent-yellow: #F5C842;
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-gradient: linear-gradient(90deg, #e9e9ee 0%, #fff6cf 100%);
+            --accent-gradient-alt: linear-gradient(135deg, #F5C842 0%, #FF6B35 100%);
+            --border-color: #E5E7EB;
+            --border-color-soft: #EEEEEE;
+            --progress-fill-light: #F0F0F0;
+            --shadow-soft: rgba(99, 99, 99, 0.08);
+            --shadow-medium: rgba(99, 99, 99, 0.15);
+            --shadow-accent: rgba(233, 233, 238, 0.4);
+        }
+
+        /* --- Basic Setup --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ================================================
+        --- 2. MAIN LAYOUT & DASHBOARD CONTAINER
+        ================================================ */
+
+        .dashboard-container {
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header positioned outside main content --- */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, rgba(233, 233, 238, 0.95), rgba(255, 246, 207, 0.95));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(233, 233, 238, 0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        /* --- Main Content Grid --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: minmax(320px, 1.1fr) 2.5fr minmax(380px, 1.2fr);
+            grid-template-rows: auto 1fr;
+            gap: 15px;
+            overflow-y: auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* --- Custom Scrollbar --- */
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--accent-gradient);
+            border-radius: 3px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #d4d4d9 0%, #f0e6b8 100%);
+        }
+
+        /* ================================================
+        --- 3. HEADER SECTION
+        ================================================ */
+
+        /* --- Logo --- */
+        .logo-container {
+            background: var(--accent-gradient);
+            border-radius: 999px;
+            padding: 12px 30px;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Main Navigation --- */
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 207, 0.8));
+            backdrop-filter: blur(10px);
+            border-radius: 999px;
+            padding: 5px;
+            box-shadow: 0 8px 25px var(--shadow-soft);
+            border: 1px solid rgba(233, 233, 238, 0.3);
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 999px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .main-nav a:hover {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px var(--shadow-accent);
+            transform: translateY(-1px);
+        }
+
+        .main-nav a.active {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        /* --- Header Actions --- */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-actions .setting-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 246, 207, 0.8));
+            border-radius: 999px;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-soft);
+        }
+
+        .header-actions .setting-btn:hover {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-accent);
+        }
+
+        .header-actions .icon-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 207, 0.8));
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-soft);
+        }
+
+        .header-actions .icon-btn:hover {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 8px 25px var(--shadow-accent);
+        }
+
+        .header-actions .icon-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .user-profile-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            background-image: url('https://i.pravatar.cc/300?u=nixtio');
+            background-size: cover;
+            background-position: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-soft);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .user-profile-btn:hover {
+            transform: scale(1.1);
+            border-color: #e9e9ee;
+            box-shadow: 0 8px 25px var(--shadow-accent);
+        }
+
+        /* ================================================
+        --- 4. GENERIC & REUSABLE COMPONENTS
+        ================================================ */
+
+        /* --- Card Style --- */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 1px solid rgba(233, 233, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card.interactive:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card.interactive:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px var(--shadow-medium);
+            border-color: rgba(233, 233, 238, 0.5);
+        }
+
+        /* --- Widget Header --- */
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .widget-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            background: black;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .widget-header .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        .widget-header .icon-btn:hover {
+            transform: rotate(45deg) scale(1.1);
+            box-shadow: 0 6px 20px var(--shadow-accent);
+        }
+
+        /* ================================================
+        --- 5. MAIN CONTENT CARDS
+        ================================================ */
+
+        /* --- Welcome Header Card --- */
+        .welcome-header {
+            grid-column: 1 / -1;
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            gap: 20px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .welcome-header h1 {
+            font-size: 50px;
+            font-weight: 100;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        }
+
+        .stats-overview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bars-container {
+            flex-grow: 1;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            padding-right: 40px;
+        }
+
+        .progress-item {
+            flex: 1;
+        }
+
+        .progress-item .label {
+            font-size: 15px;
+            color: rgba(17, 24, 39, 0.8);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .solid-progress-bar {
+            height: 10px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.135);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .solid-progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+            background: #ede5c4;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .key-metrics {
+            display: flex;
+            gap: 40px;
+            padding-left: 40px;
+            border-left: 1px solid rgba(17, 24, 39, 0.3);
+        }
+
+        .metric {
+            text-align: left;
+            animation: countUp 2s ease-out;
+        }
+
+        .metric .value {
+            font-size: 42px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric .label {
+            font-size: 14px;
+            color: rgba(17, 24, 39, 0.8);
+            font-weight: 500;
+        }
+
+        /* --- Left Column --- */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+            min-height: 344px;
+
+        }
+
+        .profile-card-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transition: transform 0.4s ease;
+        }
+
+        .profile-card:hover .profile-card-image {
+            transform: scale(1.05);
+        }
+
+        .profile-card-overlay {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 30%, transparent 100%);
+        }
+
+        .profile-card-info h2 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #FFFFFF;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-card-info p {
+            font-size: 14px;
+            color: #E0E0E0;
+            margin-top: 5px;
+        }
+
+        .profile-card-badge {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            display: inline-block;
+            align-self: flex-start;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        /* Info List Card */
+        .info-list-card {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* New styles for the accordion */
+        .info-accordion-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+        }
+
+        .info-item-header:hover {
+            background: linear-gradient(135deg, rgba(233, 233, 238, 0.3), rgba(255, 246, 207, 0.3));
+        }
+
+        .info-item-header .label {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .info-item-header .chevron {
+            color: var(--text-secondary);
+            font-size: 25px;
+            transition: transform 0.2s ease;
+        }
+
+        .info-item-header.active .chevron {
+            transform: rotate(90deg);
+        }
+
+        .info-item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            padding: 0 10px;
+        }
+
+        .info-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        .info-icon-container {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .info-text {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-text-main {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .info-text-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .dot-menu {
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        /* --- Center Column --- */
+        .center-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 15px;
+        }
+
+        /* Progress Widget */
+        .progress-widget {
+            padding: 25px;
+            min-height: 300px;
+            background: linear-gradient(135deg, var(--bg-card), rgba(233, 233, 238, 0.1));
+        }
+
+        .progress-content {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .progress-main-stats {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .progress-main-stats .main-stat {
+            font-size: 36px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.662);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .progress-main-stats .sub-stat {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .weekly-progress-chart-container {
+            min-height: 150px;
+            position: relative;
+        }
+
+        .time-badge {
+            position: absolute;
+            top: -5px;
+            right: 20%;
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 10;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+            animation: pulse 2s infinite;
+        }
+
+        /* Time Tracker Widget */
+        .time-tracker-widget {
+            background: linear-gradient(135deg, var(--bg-card), rgba(255, 246, 207, 0.2));
+            min-height: 300px;
+        }
+
+        .time-tracker-widget .timer-display {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .time-tracker-widget .timer-circle {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 4px 8px rgba(233, 233, 238, 0.3));
+        }
+
+        .time-tracker-widget .timer-bg-circle,
+        .time-tracker-widget .timer-progress-circle {
+            fill: none;
+            stroke-width: 12;
+        }
+
+        .time-tracker-widget .timer-bg-circle {
+            stroke: rgba(0, 0, 0, 0.135);
+        }
+
+        .time-tracker-widget .timer-progress-circle {
+            stroke: #fff6cf;
+            stroke-linecap: round;
+            stroke-dasharray: 503;
+            stroke-dashoffset: 280;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .time-tracker-widget .timer-text {
+            position: absolute;
+            text-align: center;
+        }
+
+        .time-tracker-widget .time {
+            font-size: 36px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.662);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .time-tracker-widget .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .time-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .time-controls .control-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 207, 0.8));
+            border: none;
+            font-size: 20px;
+            /* Smaller Icon Font Size */
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            /* Smaller Width */
+            height: 35px;
+            /* Smaller Height */
+            padding: 5px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-soft);
+        }
+
+        .time-controls .control-btn:hover {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px var(--shadow-accent);
+        }
+
+        .time-controls .dark-btn {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        .time-controls .dark-btn:hover {
+            transform: translateY(-3px) rotate(90deg) scale(1.1);
+        }
+
+        /* Schedule Card */
+        .schedule-card {
+            grid-column: 1 / -1;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--bg-card), rgba(59, 130, 246, 0.05));
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-nav button {
+            background: var(--accent-gradient);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        .date-nav button:hover {
+            transform: scale(1.1);
+        }
+
+        .date-nav h3 {
+            font-size: 18px;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.432);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .schedule-days {
+            display: flex;
+            gap: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .day {
+            padding: 15px 10px;
+            flex: 1;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .day:hover {
+            background: rgba(233, 233, 238, 0.3);
+        }
+
+        .day .day-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .day .day-number {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 50%;
+            margin: 8px auto 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .day .day-number.active {
+            background: var(--accent-gradient);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px var(--shadow-accent);
+            transform: scale(1.1);
+        }
+
+        .day .day-number:hover:not(.active) {
+            background-color: rgba(233, 233, 238, 0.4);
+            transform: scale(1.05);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .timeline-time {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            width: 80px;
+            text-align: right;
+            padding-top: 15px;
+        }
+
+        .timeline-event {
+            flex-grow: 1;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 207, 0.5));
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-event:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px var(--shadow-medium);
+        }
+
+        .event-sync {
+            border-color: var(--accent-purple);
+            background: linear-gradient(135deg, #1F1F1F, #2D2D2D);
+        }
+
+        .event-sync .event-details p,
+        .event-sync .event-details span {
+            color: white;
+        }
+
+        .event-session {
+            border-color: var(--accent-blue);
+            background: linear-gradient(135deg, var(--bg-card), rgba(59, 130, 246, 0.1));
+        }
+
+        .event-details p {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .event-details span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .event-avatars {
+            display: flex;
+        }
+
+        .event-avatars img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-left: -12px;
+            transition: transform 0.3s ease;
+        }
+
+        .event-avatars img:first-child {
+            margin-left: 0;
+        }
+
+        .event-avatars img:hover {
+            transform: scale(1.1) translateY(-2px);
+            z-index: 10;
+        }
+
+        /* --- Right Column --- */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Onboarding Card */
+        .onboarding-parent-card {
+            padding: 25px;
+            background: linear-gradient(135deg, var(--bg-card), rgba(139, 92, 246, 0.05));
+        }
+
+        .onboarding-parent-card .widget-header {
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .onboarding-parent-card .widget-header h3 {
+            font-size: 22px;
+        }
+
+        .onboarding-parent-card .widget-header .percent {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .onboarding-progress-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .onboarding-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+        }
+
+        .onboarding-progress-labels span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .onboarding-progress-bars {
+            display: flex;
+            width: 100%;
+            height: 35px;
+        }
+
+        .onboarding-progress-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .onboarding-progress-bar.task {
+            background: var(--accent-gradient);
+            width: 45%;
+            z-index: 3;
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        .onboarding-progress-bar.black {
+            background: linear-gradient(135deg, var(--bg-card-dark), #1a1a1a);
+            width: 35%;
+            margin-left: -15px;
+            z-index: 2;
+            color: white;
+        }
+
+        .onboarding-progress-bar.grey {
+            background: linear-gradient(135deg, #D1D5DB, #9CA3AF);
+            width: 20%;
+            margin-left: -15px;
+            z-index: 1;
+            color: white;
+        }
+
+        .onboarding-task-card {
+            background: linear-gradient(145deg, #3a3a3a, #282828);
+            color: var(--text-light);
+            border-radius: 20px;
+            padding: 25px;
+            flex-grow: 1;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(233, 233, 238, 0.2);
+        }
+
+        .onboarding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .onboarding-header h4 {
+            font-size: 18px;
+            font-weight: 600;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .onboarding-header span {
+            font-size: 18px;
+            color: #a0a0a0;
+            font-weight: 600;
+        }
+
+        .onboarding-task-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--bg-card-dark-secondary);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-task-item:hover {
+            background-color: var(--bg-card-dark-secondary);
+            transform: translateX(5px);
+            border-color: #e9e9ee;
+        }
+
+        .onboarding-task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-icon-container {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--bg-card-dark-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-icon-container svg {
+            width: 22px;
+            height: 22px;
+            color: #a0a0a0;
+            transition: color 0.3s ease;
+        }
+
+        .task-details {
+            flex-grow: 1;
+        }
+
+        .task-details p {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .task-details span {
+            font-size: 13px;
+            color: #a0a0a0;
+            margin-top: 4px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .task-completion-status {
+            width: 28px;
+            height: 28px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .onboarding-task-item.completed .task-completion-status {
+            opacity: 1;
+        }
+
+        .onboarding-task-item.completed .task-icon-container {
+            background: var(--accent-gradient);
+            box-shadow: 0 4px 15px var(--shadow-accent);
+        }
+
+        .onboarding-task-item.completed .task-icon-container svg {
+            color: var(--text-primary);
+        }
+
+        /* ================================================
+        --- 6. ANIMATIONS & EFFECTS
+        ================================================ */
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================================================
+        --- 7. RESPONSIVE DESIGN
+        ================================================ */
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .welcome-header {
+                grid-column: 1 / -1;
+            }
+
+            .center-column {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 20px;
+            }
+
+            .main-nav {
+                display: none;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .progress-bars-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .key-metrics {
+                border-left: none;
+                border-top: 1px solid rgba(17, 24, 39, 0.3);
+                padding-left: 0;
+                padding-top: 20px;
+                margin-top: 20px;
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            /* spacing between image and text */
+            padding: 8px;
+        }
+
+        .logo-image {
+            height: 40px;
+            /* adjust as needed */
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            /* or any suitable color */
+        }
+
+
+        /* ================================================
+        --- 8. GRADIENT DEFINITIONS FOR SVG
+        ================================================ */
+
+        .gradient-defs {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .add-visitor-btn {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #00F5A0, #00D9F5);
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 217, 245, 0.4);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .add-visitor-btn:hover {
+            background: linear-gradient(135deg, #00D9F5, #00F5A0);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 245, 0.6);
+        }
+
+
+        .add-visitor-btn2 {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6C63FF, #00C9FF);
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .add-visitor-btn2:hover {
+            background: linear-gradient(135deg, #00C9FF, #6C63FF);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="gradient-defs">
+        <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#e9e9ee;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#fff6cf;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="dashboard-container">
+
+        <header class="header">
+            <div class="logo-container">
+                <img src="pixellent.png" class="logo-image">
+                <div class="logo-text"></div>
+            </div>
+
+
+            <nav class="main-nav">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="employee-attendance.html">Attendance</a>
+                <a href="salary_employee.html">Salary</a>
+                <a href="parking.html">Parking</a>
+                <a href="delivery_Employee.html">Delivery</a>
+                <a href="pantry.html">Pantry</a>
+                <a href="employee_appointments.html">Appointments</a>
+                <a href="meeting-room.html">Facilities</a>
+                <a href="visitior-list.html">Visitor</a>
+                <a href="anoucement.html">Insights</a>
+                <a href="employee-chat.html">Chats</a>
+                <a href="maintenance.html">Maintenance</a>
+
+            </nav>
+
+            <div class="header-actions">
+                <a href="AI-assistant.html" class="setting-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
+                        height="20">
+                        <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+                    </svg>
+                    <span>AI</span>
+                </a>
+                <button class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+                        </path>
+                    </svg>
+                </button>
+                <div class="user-profile-btn"></div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="card welcome-header">
+                <div style="display: flex;justify-content: space-between;align-items: center;">
+                    <h1 style="font-weight: 100;">Welcome in, Joy</h1>
+                    <div>
+                        <a href="room-booking-4.html" class="add-visitor-btn2" id="addVisitorBtn"
+                            style="text-decoration: none;">Hot
+                            Desk</a>
+                        <a href="navigation.html" class="add-visitor-btn" id="addVisitorBtn"
+                            style="text-decoration: none;">Smart
+                            Navigation System</a>
+                    </div>
+                </div>
+                <!--  -->
+            </div>
+
+            <div class="left-column">
+                <div class="card profile-card interactive">
+                    <img src="woman.png" alt="Lora Piterson" class="profile-card-image">
+                    <div class="profile-card-overlay">
+                        <div class="profile-card-info">
+                            <h2>Amilia Johnson</h2>
+                            <p>UX/UI Designer</p>
+                        </div>
+                        <div class="profile-card-badge">$1,200</div>
+                    </div>
+                </div>
+                <div class="card info-list-card interactive">
+                    <div class="info-accordion-item">
+                        <div class="info-item-header">
+                            <span class="label">Pension contributions</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="info-item-content">
+                            <div class="info-detail-row">
+                                <div class="info-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        width="36" height="36">
+                                        <path
+                                            d="M10.425 4.5A6.002 6.002 0 0 0 5.25 8.25v.75a.75.75 0 0 1-1.5 0V7.5a1.5 1.5 0 0 1 1.5-1.5h.105a6.001 6.001 0 0 1 9.29 0H15a1.5 1.5 0 0 1 1.5 1.5v1.5a.75.75 0 0 1-1.5 0v-.75a6.002 6.002 0 0 0-5.175-3.75Zm-2.175 6a.75.75 0 0 0 0 1.5h.9a4.5 4.5 0 0 1 4.5 4.5v.75a.75.75 0 0 0 1.5 0v-.75a6 6 0 0 0-6-6h-.9Zm1.22 3.97a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06Z">
+                                        </path>
+                                        <path
+                                            d="M3 12.75a.75.75 0 0 1 .75-.75h.316a6.02 6.02 0 0 1 3.518 1.018A4.48 4.48 0 0 0 5.25 12.75a.75.75 0 0 1-1.5 0 5.98 5.98 0 0 1 2.52-4.765A5.98 5.98 0 0 1 3 3.75a.75.75 0 0 1 0-1.5 7.479 7.479 0 0 0 5.25-2.141 7.479 7.479 0 0 0-5.25 2.141.75.75 0 0 1-1.06-.02A8.981 8.981 0 0 1 7.82 1.5h8.36a8.981 8.981 0 0 1 5.92 2.23.75.75 0 0 1-1.04 1.08A7.48 7.48 0 0 0 15.75 3a7.48 7.48 0 0 0-4.938 1.765 5.98 5.98 0 0 1 4.938 4.935.75.75 0 0 1-1.5 0 4.48 4.48 0 0 0-2.316-3.882 6.02 6.02 0 0 1 3.518-1.018h.316a.75.75 0 0 1 0 1.5H18a5.98 5.98 0 0 1-2.52 4.765A5.98 5.98 0 0 1 21 17.25a.75.75 0 0 1 0 1.5 7.479 7.479 0 0 0-5.25 2.141 7.479 7.479 0 0 0 5.25-2.141.75.75 0 0 1 1.06.02A8.981 8.981 0 0 1 16.18 22.5H7.82a8.981 8.981 0 0 1-5.92-2.23.75.75 0 0 1 1.04-1.08A7.48 7.48 0 0 0 8.25 21a7.48 7.48 0 0 0 4.938-1.765 5.98 5.98 0 0 1-4.938-4.935.75.75 0 0 1 1.5 0 4.48 4.48 0 0 0 2.316 3.882 6.02 6.02 0 0 1-3.518 1.018H3.75a.75.75 0 0 1 0-1.5H6a5.98 5.98 0 0 1 2.52-4.765A5.98 5.98 0 0 1 3 12.75Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="info-text">
+                                    <span class="info-text-main">Standard Plan</span>
+                                    <span class="info-text-sub">5% Contribution</span>
+                                </div>
+                                <span class="dot-menu">⋯</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-accordion-item">
+                        <div class="info-item-header">
+                            <span class="label">Devices</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="info-item-content">
+                            <div class="info-detail-row">
+                                <div class="info-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        width="36" height="36">
+                                        <path
+                                            d="M12 2.25a.75.75 0 0 1 .75.75v11.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 0 1 1.06-1.06l1.72 1.72V3a.75.75 0 0 1 .75-.75Zm-3.086 4.293a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0ZM6 18a.75.75 0 0 0-1.5 0v1.5A2.25 2.25 0 0 0 6.75 21.75h10.5A2.25 2.25 0 0 0 19.5 19.5V18a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V18Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="info-text">
+                                    <span class="info-text-main">MacBook Air M1</span>
+                                    <span class="info-text-sub">Company Property</span>
+                                </div>
+                                <span class="dot-menu">⋯</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-accordion-item">
+                        <div class="info-item-header">
+                            <span class="label">Compensation Summary</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="info-item-content">
+                            <div class="info-detail-row">
+                                <div class="info-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        width="36" height="36">
+                                        <path fill-rule="evenodd"
+                                            d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Zm-2.625.75a6 6 0 1 1 12 0 6 6 0 0 1-12 0ZM19.5 14.25a.75.75 0 0 0-1.5 0v.75a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-.75a.75.75 0 0 0-1.5 0v.75a4.5 4.5 0 0 0 4.5 4.5h7.5a4.5 4.5 0 0 0 4.5-4.5v-.75a.75.75 0 0 0-1.5 0v.75a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-.75a.75.75 0 0 0-1.5 0v.75a4.5 4.5 0 0 0 4.5 4.5h7.5a4.5 4.5 0 0 0 4.5-4.5v-.75Z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="info-text">
+                                    <span class="info-text-main">View Full Summary</span>
+                                    <span class="info-text-sub">Salary, Bonus & Equity</span>
+                                </div>
+                                <span class="dot-menu">⋯</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-accordion-item">
+                        <div class="info-item-header">
+                            <span class="label">Employee Benefits</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="info-item-content">
+                            <div class="info-detail-row">
+                                <div class="info-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        width="36" height="36">
+                                        <path fill-rule="evenodd"
+                                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="info-text">
+                                    <span class="info-text-main">Health & Wellness Plan</span>
+                                    <span class="info-text-sub">Active Coverage</span>
+                                </div>
+                                <span class="dot-menu">⋯</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center-column">
+                <div class="card progress-widget interactive">
+                    <div class="widget-header">
+                        <h3>Progress</h3>
+                        <button class="icon-btn">↗</button>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-main-stats">
+                            <div class="main-stat">6.1 h</div>
+                            <div class="sub-stat">Work Time this week</div>
+                        </div>
+                        <div class="weekly-progress-chart-container">
+                            <div class="time-badge">5h 23m</div>
+                            <canvas id="weeklyProgressChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card time-tracker-widget interactive">
+                    <div class="widget-header">
+                        <h3>Time tracker</h3>
+                        <button class="icon-btn">↗</button>
+                    </div>
+                    <div class="timer-display">
+                        <svg class="timer-circle" width="180" height="180" viewBox="0 0 180 180">
+                            <circle class="timer-bg-circle" cx="90" cy="90" r="80"></circle>
+                            <circle class="timer-progress-circle" id="timer-progress" cx="90" cy="90" r="80"></circle>
+                        </svg>
+                        <div class="timer-text">
+                            <div class="time" id="timer">02:35</div>
+                            <div class="label">Work Time</div>
+                        </div>
+                    </div>
+                    <div class="time-controls">
+                        <button class="control-btn" id="play-pause-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M6.32 2.877a1.5 1.5 0 0 1 2.36 0l10.5 9.75a1.5 1.5 0 0 1 0 2.746l-10.5 9.75a1.5 1.5 0 0 1-2.36-1.373V4.25a1.5 1.5 0 0 1 0-1.373Z">
+                                </path>
+                            </svg>
+                        </button>
+                        <button class="control-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M5.25 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM2.25 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM18.75 7.5a.75.75 0 0 0-1.5 0v2.25H15a.75.75 0 0 0 0 1.5h2.25v2.25a.75.75 0 0 0 1.5 0v-2.25H21a.75.75 0 0 0 0-1.5h-2.25V7.5Z">
+                                </path>
+                            </svg>
+                        </button>
+                        <button class="control-btn dark-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="card schedule-card interactive">
+                    <div class="schedule-header">
+                        <div class="date-nav">
+                            <button>&lt;</button>
+                            <h3>August</h3>
+                        </div>
+                        <h3>September 2025</h3>
+                        <div class="date-nav">
+                            <h3>October</h3>
+                            <button>&gt;</button>
+                        </div>
+                    </div>
+                    <div class="schedule-days">
+                        <div class="day"><span class="day-name">Mon</span><span class="day-number">22</span></div>
+                        <div class="day"><span class="day-name">Tue</span><span class="day-number">23</span></div>
+                        <div class="day"><span class="day-name">Wed</span><span class="day-number active">24</span>
+                        </div>
+                        <div class="day"><span class="day-name">Thu</span><span class="day-number">25</span></div>
+                        <div class="day"><span class="day-name">Fri</span><span class="day-number">26</span></div>
+                        <div class="day"><span class="day-name">Sat</span><span class="day-number">27</span></div>
+                    </div>
+                    <div class="schedule-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-time">8.00 am</div>
+                            <div class="timeline-event event-sync">
+                                <div class="event-details">
+                                    <p>Weekly Team Sync</p>
+                                    <span>Weekly progress on projects</span>
+                                </div>
+                                <div class="event-avatars">
+                                    <img src="https://i.pravatar.cc/30?u=a" alt="avatar">
+                                    <img src="https://i.pravatar.cc/30?u=b" alt="avatar">
+                                    <img src="https://i.pravatar.cc/30?u=c" alt="avatar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">10.00 am</div>
+                            <div class="timeline-event event-session">
+                                <div class="event-details">
+                                    <p>Onboarding Session</p>
+                                    <span>Introduction for new hires</span>
+                                </div>
+                                <div class="event-avatars">
+                                    <img src="https://i.pravatar.cc/30?u=d" alt="avatar">
+                                    <img src="https://i.pravatar.cc/30?u=e" alt="avatar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="card onboarding-parent-card interactive">
+                    <div class="widget-header">
+                        <h3>Onboarding</h3>
+                        <span class="percent">25%</span>
+                    </div>
+                    <div class="onboarding-progress-wrapper">
+                        <div class="onboarding-progress-labels">
+                            <span>45%</span>
+                            <span>35%</span>
+                            <span>20%</span>
+                        </div>
+                        <div class="onboarding-progress-bars">
+                            <div class="onboarding-progress-bar task">Tasks</div>
+                            <div class="onboarding-progress-bar black"></div>
+                            <div class="onboarding-progress-bar grey"></div>
+                        </div>
+                    </div>
+                    <div class="onboarding-task-card">
+                        <div class="onboarding-header">
+                            <h4>Onboarding Tasks</h4>
+                            <span>2/5</span>
+                        </div>
+                        <div class="onboarding-task-list">
+                            <div class="onboarding-task-item completed">
+                                <div class="task-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M4.929 12.121C4.929 10.95 5.879 10 7 10h10c1.121 0 2.071.95 2.071 2.121a2.071 2.071 0 0 1-2.071 2.121H7c-1.121 0-2.071-.95-2.071-2.121Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="task-details">
+                                    <p>Interview Completed</p>
+                                    <span>Sep 13, 08:30</span>
+                                </div>
+                                <div class="task-completion-status">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-.232-5.033.004-.004.01-.009.005-.005 4.5-4.5a.75.75 0 0 0-1.06-1.06l-3.72 3.72-1.72-1.72a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0Z"
+                                            clip-rule="evenodd" style="color: #e9e9ee"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="onboarding-task-item completed">
+                                <div class="task-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M11.25 4.533A9.715 9.715 0 0 1 12 4.5c4.473 0 8.213 3.235 8.924 7.5-.71 4.265-4.45 7.5-8.924 7.5a9.715 9.715 0 0 1-.75-.033V4.533Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="task-details">
+                                    <p>Team Meeting</p>
+                                    <span>Sep 13, 10:30</span>
+                                </div>
+                                <div class="task-completion-status">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-.232-5.033.004-.004.01-.009.005-.005 4.5-4.5a.75.75 0 0 0-1.06-1.06l-3.72 3.72-1.72-1.72a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0Z"
+                                            clip-rule="evenodd" style="color: #e9e9ee"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="onboarding-task-item">
+                                <div class="task-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="task-details">
+                                    <p>Project Assignment</p>
+                                    <span>Sep 13, 13:00</span>
+                                </div>
+                                <div class="task-completion-status"></div>
+                            </div>
+                            <div class="onboarding-task-item">
+                                <div class="task-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712Z">
+                                        </path>
+                                        <path
+                                            d="M19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="task-details">
+                                    <p>Q3 Goals Review</p>
+                                    <span>Sep 13, 14:45</span>
+                                </div>
+                                <div class="task-completion-status"></div>
+                            </div>
+                            <div class="onboarding-task-item">
+                                <div class="task-icon-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M10.5 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="task-details">
+                                    <p>HR Policy Training</p>
+                                    <span>Sep 13, 16:30</span>
+                                </div>
+                                <div class="task-completion-status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Counter Animation for Metrics --- //
+            function animateCounters() {
+                const counters = document.querySelectorAll('.metric .value');
+                counters.forEach(counter => {
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const increment = target / 30; // Faster increment
+                    let current = 0;
+
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        counter.textContent = Math.floor(current);
+                    }, 33); // ~30fps
+                });
+            }
+
+            // --- Animation for progress bars --- //
+            function animateProgressBars() {
+                const solidBars = document.querySelectorAll('.solid-progress-bar');
+
+                solidBars.forEach((bar, index) => {
+                    const percentage = parseInt(bar.dataset.value, 10);
+                    setTimeout(() => {
+                        bar.style.setProperty('--progress-width', `${percentage}%`);
+                        // Create and inject a style rule for this specific bar
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .solid-progress-bar[data-value="${percentage}"]::before {
+                                width: ${percentage}% !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }, index * 100); // Faster stagger
+                });
+            }
+
+            // --- Time Tracker Logic --- //
+            const timerElement = document.getElementById('timer');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const progressCircle = document.getElementById('timer-progress');
+            const circumference = 2 * Math.PI * 80;
+            if (progressCircle) {
+                progressCircle.style.strokeDasharray = circumference;
+            }
+
+            let timerInterval;
+            let isRunning = false;
+            let totalSeconds = (2 * 60) + 35; // 02:35
+
+            const playIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.32 2.877a1.5 1.5 0 0 1 2.36 0l10.5 9.75a1.5 1.5 0 0 1 0 2.746l-10.5 9.75a1.5 1.5 0 0 1-2.36-1.373V4.25a1.5 1.5 0 0 1 0-1.373Z"></path></svg>`;
+            const pauseIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8.25 4.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-1.5 0V5.25a.75.75 0 0 1 .75-.75ZM15.75 4.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-1.5 0V5.25a.75.75 0 0 1 .75-.75Z"></path></svg>`;
+
+            function updateTimerDisplay() {
+                if (!timerElement || !progressCircle) return;
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                const totalWorkdaySeconds = 8 * 60 * 60;
+                const progress = (totalSeconds % totalWorkdaySeconds) / totalWorkdaySeconds;
+                const offset = circumference * (1 - progress);
+                progressCircle.style.strokeDashoffset = offset;
+            }
+
+            function toggleTimer() {
+                if (isRunning) {
+                    isRunning = false;
+                    clearInterval(timerInterval);
+                    playPauseBtn.innerHTML = playIcon;
+                } else {
+                    isRunning = true;
+                    playPauseBtn.innerHTML = pauseIcon;
+                    timerInterval = setInterval(() => {
+                        totalSeconds++;
+                        updateTimerDisplay();
+                    }, 1000);
+                }
+            }
+
+            if (playPauseBtn) playPauseBtn.addEventListener('click', toggleTimer);
+
+            // --- Onboarding Task Click Logic --- //
+            const taskItems = document.querySelectorAll('.onboarding-task-item');
+            taskItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('completed');
+                    updateTaskProgress();
+                });
+            });
+
+            function updateTaskProgress() {
+                const totalTasks = taskItems.length;
+                const completedTasks = document.querySelectorAll('.onboarding-task-item.completed').length;
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+
+                // Update the progress percentage
+                const percentElement = document.querySelector('.onboarding-parent-card .percent');
+                if (percentElement) {
+                    percentElement.textContent = `${progressPercent}%`;
+                }
+
+                // Update the task counter
+                const taskCounter = document.querySelector('.onboarding-header span');
+                if (taskCounter) {
+                    taskCounter.textContent = `${completedTasks}/${totalTasks}`;
+                }
+            }
+
+            // --- Weekly Progress Chart (Chart.js) --- //
+            const ctx = document.getElementById('weeklyProgressChart');
+            if (ctx) {
+                const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, '#e9e9ee');
+                gradient.addColorStop(1, '#F5C842');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+                        datasets: [{
+                            label: 'Work Hours',
+                            data: [5, 8, 4.5, 7, 8.5, 3.5, 5.5],
+                            backgroundColor: gradient,
+                            borderWidth: 0,
+                            borderRadius: 8,
+                            barPercentage: 0.5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000, // Faster animation
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#e9e9ee',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function (context) {
+                                        return `${context.parsed.y}h worked`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 13,
+                                        family: 'Poppins, sans-serif',
+                                        weight: '600'
+                                    },
+                                    color: 'var(--text-secondary)'
+                                }
+                            },
+                            y: {
+                                display: false,
+                                beginAtZero: true
+                            }
+                        },
+                        onHover: (event, activeElements) => {
+                            event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+            }
+
+            // --- Calendar Day Click Logic --- //
+            const dayNumbers = document.querySelectorAll('.day-number');
+            dayNumbers.forEach(day => {
+                day.addEventListener('click', () => {
+                    // Remove active class from all days
+                    dayNumbers.forEach(d => d.classList.remove('active'));
+                    // Add active class to clicked day
+                    day.classList.add('active');
+                });
+            });
+
+            // --- Add dynamic hover effects to cards --- //
+            const cards = document.querySelectorAll('.card.interactive');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // --- Smooth scroll to top when logo is clicked --- //
+            const logoContainer = document.querySelector('.logo-container');
+            if (logoContainer) {
+                logoContainer.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+
+            // --- Dynamic time updates --- //
+            function updateCurrentTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+
+                // Update any time displays that might need real-time updates
+                const timeElements = document.querySelectorAll('[data-live-time]');
+                timeElements.forEach(element => {
+                    element.textContent = timeString;
+                });
+            }
+
+            // --- Add staggered animations to timeline items --- //
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`; // Faster stagger
+            });
+
+            // --- Add parallax effect to profile card --- //
+            const profileCard = document.querySelector('.profile-card');
+            if (profileCard) {
+                profileCard.addEventListener('mousemove', (e) => {
+                    const rect = profileCard.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+
+                    profileCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+                });
+
+                profileCard.addEventListener('mouseleave', () => {
+                    profileCard.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                });
+            }
+
+            // --- NEW: Accordion functionality --- //
+            function setupAccordion() {
+                const accordionHeaders = document.querySelectorAll('.info-item-header');
+
+                accordionHeaders.forEach(header => {
+                    header.addEventListener('click', () => {
+                        // Toggle the 'active' class on the header to rotate chevron
+                        header.classList.toggle('active');
+
+                        // Get the content panel
+                        const content = header.nextElementSibling;
+
+                        // Toggle the max-height for smooth collapse/expand
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        }
+                    });
+                });
+            }
+
+
+            // --- Initialize all functions --- //
+            setTimeout(() => {
+                animateProgressBars();
+                animateCounters();
+            }, 100); // Reduced delay
+
+            updateTimerDisplay();
+            updateCurrentTime();
+            setupAccordion(); // Initialize the new accordion
+
+            // Update time every minute
+            setInterval(updateCurrentTime, 60000);
+
+            // Add loading state removal
+            document.body.classList.add('loaded');
+        });
+
+        // --- Add CSS for loaded state --- //
+        const style = document.createElement('style');
+        style.textContent = `
+            body:not(.loaded) * {
+                animation-play-state: paused !important;
+            }
+            
+            .card.interactive {
+                transition: all 0.05s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+            
+            .card.interactive:hover {
+                box-shadow: 0 20px 60px rgba(233, 233, 238, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Office Gym Booking — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg-grad-a: #e9e9ee;
+      --bg-grad-b: #fff6cf;
+      --selected: #fde68a;
+      --ink: #1f2937;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --chip-green-bg: #ecfdf5;
+      --chip-green-fg: #047857;
+      --chip-gray-bg: #f3f4f6;
+      --chip-gray-fg: #6b7280;
+      --chip-gold-bg: #fef9c3;
+      --chip-gold-fg: #a16207;
+      --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+      --pill-pad: .75rem 2rem;
+      --radius-xl: 1.5rem;
+      --lux-bg: #ffffff;
+      --lux-panel: rgba(0, 0, 0, .03);
+      --lux-glass: rgba(0, 0, 0, .04);
+      --lux-gold: #D4AF37;
+      --lux-gold-2: #b78f2a;
+      --lux-black: #000;
+      --lux-muted: rgba(0, 0, 0, .65);
+      --lux-radius: 14px;
+      --lux-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 0
+    }
+
+    .container {
+      min-height: 100vh;
+      background: linear-gradient(90deg, var(--bg-grad-a), var(--bg-grad-b));
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px
+    }
+
+    .title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--ink);
+      margin: 0
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9999px;
+      padding: .65rem 1.1rem;
+      background: #fff;
+      box-shadow: var(--shadow-2);
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--ink-2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-primary {
+      background: #fcd34d;
+      color: var(--ink);
+      font-weight: 500;
+      border: none;
+      border-radius: 30px;
+      padding: .65rem 1.1rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center
+    }
+
+    /* KPI */
+    .kpis {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 18px 14px
+    }
+
+    .kpi {
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px 18px;
+      box-shadow: var(--shadow-2);
+      min-width: 170px
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-size: .8rem;
+      margin: 0 0 6px
+    }
+
+    .kpi .value {
+      color: var(--ink);
+      font-size: 1.35rem;
+      font-weight: 500;
+      margin: 0
+    }
+
+    .kpi .sub {
+      color: var(--muted);
+      font-size: .75rem;
+      margin-top: 4px
+    }
+
+    /* Board */
+    .board {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      margin: 10px auto 24px;
+      width: 98%;
+      position: relative;
+      padding: 82px 18px 18px;
+    }
+
+    .controls {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .search {
+      position: relative
+    }
+
+    .search input {
+      padding: .7rem 1rem .7rem 2.4rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      background: #fff;
+      box-shadow: var(--shadow-2);
+      font-size: .9rem;
+      font-weight: 100;
+      width: min(320px, 58vw)
+    }
+
+    .search svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--muted)
+    }
+
+    .pill {
+      background: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: .65rem 1.2rem;
+      font-weight: 100;
+      font-size: .9rem;
+      color: var(--ink-2);
+      box-shadow: var(--shadow-2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer
+    }
+
+    .toolbar-right {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      display: flex;
+      gap: 10px
+    }
+
+    .scroll {
+      overflow: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px
+    }
+
+    thead {
+      background: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 0
+    }
+
+    th {
+      font-size: .75rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      text-align: left;
+      padding: .75rem
+    }
+
+    td {
+      padding: 1rem .75rem;
+      color: var(--ink-2);
+      font-size: .92rem;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+      vertical-align: middle
+    }
+
+    .chip {
+      padding: .3rem .65rem;
+      border-radius: 9999px;
+      font-size: .75rem;
+      font-weight: 600;
+      display: inline-block
+    }
+
+    .chip.approved {
+      background: var(--chip-green-bg);
+      color: var(--chip-green-fg)
+    }
+
+    .chip.pending {
+      background: #fef3c7;
+      color: #a16207
+    }
+
+    .chip.cancelled {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .chip.waitlist {
+      background: #e5e7eb;
+      color: #374151
+    }
+
+    .slot {
+      padding: .35rem .7rem;
+      border-radius: 9999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-weight: 600;
+      font-size: .75rem
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px
+    }
+
+    .btn-ghost {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      padding: .35rem .75rem;
+      border-radius: 9999px;
+      font-weight: 500
+    }
+
+    .btn-dark {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: .45rem .9rem;
+      font-weight: 100
+    }
+
+    .btn-gold {
+      background: #fcd34d;
+      color: var(--ink);
+      border: none;
+      border-radius: 9999px;
+      padding: .45rem .9rem;
+      font-weight: 100
+    }
+
+    /* modal base */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50
+    }
+
+    .modal.hidden {
+      display: none !important
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 14px 38px rgba(0, 0, 0, .12);
+      padding: 22px;
+      position: relative;
+      width: min(820px, 92vw)
+    }
+
+    .close {
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, .06);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--ink-2)
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-weight: 400;
+      color: var(--ink)
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .grid .full {
+      grid-column: 1 / -1
+    }
+
+    label {
+      display: block;
+      color: var(--lux-muted);
+      font-size: .9rem;
+      margin: 0 0 6px
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, .02);
+      border: 1px solid rgba(0, 0, 0, .08);
+      font-size: 16px;
+      outline: none
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      box-shadow: 0 6px 18px rgba(212, 175, 55, .08);
+      border-color: rgba(212, 175, 55, .32)
+    }
+
+    /* mini availability bar */
+    .avail {
+      display: flex;
+      gap: 2px
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 6px;
+      background: #e5e7eb;
+      flex: 1
+    }
+
+    .bar.busy {
+      background: #fecaca
+    }
+
+    .bar.ok {
+      background: #fde68a
+    }
+
+    .bar.free {
+      background: #bbf7d0
+    }
+
+    /* animations */
+    tbody tr {
+      animation: fade .35s ease forwards;
+      opacity: 0;
+      transform: translateY(8px)
+    }
+
+    @keyframes fade {
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @media(max-width:760px) {
+      .grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Office Gym — Admin</h1>
+      <div class="actions">
+        <button class="btn" id="btnBlock">Block Slot</button>
+        <button class="btn" id="btnCreate">Create Booking</button>
+        <button class="btn-primary" id="btnAddSlot">Add Time Slot</button>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <p class="label">Today Bookings</p>
+        <p class="value" id="kpiToday">—</p>
+        <p class="sub" id="kpiOcc">—</p>
+      </div>
+      <div class="kpi">
+        <p class="label">Pending Approvals</p>
+        <p class="value" id="kpiPending">—</p>
+      </div>
+      <div class="kpi">
+        <p class="label">Blocked Slots</p>
+        <p class="value" id="kpiBlocked">—</p>
+      </div>
+      <div class="kpi">
+        <p class="label">No-shows (7d)</p>
+        <p class="value" id="kpiNoShow">—</p>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="controls">
+        <div class="search">
+          <input id="search" type="text" placeholder="Search employee / email / dept" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+          </svg>
+        </div>
+        <button class="pill" id="filterDate">Date ▾</button>
+        <button class="pill" id="filterLocation">Location ▾</button>
+        <button class="pill" id="filterStatus">Status ▾</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn" id="export">Export CSV</button>
+      </div>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Booking</th>
+              <th>Employee</th>
+              <th>Dept</th>
+              <th>Date</th>
+              <th>Slot</th>
+              <th>Capacity</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- View / Approve Modal -->
+  <div class="modal hidden" id="viewModal">
+    <div class="card">
+      <button class="close" data-close>&times;</button>
+      <h3>Booking Details</h3>
+      <div class="grid">
+        <div>
+          <label>Employee</label>
+          <div id="vEmployee" style="font-weight:500;color:var(--ink)">—</div>
+        </div>
+        <div>
+          <label>Email</label>
+          <div id="vEmail">—</div>
+        </div>
+        <div>
+          <label>Department</label>
+          <div id="vDept">—</div>
+        </div>
+        <div>
+          <label>Location</label>
+          <div id="vLocation">—</div>
+        </div>
+        <div>
+          <label>Date</label>
+          <div id="vDate">—</div>
+        </div>
+        <div>
+          <label>Time Slot</label>
+          <div id="vSlot">—</div>
+        </div>
+        <div>
+          <label>Capacity</label>
+          <div id="vCap">—</div>
+        </div>
+        <div>
+          <label>Status</label>
+          <div id="vStatus">—</div>
+        </div>
+        <div class="full">
+          <label>Admin Notes</label>
+          <textarea id="vNotes" placeholder="Add internal notes"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="btn-dark" id="approveBtn">Approve</button>
+        <button class="btn" id="rejectBtn">Reject</button>
+        <button class="btn-gold" id="cancelBtn">Cancel Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Booking Modal -->
+  <div class="modal hidden" id="createModal">
+    <div class="card">
+      <button class="close" data-close>&times;</button>
+      <h3>Create Booking</h3>
+      <form id="createForm">
+        <div class="grid">
+          <div>
+            <label>Employee Name</label>
+            <input name="name" required placeholder="Full name" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input name="email" type="email" required placeholder="name@company.com" />
+          </div>
+          <div>
+            <label>Department</label>
+            <input name="dept" required placeholder="e.g., Finance" />
+          </div>
+          <div>
+            <label>Location</label>
+            <select name="location" required>
+              <option>HQ — Level 3 Gym</option>
+              <option>HQ — Basement Gym</option>
+              <option>Branch — Marina</option>
+            </select>
+          </div>
+          <div>
+            <label>Date</label>
+            <input name="date" type="date" required />
+          </div>
+          <div>
+            <label>Time Slot</label>
+            <select name="slot" required id="slotSelect"></select>
+          </div>
+          <div>
+            <label>Capacity</label>
+            <input name="cap" type="number" min="1" value="8" required />
+          </div>
+          <div>
+            <label>Status</label>
+            <select name="status" required>
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Waitlist</option>
+            </select>
+          </div>
+          <div class="full">
+            <label>Notes (optional)</label>
+            <textarea name="notes" placeholder="Any context"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button type="button" class="btn" data-close>Close</button>
+          <button class="btn-gold" type="submit">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Block Slot Modal -->
+  <div class="modal hidden" id="blockModal">
+    <div class="card">
+      <button class="close" data-close>&times;</button>
+      <h3>Block Time Slot</h3>
+      <form id="blockForm">
+        <div class="grid">
+          <div>
+            <label>Location</label>
+            <select name="location" required>
+              <option>HQ — Level 3 Gym</option>
+              <option>HQ — Basement Gym</option>
+              <option>Branch — Marina</option>
+            </select>
+          </div>
+          <div>
+            <label>Date</label>
+            <input name="date" type="date" required />
+          </div>
+          <div class="full">
+            <label>Time Range</label>
+            <div style="display:flex;gap:8px">
+              <select name="from" style="flex:1"></select>
+              <select name="to" style="flex:1"></select>
+            </div>
+          </div>
+          <div class="full">
+            <label>Reason</label>
+            <textarea name="reason" placeholder="Maintenance, cleaning, private session..."></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button type="button" class="btn" data-close>Close</button>
+          <button class="btn-dark" type="submit">Block</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ---- Demo Data ----
+    const TIME_SLOTS = [
+      '06:00–06:45', '07:00–07:45', '08:00–08:45', '12:30–13:15', '17:30–18:15', '18:30–19:15', '19:30–20:15'
+    ];
+
+    const bookings = [
+      { id: 'BK-1001', name: 'Omar Al-Mansouri', email: 'omar@ab.com', dept: 'Engineering', location: 'HQ — Level 3 Gym', date: '2025-08-13', slot: '18:30–19:15', cap: 8, status: 'Pending', created: '2025-08-12T10:12:00Z', notes: 'Wants squat rack' },
+      { id: 'BK-1002', name: 'Sara Khan', email: 'sara@ab.com', dept: 'Finance', location: 'HQ — Basement Gym', date: '2025-08-13', slot: '12:30–13:15', cap: 8, status: 'Approved', created: '2025-08-12T08:05:00Z', notes: '' },
+      { id: 'BK-1003', name: 'James Parker', email: 'j.parker@ab.com', dept: 'Design', location: 'HQ — Level 3 Gym', date: '2025-08-14', slot: '07:00–07:45', cap: 8, status: 'Waitlist', created: '2025-08-11T16:40:00Z', notes: 'Prefers treadmill' },
+      { id: 'BK-1004', name: 'Aisha Al Suwaidi', email: 'aisha@ab.com', dept: 'HR', location: 'Branch — Marina', date: '2025-08-13', slot: '17:30–18:15', cap: 6, status: 'Cancelled', created: '2025-08-10T09:20:00Z', notes: '—' },
+    ];
+
+    const blocks = [
+      { location: 'HQ — Level 3 Gym', date: '2025-08-13', from: '06:00–06:45', to: '08:45', reason: 'Cleaning' }
+    ];
+
+    // ---- DOM helpers ----
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    const rowsEl = $('#rows');
+
+    function chip(status) {
+      const map = { Approved: 'approved', Pending: 'pending', Cancelled: 'cancelled', Waitlist: 'waitlist' };
+      const cls = map[status] || 'pending';
+      return `<span class="chip ${cls}">${status}</span>`;
+    }
+
+    function fmtDate(iso) { const d = new Date(iso); if (Number.isNaN(+d)) return iso; return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' }); }
+    function fmtTs(iso) { const d = new Date(iso); if (Number.isNaN(+d)) return '—'; return d.toLocaleString(); }
+
+    // ---- Filters state ----
+    let fDate = null, fLocation = null, fStatus = null, q = '';
+
+    function apply() {
+      const list = bookings.filter(b => {
+        const matchesQ = !q || `${b.name} ${b.email} ${b.dept} ${b.id}`.toLowerCase().includes(q);
+        const matchesD = !fDate || b.date === fDate;
+        const matchesL = !fLocation || b.location === fLocation;
+        const matchesS = !fStatus || b.status === fStatus;
+        return matchesQ && matchesD && matchesL && matchesS;
+      }).sort((a, b) => a.date.localeCompare(b.date) || a.slot.localeCompare(b.slot));
+      render(list);
+      updateKPIs();
+    }
+
+    function render(list) {
+      rowsEl.innerHTML = list.map(b => `
+        <tr data-id="${b.id}">
+          <td><input type="checkbox"/></td>
+          <td><strong>${b.id}</strong></td>
+          <td>${b.name}<div style="font-size:.78rem;color:var(--muted)">${b.email}</div></td>
+          <td>${b.dept}</td>
+          <td>${fmtDate(b.date)}</td>
+          <td><span class="slot">${b.slot}</span></td>
+          <td>
+            <div class="avail" title="Capacity usage preview">
+              ${[...Array(6)].map((_, i) => `<span class="bar ${i < 2 ? 'free' : i < 4 ? 'ok' : 'busy'}"></span>`).join('')}
+            </div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:4px">Max ${b.cap}</div>
+          </td>
+          <td>${chip(b.status)}</td>
+          <td>${fmtTs(b.created)}</td>
+          <td class="row-actions">
+            <button class="btn-ghost" data-view>View</button>
+            ${b.status === 'Pending' ? '<button class="btn-dark" data-approve>Approve</button>' : ''}
+            ${b.status !== 'Cancelled' ? '<button class="btn" data-cancel>Cancel</button>' : ''}
+          </td>
+        </tr>`).join('');
+    }
+
+    function updateKPIs() {
+      const today = new Date().toISOString().slice(0, 10);
+      const todayList = bookings.filter(b => b.date === today && b.status !== 'Cancelled');
+      $('#kpiToday').textContent = todayList.length;
+      const occ = todayList.length ? Math.min(100, Math.round((todayList.length / (TIME_SLOTS.length * 2)) * 100)) : 0;
+      $('#kpiOcc').textContent = `${occ}% occupancy est.`;
+      $('#kpiPending').textContent = bookings.filter(b => b.status === 'Pending').length;
+      $('#kpiBlocked').textContent = blocks.length;
+      $('#kpiNoShow').textContent = 1; // demo
+    }
+
+    // ---- Events ----
+    $('#search').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); apply(); });
+
+    $('#filterDate').addEventListener('click', () => {
+      const v = prompt('Filter by date (YYYY-MM-DD). Leave empty to clear.', '');
+      fDate = v && v.match(/^\d{4}-\d{2}-\d{2}$/) ? v : null; apply();
+    });
+    $('#filterLocation').addEventListener('click', () => {
+      const v = prompt('Location (exact). Leave empty to clear.', 'HQ — Level 3 Gym');
+      fLocation = v && v.trim() ? v.trim() : null; apply();
+    });
+    $('#filterStatus').addEventListener('click', () => {
+      const v = prompt('Status (Approved, Pending, Cancelled, Waitlist). Leave empty to clear.', '');
+      fStatus = v && v.trim() ? v.trim() : null; apply();
+    });
+
+    // Row buttons
+    rowsEl.addEventListener('click', (e) => {
+      const tr = e.target.closest('tr'); if (!tr) return; const id = tr.dataset.id; const b = bookings.find(x => x.id === id); if (!b) return;
+      if (e.target.matches('[data-view]')) openView(b);
+      if (e.target.matches('[data-approve]')) { b.status = 'Approved'; apply(); }
+      if (e.target.matches('[data-cancel]')) { b.status = 'Cancelled'; apply(); }
+    });
+
+    // View modal
+    const viewModal = $('#viewModal'); let current = null;
+    function openView(b) {
+      current = b;
+      $('#vEmployee').textContent = b.name; $('#vEmail').textContent = b.email; $('#vDept').textContent = b.dept;
+      $('#vLocation').textContent = b.location; $('#vDate').textContent = fmtDate(b.date); $('#vSlot').textContent = b.slot;
+      $('#vCap').textContent = `Max ${b.cap}`; $('#vStatus').textContent = b.status; $('#vNotes').value = b.notes || '';
+      viewModal.classList.remove('hidden');
+    }
+    function closeModals() { $$('.modal').forEach(m => m.classList.add('hidden')); }
+    document.addEventListener('click', (e) => { if (e.target.matches('[data-close]') || (e.target.classList.contains('modal') && !e.target.closest('.card'))) closeModals(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModals(); });
+
+    $('#approveBtn').addEventListener('click', () => { if (!current) return; current.status = 'Approved'; current.notes = $('#vNotes').value; apply(); closeModals(); });
+    $('#rejectBtn').addEventListener('click', () => { if (!current) return; current.status = 'Cancelled'; current.notes = $('#vNotes').value; apply(); closeModals(); });
+    $('#cancelBtn').addEventListener('click', () => { if (!current) return; current.status = 'Cancelled'; apply(); closeModals(); });
+
+    // Create booking
+    const createModal = $('#createModal');
+    $('#btnCreate').addEventListener('click', () => { populateSlotSelect($('#slotSelect')); createModal.classList.remove('hidden'); });
+    function populateSlotSelect(sel) { sel.innerHTML = TIME_SLOTS.map(s => `<option>${s}</option>`).join(''); }
+    $('#createForm').addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(e.target); const rec = Object.fromEntries(fd.entries());
+      const id = `BK-${Math.floor(1000 + Math.random() * 9000)}`;
+      bookings.unshift({ id, name: rec.name.trim(), email: rec.email.trim(), dept: rec.dept.trim(), location: rec.location, date: rec.date, slot: rec.slot, cap: parseInt(rec.cap, 10) || 8, status: rec.status, created: new Date().toISOString(), notes: (rec.notes || '') });
+      apply(); e.target.reset(); closeModals();
+    });
+
+    // Block slot
+    const blockModal = $('#blockModal');
+    $('#btnBlock').addEventListener('click', () => { populateRange($('#blockForm select[name="from"]')); populateRange($('#blockForm select[name="to"]')); blockModal.classList.remove('hidden'); });
+    function populateRange(sel) { sel.innerHTML = TIME_SLOTS.map(s => `<option>${s}</option>`).join(''); }
+    $('#blockForm').addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(e.target); const rec = Object.fromEntries(fd.entries());
+      blocks.push({ location: rec.location, date: rec.date, from: rec.from, to: rec.to, reason: rec.reason || '' });
+      updateKPIs(); closeModals(); alert('Slot blocked for ' + rec.date + ' @ ' + rec.location);
+    });
+
+    // Add time slot (simple prompt demo)
+    $('#btnAddSlot').addEventListener('click', () => {
+      const s = prompt('Add new time slot (e.g., 20:00–20:45)');
+      if (s && !TIME_SLOTS.includes(s)) { TIME_SLOTS.push(s); alert('Added slot: ' + s); }
+    });
+
+    // Export CSV
+    $('#export').addEventListener('click', () => {
+      const header = ['ID', 'Employee', 'Email', 'Dept', 'Location', 'Date', 'Slot', 'Capacity', 'Status', 'Created'];
+      const rows = bookings.map(b => [b.id, b.name, b.email, b.dept, b.location, b.date, b.slot, b.cap, b.status, b.created]);
+      const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gym_bookings.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // Init
+    apply();
+  </script>
+</body>
+
+</html>

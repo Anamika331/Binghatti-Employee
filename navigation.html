@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indoor Navigation - Premium Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg-grad-a: #e9e9ee;
+            --selected: #fde68a;
+            --bg-grad-b: #fff6cf;
+            --ink: #1f2937;
+            --ink-2: #374151;
+            --muted: #6b7280;
+            --chip-green-bg: #ecfdf5;
+            --chip-green-fg: #047857;
+            --chip-gray-bg: #f3f4f6;
+            --chip-gray-fg: #6b7280;
+            --chip-gold-bg: #fef9c3;
+            --chip-gold-fg: #a16207;
+            --chip-blue-bg: #eff6ff;
+            --chip-blue-fg: #1d4ed8;
+            --chip-red-bg: #fee2e2;
+            --chip-red-fg: #991b1b;
+            --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+            --radius-xl: 1.5rem;
+            --lux-bg: #ffffff;
+            --lux-gold: #D4AF37;
+            --lux-gold-2: #b78f2a;
+            --lux-black: #000000;
+            --lux-muted: rgba(0, 0, 0, 0.65);
+            --lux-radius: 14px;
+            --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+            min-height: 100vh;
+            color: var(--ink);
+        }
+
+        .navigation-container {
+            background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+            width: 100%;
+            min-height: 100vh;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .navigation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 0rem;
+            padding: 0 1rem;
+        }
+
+        .navigation-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        .subtitle-text {
+            font-weight: 100;
+            font-size: .9rem;
+            color: black;
+            margin: .25rem 1rem 1.25rem;
+        }
+
+        .app-container {
+            display: flex;
+            height: calc(100vh - 140px);
+            max-width: 1600px;
+            margin: 0 auto;
+            box-shadow: var(--lux-shadow);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: white;
+        }
+
+        /* Sidebar - Luxury styling */
+        .sidebar {
+            width: 380px;
+            background: var(--lux-bg);
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: var(--lux-bg);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--lux-gold) 0%, var(--lux-gold-2) 100%);
+            border-radius: var(--lux-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--ink);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--lux-radius);
+            font-size: 16px;
+            font-family: 'Lexend', sans-serif;
+            background: var(--lux-bg);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-2);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--lux-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .controls {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-section {
+            margin-bottom: 24px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--lux-radius);
+            font-size: 15px;
+            font-weight: 400;
+            font-family: 'Lexend', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            box-shadow: var(--shadow-2);
+            margin-bottom: 8px;
+        }
+
+        .set-start {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+            border-color: rgba(4, 120, 87, 0.2);
+        }
+
+        .set-start:hover {
+            background: #dcfce7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
+        }
+
+        .set-end {
+            background: var(--chip-red-bg);
+            color: var(--chip-red-fg);
+            border-color: rgba(153, 27, 27, 0.2);
+        }
+
+        .set-end:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(153, 27, 27, 0.15);
+        }
+
+        .find-route {
+            background: linear-gradient(135deg, var(--lux-gold) 0%, var(--lux-gold-2) 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+
+        .find-route:hover {
+            background: linear-gradient(135deg, var(--lux-gold-2) 0%, #9a7c24 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .clear-btn {
+            background: var(--lux-bg);
+            color: var(--ink-2);
+            border: 1px solid #d1d5db;
+        }
+
+        .clear-btn:hover {
+            background: #f9fafb;
+            transform: translateY(-1px);
+        }
+
+        .control-btn.active {
+            background: var(--selected);
+            color: var(--ink);
+            border-color: var(--lux-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        .status-panel {
+            margin-top: auto;
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .status {
+            padding: 16px 20px;
+            border-radius: var(--lux-radius);
+            font-size: 14px;
+            font-weight: 400;
+            border-left: 4px solid;
+            box-shadow: var(--shadow-2);
+        }
+
+        .status.info {
+            background: var(--chip-blue-bg);
+            color: var(--chip-blue-fg);
+            border-color: var(--chip-blue-fg);
+        }
+
+        .status.success {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+            border-color: var(--chip-green-fg);
+        }
+
+        .status.warning {
+            background: var(--chip-gold-bg);
+            color: var(--chip-gold-fg);
+            border-color: var(--chip-gold-fg);
+        }
+
+        /* Map Container - Premium styling */
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .map-toolbar {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .map-tool {
+            width: 48px;
+            height: 48px;
+            background: var(--lux-bg);
+            border: 1px solid #e5e7eb;
+            border-radius: var(--lux-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--lux-shadow);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--ink-2);
+        }
+
+        .map-tool:hover {
+            background: #f9fafb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--lux-gold);
+        }
+
+        .floor-plan {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #f8fafc;
+            cursor: default;
+        }
+
+        .floor-plan.selecting {
+            cursor: crosshair;
+        }
+
+        /* Roads and Pathways - Enhanced styling */
+        .pathway {
+            position: absolute;
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            border-radius: 8px;
+            z-index: 1;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main horizontal roads */
+        .pathway-h1 {
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: 18px;
+        }
+
+        .pathway-h2 {
+            top: 200px;
+            left: 0;
+            width: 100%;
+            height: 18px;
+        }
+
+        .pathway-h3 {
+            top: 350px;
+            left: 0;
+            width: 100%;
+            height: 18px;
+        }
+
+        /* Vertical connecting roads */
+        .pathway-v1 {
+            top: 50px;
+            left: 200px;
+            width: 18px;
+            height: 318px;
+        }
+
+        .pathway-v2 {
+            top: 50px;
+            left: 350px;
+            width: 18px;
+            height: 318px;
+        }
+
+        .pathway-v3 {
+            top: 50px;
+            left: 500px;
+            width: 18px;
+            height: 318px;
+        }
+
+        .pathway-v4 {
+            top: 50px;
+            left: 650px;
+            width: 18px;
+            height: 318px;
+        }
+
+        .pathway-v5 {
+            top: 50px;
+            left: 800px;
+            width: 18px;
+            height: 318px;
+        }
+
+        /* Buildings - Premium styling */
+        .building {
+            position: absolute;
+            background: var(--lux-bg);
+            border: 1px solid #e5e7eb;
+            border-radius: var(--lux-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--ink-2);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .building:hover {
+            background: #f9fafb;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--lux-gold);
+        }
+
+        /* Building Types with gradient backgrounds */
+        .office {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .conference {
+            background: linear-gradient(135deg, var(--chip-blue-bg) 0%, #bae6fd 100%);
+            color: var(--chip-blue-fg);
+        }
+
+        .restaurant {
+            background: linear-gradient(135deg, var(--chip-gold-bg) 0%, #fde68a 100%);
+            color: var(--chip-gold-fg);
+        }
+
+        .restroom {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #7c3aed;
+        }
+
+        .storage {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--muted);
+        }
+
+        .security {
+            background: linear-gradient(135deg, var(--chip-red-bg) 0%, #fca5a5 100%);
+            color: var(--chip-red-fg);
+        }
+
+        .medical {
+            background: linear-gradient(135deg, var(--chip-green-bg) 0%, #d1fae5 100%);
+            color: var(--chip-green-fg);
+        }
+
+        /* Building positions - same as before */
+        .building1 {
+            top: 10px;
+            left: 50px;
+            width: 140px;
+            height: 35px;
+        }
+
+        .building2 {
+            top: 10px;
+            left: 220px;
+            width: 120px;
+            height: 35px;
+        }
+
+        .building3 {
+            top: 10px;
+            left: 370px;
+            width: 120px;
+            height: 35px;
+        }
+
+        .building4 {
+            top: 10px;
+            left: 520px;
+            width: 120px;
+            height: 35px;
+        }
+
+        .building5 {
+            top: 10px;
+            left: 670px;
+            width: 120px;
+            height: 35px;
+        }
+
+        .building6 {
+            top: 75px;
+            left: 50px;
+            width: 140px;
+            height: 115px;
+        }
+
+        .building7 {
+            top: 75px;
+            left: 220px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building8 {
+            top: 75px;
+            left: 370px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building9 {
+            top: 75px;
+            left: 520px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building10 {
+            top: 75px;
+            left: 670px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building11 {
+            top: 75px;
+            left: 820px;
+            width: 100px;
+            height: 115px;
+        }
+
+        .building12 {
+            top: 225px;
+            left: 50px;
+            width: 140px;
+            height: 115px;
+        }
+
+        .building13 {
+            top: 225px;
+            left: 220px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building14 {
+            top: 225px;
+            left: 370px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building15 {
+            top: 225px;
+            left: 520px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building16 {
+            top: 225px;
+            left: 670px;
+            width: 120px;
+            height: 115px;
+        }
+
+        .building17 {
+            top: 225px;
+            left: 820px;
+            width: 100px;
+            height: 115px;
+        }
+
+        .building18 {
+            top: 375px;
+            left: 50px;
+            width: 70px;
+            height: 35px;
+        }
+
+        .building19 {
+            top: 375px;
+            left: 140px;
+            width: 140px;
+            height: 35px;
+        }
+
+        .building20 {
+            top: 375px;
+            left: 300px;
+            width: 80px;
+            height: 35px;
+        }
+
+        .building21 {
+            top: 375px;
+            left: 400px;
+            width: 80px;
+            height: 35px;
+        }
+
+        .building22 {
+            top: 375px;
+            left: 520px;
+            width: 100px;
+            height: 35px;
+        }
+
+        .building23 {
+            top: 375px;
+            left: 640px;
+            width: 100px;
+            height: 35px;
+        }
+
+        /* Stairs and Elevators - Enhanced */
+        .stairs,
+        .elevator {
+            position: absolute;
+            border: 2px solid #6366f1;
+            border-radius: var(--lux-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 10px;
+            color: #6366f1;
+            z-index: 5;
+            background: rgba(99, 102, 241, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stairs {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.2));
+        }
+
+        .elevator {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(45deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.2));
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .stairs:hover,
+        .elevator:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Enhanced highlighting for active path elements */
+        .stairs.highlighted,
+        .elevator.highlighted {
+            animation: pathElementHighlight 2s infinite;
+            z-index: 30;
+            transform: scale(1.2);
+        }
+
+        .stairs.highlighted {
+            background: linear-gradient(45deg, rgba(99, 102, 241, 0.4), rgba(99, 102, 241, 0.6));
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .elevator.highlighted {
+            background: linear-gradient(45deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.6));
+            border-color: #f59e0b;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
+        }
+
+        @keyframes pathElementHighlight {
+            0% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(99, 102, 241, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.4);
+            }
+        }
+
+        /* Stair positions */
+        .stairs1 {
+            top: 38px;
+            left: 188px;
+        }
+
+        .stairs2 {
+            top: 38px;
+            left: 338px;
+        }
+
+        .stairs3 {
+            top: 38px;
+            left: 488px;
+        }
+
+        .stairs4 {
+            top: 188px;
+            left: 188px;
+        }
+
+        .stairs5 {
+            top: 188px;
+            left: 338px;
+        }
+
+        .stairs6 {
+            top: 188px;
+            left: 488px;
+        }
+
+        /* Elevator positions */
+        .elevator1 {
+            top: 32px;
+            left: 632px;
+        }
+
+        .elevator2 {
+            top: 32px;
+            left: 782px;
+        }
+
+        .elevator3 {
+            top: 182px;
+            left: 632px;
+        }
+
+        .elevator4 {
+            top: 182px;
+            left: 782px;
+        }
+
+        /* Point markers - Enhanced */
+        .point {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: pointPulse 2s infinite;
+        }
+
+        .start-point {
+            background: var(--chip-green-fg);
+            border-color: var(--chip-green-bg);
+        }
+
+        .end-point {
+            background: var(--chip-red-fg);
+            border-color: var(--chip-red-bg);
+        }
+
+        @keyframes pointPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+
+            70% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 12px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        /* Route path - Premium styling */
+        .route-path {
+            position: absolute;
+            background: linear-gradient(90deg, var(--lux-gold) 0%, var(--lux-gold-2) 100%);
+            height: 6px;
+            z-index: 15;
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Navigation arrow - Enhanced */
+        .nav-arrow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            z-index: 25;
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .nav-arrow::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--lux-gold);
+            border-radius: 50% 50% 50% 0;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+            border: 3px solid white;
+        }
+
+        .nav-arrow.slow {
+            animation: arrowSlow 1.2s infinite ease-in-out;
+        }
+
+        .nav-arrow.normal {
+            animation: arrowNormal 1s infinite ease-in-out;
+        }
+
+        .nav-arrow.fast {
+            animation: arrowFast 0.8s infinite ease-in-out;
+        }
+
+        @keyframes arrowSlow {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1.15);
+            }
+        }
+
+        @keyframes arrowNormal {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1.1);
+            }
+        }
+
+        @keyframes arrowFast {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(-45deg) scale(1.05);
+            }
+        }
+
+        /* Legend - Premium styling */
+        .legend {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 20px;
+            box-shadow: var(--lux-shadow);
+            border: 1px solid #e5e7eb;
+        }
+
+        .legend-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--ink-2);
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Path instruction panel - positioned beside legend */
+        .path-instructions {
+            position: absolute;
+            bottom: 24px;
+            left: 320px;
+            /* Position it beside the legend */
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 16px 20px;
+            box-shadow: var(--lux-shadow);
+            border: 1px solid #e5e7eb;
+            max-width: 280px;
+            min-width: 260px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s ease;
+            z-index: 40;
+        }
+
+        .path-instructions.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .instruction-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-title::before {
+            content: '🧭';
+            font-size: 16px;
+        }
+
+        .instruction-text {
+            font-size: 13px;
+            color: var(--ink-2);
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        /* Adjust legend positioning to accommodate instructions */
+        .legend {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 20px;
+            box-shadow: var(--lux-shadow);
+            border: 1px solid #e5e7eb;
+            min-width: 260px;
+        }
+
+        /* Responsive adjustments for instruction panel */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: calc(100vh - 100px);
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 45vh;
+                overflow-y: auto;
+            }
+
+            .map-container {
+                flex: 1;
+                min-height: 55vh;
+            }
+
+            .building {
+                font-size: 10px;
+                transform: scale(0.9);
+            }
+
+            .navigation-header h1 {
+                font-size: 2rem;
+            }
+
+            /* Stack instructions vertically on mobile */
+            .path-instructions {
+                left: 24px;
+                bottom: 200px;
+                /* Position above legend on mobile */
+                max-width: calc(100vw - 80px);
+                min-width: auto;
+                transform: translateY(20px);
+            }
+
+            .path-instructions.show {
+                transform: translateY(0);
+            }
+
+            .legend {
+                min-width: auto;
+                max-width: calc(100vw - 80px);
+            }
+        }
+
+        @media (max-width: 1200px) {
+
+            /* Adjust for medium screens */
+            .path-instructions {
+                max-width: 240px;
+                min-width: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navigation-container">
+        <div class="navigation-header">
+            <h1>Indoor Navigation</h1>
+        </div>
+
+        <p class="subtitle-text">Navigate through indoor spaces with precision – find your way with AI-powered route
+            optimization.</p>
+
+        <div class="app-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">🗺️</div>
+                        <div class="logo-text">Indoor Maps</div>
+                    </div>
+                    <input type="text" class="search-input" placeholder="Search buildings, rooms...">
+                </div>
+
+                <div class="controls">
+                    <div class="control-section">
+                        <div class="control-label">Navigation</div>
+                        <button class="control-btn set-start" onclick="setMode('start')">
+                            <span>📍</span> Set Starting Point
+                        </button>
+                        <button class="control-btn set-end" onclick="setMode('end')">
+                            <span>🎯</span> Set Destination
+                        </button>
+                    </div>
+
+                    <div class="control-section">
+                        <div class="control-label">Actions</div>
+                        <button class="control-btn find-route" onclick="findRoute()">
+                            <span>🧭</span> Get Directions
+                        </button>
+                        <button class="control-btn clear-btn" onclick="clearAll()">
+                            <span>🔄</span> Clear Route
+                        </button>
+                    </div>
+                </div>
+
+                <div class="status-panel">
+                    <div class="status info" id="status">
+                        Click "Set Starting Point" to begin navigation
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-container">
+                <div class="map-toolbar">
+                    <div class="map-tool" title="Zoom In">+</div>
+                    <div class="map-tool" title="Zoom Out">−</div>
+                    <div class="map-tool" title="Reset View">⌂</div>
+                </div>
+
+                <!-- Path Instructions Panel -->
+                <div class="path-instructions" id="pathInstructions">
+                    <div class="instruction-title">Navigation Info</div>
+                    <div class="instruction-text" id="instructionText">Route instructions will appear here</div>
+                </div>
+
+                <div class="floor-plan" id="floorPlan">
+                    <!-- Pathways/Roads -->
+                    <div class="pathway pathway-h1"></div>
+                    <div class="pathway pathway-h2"></div>
+                    <div class="pathway pathway-h3"></div>
+                    <div class="pathway pathway-v1"></div>
+                    <div class="pathway pathway-v2"></div>
+                    <div class="pathway pathway-v3"></div>
+                    <div class="pathway pathway-v4"></div>
+                    <div class="pathway pathway-v5"></div>
+
+                    <!-- Stairs -->
+                    <div class="stairs stairs1" data-element="stairs1" title="Stairs to 2nd Floor">🚶</div>
+                    <div class="stairs stairs2" data-element="stairs2" title="Stairs to 2nd Floor">🚶</div>
+                    <div class="stairs stairs3" data-element="stairs3" title="Stairs to 2nd Floor">🚶</div>
+                    <div class="stairs stairs4" data-element="stairs4" title="Stairs to 3rd Floor">🚶</div>
+                    <div class="stairs stairs5" data-element="stairs5" title="Stairs to 3rd Floor">🚶</div>
+                    <div class="stairs stairs6" data-element="stairs6" title="Stairs to 3rd Floor">🚶</div>
+
+                    <!-- Elevators -->
+                    <div class="elevator elevator1" data-element="elevator1" title="Elevator A">🛗</div>
+                    <div class="elevator elevator2" data-element="elevator2" title="Elevator B">🛗</div>
+                    <div class="elevator elevator3" data-element="elevator3" title="Elevator C">🛗</div>
+                    <div class="elevator elevator4" data-element="elevator4" title="Elevator D">🛗</div>
+
+                    <!-- Buildings -->
+                    <!-- Top Row -->
+                    <div class="building building1 office">Main Office</div>
+                    <div class="building building2 conference">Conference A</div>
+                    <div class="building building3 storage">Storage</div>
+                    <div class="building building4 office">IT Department</div>
+                    <div class="building building5 office">HR Office</div>
+
+                    <!-- First Floor -->
+                    <div class="building building6 office">Reception</div>
+                    <div class="building building7 conference">Board Room</div>
+                    <div class="building building8 conference">Meeting Room</div>
+                    <div class="building building9 office">Executive Suite</div>
+                    <div class="building building10 office">Finance Dept</div>
+                    <div class="building building11 office">Legal Dept</div>
+
+                    <!-- Second Floor -->
+                    <div class="building building12 office">Lab A</div>
+                    <div class="building building13 office">Lab B</div>
+                    <div class="building building14 office">Research Center</div>
+                    <div class="building building15 conference">Training Room</div>
+                    <div class="building building16 storage">Archive</div>
+                    <div class="building building17 office">Server Room</div>
+
+                    <!-- Bottom Row -->
+                    <div class="building building18 restroom">Restrooms</div>
+                    <div class="building building19 restaurant">Cafeteria</div>
+                    <div class="building building20 restaurant">Kitchen</div>
+                    <div class="building building21 security">Security</div>
+                    <div class="building building22 medical">Medical Bay</div>
+                    <div class="building building23 storage">Supply Room</div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-title">Map Legend</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--chip-green-fg);"></div>
+                            <span>Start</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--chip-red-fg);"></div>
+                            <span>End</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--lux-gold);"></div>
+                            <span>Route</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #94a3b8;"></div>
+                            <span>Pathway</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #6366f1;"></div>
+                            <span>Stairs</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f59e0b;"></div>
+                            <span>Elevator</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = '';
+        let startPoint = null;
+        let endPoint = null;
+        let routeInterval = null;
+        let highlightedElements = [];
+        let currentPath = [];
+
+        // Enhanced navigation graph with element mappings
+        const navigationGraph = {
+            nodes: [
+                // Top horizontal road nodes (y=59)
+                { id: 'top_start', x: 30, y: 59, type: 'road' },
+                { id: 'top_v1', x: 209, y: 59, type: 'intersection' },
+                { id: 'top_stairs1', x: 200, y: 59, type: 'stairs', speed: 0.5, element: 'stairs1' },
+                { id: 'top_v2', x: 359, y: 59, type: 'intersection' },
+                { id: 'top_stairs2', x: 350, y: 59, type: 'stairs', speed: 0.5, element: 'stairs2' },
+                { id: 'top_v3', x: 509, y: 59, type: 'intersection' },
+                { id: 'top_stairs3', x: 500, y: 59, type: 'stairs', speed: 0.5, element: 'stairs3' },
+                { id: 'top_v4', x: 659, y: 59, type: 'intersection' },
+                { id: 'top_elevator1', x: 650, y: 59, type: 'elevator', speed: 0.3, element: 'elevator1' },
+                { id: 'top_v5', x: 809, y: 59, type: 'intersection' },
+                { id: 'top_elevator2', x: 800, y: 59, type: 'elevator', speed: 0.3, element: 'elevator2' },
+                { id: 'top_end', x: 950, y: 59, type: 'road' },
+
+                // Middle horizontal road nodes (y=209)
+                { id: 'mid_start', x: 30, y: 209, type: 'road' },
+                { id: 'mid_v1', x: 209, y: 209, type: 'intersection' },
+                { id: 'mid_stairs4', x: 200, y: 209, type: 'stairs', speed: 0.5, element: 'stairs4' },
+                { id: 'mid_v2', x: 359, y: 209, type: 'intersection' },
+                { id: 'mid_stairs5', x: 350, y: 209, type: 'stairs', speed: 0.5, element: 'stairs5' },
+                { id: 'mid_v3', x: 509, y: 209, type: 'intersection' },
+                { id: 'mid_stairs6', x: 500, y: 209, type: 'stairs', speed: 0.5, element: 'stairs6' },
+                { id: 'mid_v4', x: 659, y: 209, type: 'intersection' },
+                { id: 'mid_elevator3', x: 650, y: 209, type: 'elevator', speed: 0.3, element: 'elevator3' },
+                { id: 'mid_v5', x: 809, y: 209, type: 'intersection' },
+                { id: 'mid_elevator4', x: 800, y: 209, type: 'elevator', speed: 0.3, element: 'elevator4' },
+                { id: 'mid_end', x: 950, y: 209, type: 'road' },
+
+                // Bottom horizontal road nodes (y=359)
+                { id: 'bot_start', x: 30, y: 359, type: 'road' },
+                { id: 'bot_v1', x: 209, y: 359, type: 'intersection' },
+                { id: 'bot_v2', x: 359, y: 359, type: 'intersection' },
+                { id: 'bot_v3', x: 509, y: 359, type: 'intersection' },
+                { id: 'bot_v4', x: 659, y: 359, type: 'intersection' },
+                { id: 'bot_v5', x: 809, y: 359, type: 'intersection' },
+                { id: 'bot_end', x: 950, y: 359, type: 'road' },
+
+                // Building entrance nodes
+                { id: 'building1_door', x: 120, y: 45, type: 'building_entrance' },
+                { id: 'building2_door', x: 280, y: 45, type: 'building_entrance' },
+                { id: 'building3_door', x: 430, y: 45, type: 'building_entrance' },
+                { id: 'building4_door', x: 580, y: 45, type: 'building_entrance' },
+                { id: 'building5_door', x: 730, y: 45, type: 'building_entrance' },
+
+                { id: 'building6_door', x: 120, y: 190, type: 'building_entrance' },
+                { id: 'building7_door', x: 280, y: 190, type: 'building_entrance' },
+                { id: 'building8_door', x: 430, y: 190, type: 'building_entrance' },
+                { id: 'building9_door', x: 580, y: 190, type: 'building_entrance' },
+                { id: 'building10_door', x: 730, y: 190, type: 'building_entrance' },
+                { id: 'building11_door', x: 870, y: 190, type: 'building_entrance' },
+
+                { id: 'building12_door', x: 120, y: 225, type: 'building_entrance' },
+                { id: 'building13_door', x: 280, y: 225, type: 'building_entrance' },
+                { id: 'building14_door', x: 430, y: 225, type: 'building_entrance' },
+                { id: 'building15_door', x: 580, y: 225, type: 'building_entrance' },
+                { id: 'building16_door', x: 730, y: 225, type: 'building_entrance' },
+                { id: 'building17_door', x: 870, y: 225, type: 'building_entrance' },
+
+                { id: 'building18_door', x: 85, y: 370, type: 'building_entrance' },
+                { id: 'building19_door', x: 210, y: 370, type: 'building_entrance' },
+                { id: 'building20_door', x: 340, y: 370, type: 'building_entrance' },
+                { id: 'building21_door', x: 440, y: 370, type: 'building_entrance' },
+                { id: 'building22_door', x: 570, y: 370, type: 'building_entrance' },
+                { id: 'building23_door', x: 690, y: 370, type: 'building_entrance' },
+            ],
+            edges: [
+                // Top horizontal road connections
+                ['top_start', 'top_v1'], ['top_v1', 'top_stairs1'], ['top_stairs1', 'top_v2'],
+                ['top_v2', 'top_stairs2'], ['top_stairs2', 'top_v3'], ['top_v3', 'top_stairs3'],
+                ['top_stairs3', 'top_v4'], ['top_v4', 'top_elevator1'], ['top_elevator1', 'top_v5'],
+                ['top_v5', 'top_elevator2'], ['top_elevator2', 'top_end'],
+
+                // Middle horizontal road connections
+                ['mid_start', 'mid_v1'], ['mid_v1', 'mid_stairs4'], ['mid_stairs4', 'mid_v2'],
+                ['mid_v2', 'mid_stairs5'], ['mid_stairs5', 'mid_v3'], ['mid_v3', 'mid_stairs6'],
+                ['mid_stairs6', 'mid_v4'], ['mid_v4', 'mid_elevator3'], ['mid_elevator3', 'mid_v5'],
+                ['mid_v5', 'mid_elevator4'], ['mid_elevator4', 'mid_end'],
+
+                // Bottom horizontal road connections
+                ['bot_start', 'bot_v1'], ['bot_v1', 'bot_v2'], ['bot_v2', 'bot_v3'],
+                ['bot_v3', 'bot_v4'], ['bot_v4', 'bot_v5'], ['bot_v5', 'bot_end'],
+
+                // Vertical connections
+                ['top_v1', 'mid_v1'], ['mid_v1', 'bot_v1'],
+                ['top_v2', 'mid_v2'], ['mid_v2', 'bot_v2'],
+                ['top_v3', 'mid_v3'], ['mid_v3', 'bot_v3'],
+                ['top_v4', 'mid_v4'], ['mid_v4', 'bot_v4'],
+                ['top_v5', 'mid_v5'], ['mid_v5', 'bot_v5'],
+
+                // Building connections to nearest road nodes
+                ['top_v1', 'building1_door'],
+                ['top_v1', 'building2_door'],
+                ['top_v2', 'building3_door'],
+                ['top_v4', 'building4_door'],
+                ['top_v4', 'building5_door'],
+
+                ['mid_start', 'building6_door'],
+                ['mid_v1', 'building7_door'],
+                ['mid_v2', 'building8_door'],
+                ['mid_v3', 'building9_door'],
+                ['mid_v4', 'building10_door'],
+                ['mid_v5', 'building11_door'],
+
+                ['mid_start', 'building12_door'],
+                ['mid_v1', 'building13_door'],
+                ['mid_v2', 'building14_door'],
+                ['mid_v3', 'building15_door'],
+                ['mid_v4', 'building16_door'],
+                ['mid_v5', 'building17_door'],
+
+                ['bot_v1', 'building18_door'],
+                ['bot_v1', 'building19_door'],
+                ['bot_v2', 'building20_door'],
+                ['bot_v2', 'building21_door'],
+                ['bot_v3', 'building22_door'],
+                ['bot_v4', 'building23_door'],
+            ]
+        };
+
+        // Element name mappings for user-friendly instructions
+        const elementNames = {
+            stairs1: 'Stairs to 2nd Floor (North)',
+            stairs2: 'Stairs to 2nd Floor (Center-West)',
+            stairs3: 'Stairs to 2nd Floor (Center-East)',
+            stairs4: 'Stairs to 3rd Floor (North)',
+            stairs5: 'Stairs to 3rd Floor (Center-West)',
+            stairs6: 'Stairs to 3rd Floor (Center-East)',
+            elevator1: 'Elevator A (East Wing)',
+            elevator2: 'Elevator B (Far East Wing)',
+            elevator3: 'Elevator C (East Wing)',
+            elevator4: 'Elevator D (Far East Wing)'
+        };
+
+        function setMode(mode) {
+            const floorPlan = document.getElementById('floorPlan');
+            floorPlan.classList.remove('selecting');
+
+            currentMode = mode;
+
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (mode) {
+                const activeButton = document.querySelector(`.${mode === 'start' ? 'set-start' : 'set-end'}`);
+                activeButton.classList.add('active');
+                floorPlan.classList.add('selecting');
+
+                updateStatus(`Click on the map to set your ${mode} point`, 'info');
+            }
+        }
+
+        function handleMapClick(event) {
+            if (event.target.classList.contains('building')) {
+                return; // Let building click handler deal with it
+            }
+
+            if (!currentMode) {
+                updateStatus('Please select "Set Starting Point" or "Set Destination" first', 'warning');
+                return;
+            }
+
+            const floorPlan = document.getElementById('floorPlan');
+            const rect = floorPlan.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const boundedX = Math.max(20, Math.min(x, rect.width - 20));
+            const boundedY = Math.max(20, Math.min(y, rect.height - 20));
+
+            const point = { x: boundedX, y: boundedY };
+
+            if (currentMode === 'start') {
+                setStartPoint(point);
+            } else if (currentMode === 'end') {
+                setEndPoint(point);
+            }
+
+            currentMode = '';
+            floorPlan.classList.remove('selecting');
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function setStartPoint(point) {
+            startPoint = point;
+
+            const existingStart = document.querySelector('.start-point');
+            if (existingStart) existingStart.remove();
+
+            const startMarker = document.createElement('div');
+            startMarker.className = 'point start-point';
+            startMarker.style.left = point.x + 'px';
+            startMarker.style.top = point.y + 'px';
+
+            document.getElementById('floorPlan').appendChild(startMarker);
+            updateStatus('Starting point set! Now set your destination.', 'success');
+        }
+
+        function setEndPoint(point) {
+            endPoint = point;
+
+            const existingEnd = document.querySelector('.end-point');
+            if (existingEnd) existingEnd.remove();
+
+            const endMarker = document.createElement('div');
+            endMarker.className = 'point end-point';
+            endMarker.style.left = point.x + 'px';
+            endMarker.style.top = point.y + 'px';
+
+            document.getElementById('floorPlan').appendChild(endMarker);
+
+            if (startPoint) {
+                updateStatus('Both points set! Click "Get Directions" to find your route.', 'success');
+            } else {
+                updateStatus('Destination set! Now set your starting point.', 'success');
+            }
+        }
+
+        function findRoute() {
+            if (!startPoint || !endPoint) {
+                updateStatus('Please set both starting point and destination first', 'warning');
+                return;
+            }
+
+            clearRoute();
+
+            const startNode = findNearestNode(startPoint);
+            const endNode = findNearestNode(endPoint);
+
+            const path = findPath(startNode, endNode);
+
+            if (path.length > 0) {
+                const nodePositions = path.map(nodeId => {
+                    return navigationGraph.nodes.find(n => n.id === nodeId);
+                }).filter(node => node !== undefined);
+
+                const completePath = [startPoint, ...nodePositions, endPoint];
+                currentPath = path;
+
+                // Highlight path elements
+                highlightPathElements(path);
+
+                drawRoute(completePath);
+                startNavigation(completePath);
+
+                // Generate and show instructions
+                generateInstructions(path);
+
+                updateStatus('Route found! Follow the golden path. Highlighted elements show stairs/elevators.', 'success');
+            } else {
+                updateStatus('No route found. Try selecting different locations.', 'warning');
+            }
+        }
+
+        function highlightPathElements(path) {
+            // Clear previous highlights
+            clearHighlights();
+
+            // Find elements that are part of the path
+            const pathElements = [];
+            path.forEach(nodeId => {
+                const node = navigationGraph.nodes.find(n => n.id === nodeId);
+                if (node && node.element) {
+                    pathElements.push(node.element);
+                }
+            });
+
+            // Highlight the elements
+            pathElements.forEach(elementId => {
+                const element = document.querySelector(`[data-element="${elementId}"]`);
+                if (element) {
+                    element.classList.add('highlighted');
+                    highlightedElements.push(element);
+                }
+            });
+        }
+
+        function clearHighlights() {
+            highlightedElements.forEach(element => {
+                element.classList.remove('highlighted');
+            });
+            highlightedElements = [];
+        }
+
+        function generateInstructions(path) {
+            const pathInstructions = document.getElementById('pathInstructions');
+            const instructionText = document.getElementById('instructionText');
+
+            let instructions = [];
+            let stairsCount = 0;
+            let elevatorsCount = 0;
+
+            // Analyze path for special elements
+            path.forEach(nodeId => {
+                const node = navigationGraph.nodes.find(n => n.id === nodeId);
+                if (node && node.element) {
+                    const elementName = elementNames[node.element];
+                    if (node.type === 'stairs') {
+                        instructions.push(`Use ${elementName}`);
+                        stairsCount++;
+                    } else if (node.type === 'elevator') {
+                        instructions.push(`Take ${elementName}`);
+                        elevatorsCount++;
+                    }
+                }
+            });
+
+            // Create summary
+            let summary = 'Follow the golden route. ';
+            if (stairsCount > 0 && elevatorsCount > 0) {
+                summary += `Your path includes ${stairsCount} stair${stairsCount > 1 ? 's' : ''} and ${elevatorsCount} elevator${elevatorsCount > 1 ? 's' : ''}.`;
+            } else if (stairsCount > 0) {
+                summary += `Your path includes ${stairsCount} stair${stairsCount > 1 ? 's' : ''}.`;
+            } else if (elevatorsCount > 0) {
+                summary += `Your path includes ${elevatorsCount} elevator${elevatorsCount > 1 ? 's' : ''}.`;
+            } else {
+                summary += 'Your path uses walkways only.';
+            }
+
+            if (instructions.length > 0) {
+                summary += '\n\nKey waypoints:\n• ' + instructions.join('\n• ');
+            }
+
+            instructionText.textContent = summary;
+            pathInstructions.classList.add('show');
+        }
+
+        function hideInstructions() {
+            const pathInstructions = document.getElementById('pathInstructions');
+            pathInstructions.classList.remove('show');
+        }
+
+        function findNearestNode(point) {
+            let nearestNode = null;
+            let minDistance = Infinity;
+
+            navigationGraph.nodes.forEach(node => {
+                const distance = Math.sqrt(Math.pow(point.x - node.x, 2) + Math.pow(point.y - node.y, 2));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestNode = node.id;
+                }
+            });
+
+            return nearestNode;
+        }
+
+        function findPath(startNodeId, endNodeId) {
+            if (startNodeId === endNodeId) {
+                return [startNodeId];
+            }
+
+            const queue = [{ node: startNodeId, path: [startNodeId] }];
+            const visited = new Set([startNodeId]);
+
+            while (queue.length > 0) {
+                const { node: currentNode, path } = queue.shift();
+
+                if (currentNode === endNodeId) {
+                    return path;
+                }
+
+                const connections = navigationGraph.edges.filter(edge =>
+                    edge[0] === currentNode || edge[1] === currentNode
+                );
+
+                connections.forEach(edge => {
+                    const nextNode = edge[0] === currentNode ? edge[1] : edge[0];
+                    if (!visited.has(nextNode)) {
+                        visited.add(nextNode);
+                        queue.push({ node: nextNode, path: [...path, nextNode] });
+                    }
+                });
+            }
+
+            return [];
+        }
+
+        function drawRoute(path) {
+            const floorPlan = document.getElementById('floorPlan');
+
+            for (let i = 0; i < path.length - 1; i++) {
+                const start = path[i];
+                const end = path[i + 1];
+
+                const pathElement = document.createElement('div');
+                pathElement.className = 'route-path';
+
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+                pathElement.style.left = start.x + 'px';
+                pathElement.style.top = (start.y - 3) + 'px';
+                pathElement.style.width = length + 'px';
+                pathElement.style.transformOrigin = '0 50%';
+                pathElement.style.transform = `rotate(${angle}deg)`;
+
+                floorPlan.appendChild(pathElement);
+            }
+        }
+
+        function startNavigation(path) {
+            const existingArrow = document.querySelector('.nav-arrow');
+            if (existingArrow) existingArrow.remove();
+
+            if (path.length < 2) return;
+
+            const arrow = document.createElement('div');
+            arrow.className = 'nav-arrow normal';
+            document.getElementById('floorPlan').appendChild(arrow);
+
+            let currentSegment = 0;
+            let progress = 0;
+            let baseSpeed = 0.02;
+
+            function animateArrow() {
+                if (currentSegment >= path.length - 1) {
+                    clearInterval(routeInterval);
+                    const finalPos = path[path.length - 1];
+                    arrow.style.left = finalPos.x + 'px';
+                    arrow.style.top = finalPos.y + 'px';
+                    return;
+                }
+
+                const start = path[currentSegment];
+                const end = path[currentSegment + 1];
+
+                // Find the corresponding node to check for special elements
+                const currentNodeId = currentPath[currentSegment];
+                const currentNode = navigationGraph.nodes.find(n => n.id === currentNodeId);
+
+                let currentSpeed = baseSpeed;
+
+                if (currentNode) {
+                    if (currentNode.type === 'stairs') {
+                        currentSpeed = baseSpeed * 0.5;
+                        arrow.className = 'nav-arrow slow';
+                    } else if (currentNode.type === 'elevator') {
+                        currentSpeed = baseSpeed * 0.3;
+                        arrow.className = 'nav-arrow slow';
+                    } else {
+                        arrow.className = 'nav-arrow normal';
+                    }
+                }
+
+                const x = start.x + (end.x - start.x) * progress;
+                const y = start.y + (end.y - start.y) * progress;
+
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                let angle = Math.atan2(dy, dx) * 180 / Math.PI + 45;
+
+                arrow.style.left = x + 'px';
+                arrow.style.top = y + 'px';
+                arrow.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+
+                progress += currentSpeed;
+                if (progress >= 1) {
+                    progress = 0;
+                    currentSegment++;
+                }
+            }
+
+            if (routeInterval) {
+                clearInterval(routeInterval);
+            }
+
+            routeInterval = setInterval(animateArrow, 50);
+        }
+
+        function clearRoute() {
+            document.querySelectorAll('.route-path').forEach(path => path.remove());
+            const arrow = document.querySelector('.nav-arrow');
+            if (arrow) arrow.remove();
+
+            // Clear highlights
+            clearHighlights();
+
+            // Hide instructions
+            hideInstructions();
+
+            if (routeInterval) {
+                clearInterval(routeInterval);
+                routeInterval = null;
+            }
+        }
+
+        function clearAll() {
+            startPoint = null;
+            endPoint = null;
+            currentMode = '';
+            currentPath = [];
+
+            const floorPlan = document.getElementById('floorPlan');
+            floorPlan.classList.remove('selecting');
+
+            document.querySelectorAll('.point').forEach(point => point.remove());
+            clearRoute();
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+
+            updateStatus('Map cleared. Ready for new navigation.', 'info');
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+
+        // Event listeners
+        document.getElementById('floorPlan').addEventListener('click', handleMapClick);
+
+        document.querySelectorAll('.building').forEach(building => {
+            building.addEventListener('click', function (event) {
+                event.stopPropagation();
+                if (currentMode) {
+                    const rect = this.getBoundingClientRect();
+                    const floorPlanRect = document.getElementById('floorPlan').getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2 - floorPlanRect.left;
+                    const centerY = rect.top + rect.height / 2 - floorPlanRect.top;
+
+                    const point = { x: centerX, y: centerY };
+
+                    if (currentMode === 'start') {
+                        setStartPoint(point);
+                    } else if (currentMode === 'end') {
+                        setEndPoint(point);
+                    }
+
+                    currentMode = '';
+                    const floorPlan = document.getElementById('floorPlan');
+                    floorPlan.classList.remove('selecting');
+                    document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+                }
+            });
+        });
+
+        // Add hover effects for stairs and elevators
+        document.querySelectorAll('.stairs, .elevator').forEach(element => {
+            element.addEventListener('mouseenter', function () {
+                if (!this.classList.contains('highlighted')) {
+                    const elementId = this.getAttribute('data-element');
+                    const elementName = elementNames[elementId];
+                    if (elementName) {
+                        this.setAttribute('title', elementName);
+                    }
+                }
+            });
+        });
+
+        // Enhanced map toolbar functionality
+        document.querySelectorAll('.map-tool').forEach((tool, index) => {
+            tool.addEventListener('click', function () {
+                const floorPlan = document.getElementById('floorPlan');
+                const currentTransform = floorPlan.style.transform || '';
+
+                switch (index) {
+                    case 0: // Zoom In
+                        const currentScale = getCurrentScale(currentTransform);
+                        if (currentScale < 1.5) {
+                            floorPlan.style.transform = currentTransform.replace(/scale\([^)]*\)/, '') + ` scale(${Math.min(currentScale * 1.2, 1.5)})`;
+                        }
+                        break;
+                    case 1: // Zoom Out
+                        const currentScaleOut = getCurrentScale(currentTransform);
+                        if (currentScaleOut > 0.5) {
+                            floorPlan.style.transform = currentTransform.replace(/scale\([^)]*\)/, '') + ` scale(${Math.max(currentScaleOut * 0.8, 0.5)})`;
+                        }
+                        break;
+                    case 2: // Reset View
+                        floorPlan.style.transform = 'scale(1)';
+                        break;
+                }
+            });
+        });
+
+        function getCurrentScale(transform) {
+            const scaleMatch = transform.match(/scale\(([^)]+)\)/);
+            return scaleMatch ? parseFloat(scaleMatch[1]) : 1;
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        const buildings = document.querySelectorAll('.building');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+
+            // Clear previous highlights
+            buildings.forEach(building => {
+                building.style.boxShadow = '';
+                building.style.transform = '';
+            });
+
+            if (searchTerm.length > 0) {
+                buildings.forEach(building => {
+                    const buildingText = building.textContent.toLowerCase();
+                    if (buildingText.includes(searchTerm)) {
+                        building.style.boxShadow = '0 0 20px rgba(212, 175, 55, 0.8)';
+                        building.style.transform = 'translateY(-2px) scale(1.05)';
+                    }
+                });
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (event) {
+            switch (event.key.toLowerCase()) {
+                case 's':
+                    if (event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+                        setMode('start');
+                    }
+                    break;
+                case 'd':
+                    if (event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+                        setMode('end');
+                    }
+                    break;
+                case 'r':
+                    if (event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+                        findRoute();
+                    }
+                    break;
+                case 'c':
+                    if (event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+                        clearAll();
+                    }
+                    break;
+                case 'escape':
+                    currentMode = '';
+                    document.getElementById('floorPlan').classList.remove('selecting');
+                    document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+                    break;
+            }
+        });
+
+        // Add accessibility features
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.setAttribute('role', 'button');
+            btn.setAttribute('tabindex', '0');
+
+            btn.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    this.click();
+                }
+            });
+        });
+
+        // Enhanced status messages with progress indication
+        function updateStatusWithProgress(message, type = 'info', progress = null) {
+            const statusElement = document.getElementById('status');
+            let displayMessage = message;
+
+            if (progress !== null) {
+                displayMessage += ` (${Math.round(progress)}%)`;
+            }
+
+            statusElement.textContent = displayMessage;
+            statusElement.className = `status ${type}`;
+        }
+
+        // Auto-clear search on route calculation
+        function findRouteEnhanced() {
+            searchInput.value = '';
+            buildings.forEach(building => {
+                building.style.boxShadow = '';
+                building.style.transform = '';
+            });
+            findRoute();
+        }
+
+        // Update the find route button to use enhanced version
+        document.querySelector('.find-route').onclick = findRouteEnhanced;
+
+        // Add touch support for mobile devices
+        let touchStartX, touchStartY;
+
+        document.getElementById('floorPlan').addEventListener('touchstart', function (event) {
+            if (event.touches.length === 1) {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            }
+        });
+
+        document.getElementById('floorPlan').addEventListener('touchend', function (event) {
+            if (event.changedTouches.length === 1) {
+                const touchEndX = event.changedTouches[0].clientX;
+                const touchEndY = event.changedTouches[0].clientY;
+                const deltaX = Math.abs(touchEndX - touchStartX);
+                const deltaY = Math.abs(touchEndY - touchStartY);
+
+                // If it's a tap (not a swipe), treat as click
+                if (deltaX < 10 && deltaY < 10) {
+                    const syntheticEvent = {
+                        clientX: touchEndX,
+                        clientY: touchEndY,
+                        target: event.target
+                    };
+                    handleMapClick(syntheticEvent);
+                }
+            }
+        });
+
+        // Initialize with welcome message and keyboard shortcuts info
+        updateStatus('Welcome! Use Ctrl+S for start, Ctrl+D for destination, Ctrl+R to route, Ctrl+C to clear.', 'info');
+
+        // Add performance monitoring for smooth animations
+        let animationFrameId;
+        const performanceMonitor = {
+            lastFrameTime: performance.now(),
+            frameCount: 0,
+
+            checkPerformance() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - this.lastFrameTime;
+                this.frameCount++;
+
+                if (this.frameCount % 60 === 0) { // Check every 60 frames
+                    const fps = 1000 / (deltaTime / 60);
+                    if (fps < 30) {
+                        // Reduce animation complexity if performance is poor
+                        document.documentElement.style.setProperty('--animation-complexity', 'reduced');
+                    }
+                }
+
+                this.lastFrameTime = currentTime;
+                animationFrameId = requestAnimationFrame(() => this.checkPerformance());
+            }
+        };
+
+        // Start performance monitoring
+        performanceMonitor.checkPerformance();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function () {
+            if (routeInterval) {
+                clearInterval(routeInterval);
+            }
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        });
+    </script>
+</body>
+
+</html>

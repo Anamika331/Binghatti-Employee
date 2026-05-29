@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visitor Log</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.min.js"></script>
+    <link href="style.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-grad-a: #e9e9ee;
+            --bg-grad-b: #fff6cf;
+            --ink: #1f2937;
+            --ink-2: #374151;
+            --muted: #6b7280;
+            --chip-green-bg: #ecfdf5;
+            --chip-green-fg: #047857;
+            --chip-gray-bg: #f3f4f6;
+            --chip-gray-fg: #6b7280;
+            --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
+            --shadow-2: 0 2px 8px rgba(0, 0, 0, .08);
+            --radius-xl: 1.5rem;
+            --lux-bg: #ffffff;
+            --lux-gold: #D4AF37;
+            --lux-gold-2: #b78f2a;
+            --lux-black: #000000;
+            --lux-muted: rgba(0, 0, 0, 0.65);
+            --lux-radius: 14px;
+            --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            margin: 0;
+            background: linear-gradient(90deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .dashboard-container {
+            width: 100%;
+
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding: 0 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .subtitle-text {
+            font-weight: 100;
+            font-size: .95rem;
+            color: var(--ink-2);
+            margin: 0;
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-1);
+            position: relative;
+            padding-top: 80px;
+        }
+
+        .table-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-input {
+            padding: .7rem 1rem .7rem 2.4rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: var(--shadow-2);
+            font-size: .9rem;
+            color: black;
+            font-weight: 100;
+            font-family: 'Lexend', sans-serif;
+            width: min(340px, 40vw);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--muted);
+        }
+
+        .add-visitor-btn {
+            font-family: 'Lexend';
+            background: #fcd34d;
+            color: var(--ink);
+            font-weight: 400;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow-2);
+            transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+            white-space: nowrap;
+        }
+
+        .add-visitor-btn:hover {
+            background: #facc15;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+        }
+
+        th {
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .75rem;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem .75rem;
+            font-size: .9rem;
+            color: var(--ink-2);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        .pill {
+            padding: .35rem .75rem;
+            border-radius: 9999px;
+            font-size: .75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .pill.green {
+            background: var(--chip-green-bg);
+            color: var(--chip-green-fg);
+        }
+
+        .pill.gray {
+            background: var(--chip-gray-bg);
+            color: var(--chip-gray-fg);
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 1100px;
+            max-width: 95%;
+            background: var(--lux-bg);
+            border-radius: var(--lux-radius);
+            padding: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: var(--lux-shadow);
+            position: relative;
+            animation: pop 260ms ease-out;
+            transition: width .3s ease;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 1100px) {
+            .modal-content {
+                width: 760px;
+            }
+
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+
+            .badge-container {
+                margin-top: 2rem;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .modal-content {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .date-time-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(.98)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 4px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: .2px;
+            font-weight: 500;
+            color: var(--lux-black);
+        }
+
+        .modal-header p {
+            margin: 6px 0 18px 0;
+            color: var(--lux-muted);
+            font-size: 14px;
+        }
+
+        .close-btn {
+            all: unset;
+            box-sizing: border-box;
+            position: absolute;
+            right: 18px;
+            top: 18px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .close-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--lux-muted);
+            font-weight: 400;
+        }
+
+        .form-field .input,
+        .form-field .select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--lux-black);
+            outline: none;
+            font-size: 16px;
+            font-weight: 400;
+            font-family: 'Lexend', sans-serif;
+            transition: box-shadow .15s ease, border-color .15s ease;
+        }
+
+        .form-field .input:focus,
+        .form-field .select:focus {
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        .form-field textarea.input {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .date-time-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+
+        .parking-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .parking-group .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .parking-group .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--lux-gold);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .modal-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .modal-footer .info {
+            font-size: 13px;
+            color: var(--muted);
+            margin-right: auto;
+        }
+
+        .btn-cancel {
+            font-family: "Lexend";
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 10px 16px;
+            border-radius: 10px;
+            color: var(--ink-2);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            font-family: "Lexend";
+            background: var(--lux-gold);
+            color: #fff;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-save .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-width: 2px;
+            border-top-color: #fff;
+            border-left-color: #fff;
+            border-bottom-color: transparent;
+            border-right-color: transparent;
+        }
+
+        /* Badge & Spinner Styling */
+        .badge-container {
+            border-left: 1px solid #e5e7eb;
+            padding-left: 2rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .badge-wrapper {
+            display: none;
+        }
+
+        #visitorBadge {
+            position: relative;
+            overflow: hidden;
+            padding: 32px 20px 24px 20px;
+            border-radius: 22px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            background: #23293a;
+            color: #fff;
+            font-family: 'Lexend', sans-serif;
+            margin: 0 auto;
+            transition: background 0.3s;
+        }
+
+        #visitorBadge[data-type="Customer"] {
+            background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+            color: #1f2937;
+        }
+
+        #visitorBadge[data-type="Agent"] {
+            background: linear-gradient(135deg, #dcfce7 0%, #a7f3d0 100%);
+            color: #064e3b;
+        }
+
+        #visitorBadge[data-type="Contractor"] {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #1e293b;
+        }
+
+        #visitorBadge[data-type="VIP"] {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #fde68a;
+        }
+
+        #visitorBadge h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .badge-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--lux-gold);
+            color: var(--ink);
+            font-size: 2.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-details {
+            font-size: 1.08rem;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .badge-checkin {
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-bottom: 18px;
+        }
+
+        #qrCode {
+            margin: 0 auto 18px auto;
+            background: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        #qrCode img {
+            display: block;
+        }
+
+        .badge-valid {
+            font-size: .95rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--lux-gold);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #visitorBadge,
+            #visitorBadge * {
+                visibility: visible;
+            }
+
+            #visitorBadge {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+                box-shadow: none;
+            }
+
+            .modal-footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="pixellent.png" class="logo-image">
+                <div class="logo-text"></div>
+            </div>
+
+
+            <nav class="main-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="employee-attendance.html">Attendance</a>
+                <a href="salary_employee.html">Salary</a>
+                <a href="parking.html">Parking</a>
+                <a href="delivery_Employee.html">Delivery</a>
+                <a href="pantry.html">Pantry</a>
+                <a href="employee_appointments.html">Appointments</a>
+                <a href="meeting-room.html">Facilities</a>
+                <a href="visitior-list.html" class="active">Visitor</a>
+                <a href="anoucement.html">Insights</a>
+                <a href="employee-chat.html">Chats</a>
+                <a href="maintenance.html">Maintenance</a>
+
+            </nav>
+
+            <div class="header-actions">
+                <a href="AI-assistant.html" class="setting-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
+                        height="20">
+                        <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+                    </svg>
+                    <span>AI</span>
+                </a>
+                <button class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+                        </path>
+                    </svg>
+                </button>
+                <div class="user-profile-btn"></div>
+            </div>
+        </header>
+        <div class="dashboard-header">
+            <div>
+                <h1>Visitor Management System</h1>
+                <p class="subtitle-text">
+                    A comprehensive list of all visitors. Use the search to filter or add a new visitor.
+                </p>
+            </div>
+            <div class="header-actions">
+                <button class="add-visitor-btn" id="addVisitorBtn">Add Visitor</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="search-wrap">
+                    <input id="searchInput" class="search-input" type="text" placeholder="Search visitors..." />
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M10 4a6 6 0 104.472 10.03l4.249 4.249 1.414-1.414-4.249-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="visitorsTable">
+                    <thead>
+                        <tr>
+                            <th>Visitor Name</th>
+                            <th>Type</th>
+                            <th>Phone Number</th>
+                            <th>Email Address</th>
+                            <th>Parking</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitorsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Visitor Modal -->
+    <div id="addVisitorModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" data-close>&times;</button>
+            <div class="modal-header">
+                <h2>Add Visitor</h2>
+                <p>Enter visitor details to register them for the visit. All fields are saved to your system.</p>
+            </div>
+            <div class="modal-body">
+                <form id="addVisitorForm">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="visitorName">Visitor name</label>
+                            <input id="visitorName" type="text" class="input" placeholder="Full name" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="visitorType">Type</label>
+                            <select id="visitorType" class="select" required>
+                                <option value="" disabled selected>Select type</option>
+                                <option value="VIP">VIP</option>
+                                <option value="Agent">Agent</option>
+                                <option value="Customer">Customer</option>
+                                <option value="Contractor">Contractor</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="phone">Phone number</label>
+                            <input id="phone" type="tel" class="input" placeholder="+91 98765 43210" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="email">Email address</label>
+                            <input id="email" type="email" class="input" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-field full-width">
+                            <label>Is parking required?</label>
+                            <div class="parking-group">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="parkingRequired">
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="parkingLabel">No</span>
+                            </div>
+                        </div>
+                        <div class="form-field full-width date-time-group">
+                            <div class="form-field">
+                                <label for="visitDate">Date</label>
+                                <input id="visitDate" type="date" class="input" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="visitTime">Time</label>
+                                <input id="visitTime" type="time" class="input" required>
+                            </div>
+                        </div>
+                        <div class="form-field full-width">
+                            <label for="notes">Notes (optional)</label>
+                            <textarea id="notes" class="input"
+                                placeholder="Meeting room, person to meet, etc."></textarea>
+                        </div>
+                    </div>
+                </form>
+                <div class="badge-container">
+                    <div class="spinner" id="loadingSpinner"></div>
+                    <div class="badge-wrapper" id="badgeWrapper">
+                        <div id="visitorBadge" data-type="Agent">
+                            <h3>VISITOR PASS</h3>
+                            <div class="badge-subtitle">Welcome</div>
+                            <div class="badge-avatar"></div>
+                            <div class="badge-details" id="badgeName">Visitor Name</div>
+                            <div class="badge-details" id="badgeType">Visitor Type</div>
+                            <div class="badge-checkin" id="badgeCheckin">Check-in: 11:00 AM</div>
+                            <div id="qrCode"></div>
+                            <div class="badge-valid" id="badgeValid">Valid for: 12 Aug 2025</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="info" id="footerInfo">Visitor entry will be logged with date & time.</span>
+                <button type="button" class="btn-cancel" data-close>Cancel</button>
+                <button type="button" class="btn-save" id="saveAndGenerateBtn">
+                    <span class="btn-text">Save Visitor</span>
+                    <div class="spinner"></div>
+                </button>
+                <button type="button" class="btn-save" id="printBadgeBtn" style="display: none;">Print Badge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // --- DATA -----------------------------------------
+            let visitors = [
+                { id: 1, name: 'Aarav Sharma', type: 'Agent', phone: '+91 98765 43210', email: 'aarav.sharma@example.com', parking: true, date: '2025-08-12', time: '11:00', notes: 'Property documents' },
+                { id: 2, name: 'Priya Patel', type: 'Customer', phone: '+91 91234 56789', email: 'priya.p@example.com', parking: false, date: '2025-08-12', time: '14:30', notes: 'Interested in 2BHK' },
+                { id: 3, name: 'Rohan Das', type: 'Contractor', phone: '+91 87654 32109', email: 'delivery.service@example.com', parking: false, date: '2025-08-11', time: '15:00', notes: 'Site inspection' },
+                { id: 4, name: 'Meera Singh', type: 'VIP', phone: '+91 99887 66554', email: 'meera.singh@example.com', parking: true, date: '2025-08-10', time: '10:30', notes: 'Viewing apartment' },
+                { id: 5, name: 'Suresh Kumar', type: 'Agent', phone: '+91 88776 55443', email: 'suresh.kumar@example.com', parking: false, date: '2025-08-09', time: '09:45', notes: 'Client meeting' },
+                { id: 6, name: 'Suresh Kumar', type: 'Agent', phone: '+91 88776 55443', email: 'suresh.kumar@example.com', parking: false, date: '2025-08-09', time: '09:45', notes: 'Client meeting' },
+                { id: 7, name: 'Suresh Kumar', type: 'Agent', phone: '+91 88776 55443', email: 'suresh.kumar@example.com', parking: false, date: '2025-08-09', time: '09:45', notes: 'Client meeting' },
+                { id: 8, name: 'Suresh Kumar', type: 'Agent', phone: '+91 88776 55443', email: 'suresh.kumar@example.com', parking: false, date: '2025-08-09', time: '09:45', notes: 'Client meeting' },
+            ];
+
+            // --- DOM ELEMENTS ---------------------------------
+            const $ = (sel) => document.querySelector(sel);
+            const visitorsBody = $('#visitorsBody');
+            const searchInput = $('#searchInput');
+            const addVisitorModal = $('#addVisitorModal');
+            const addVisitorBtn = $('#addVisitorBtn');
+            const addVisitorForm = $('#addVisitorForm');
+            const parkingSwitch = $('#parkingRequired');
+            const parkingLabel = $('#parkingLabel');
+            const printBadgeBtn = $('#printBadgeBtn');
+            const saveAndGenerateBtn = $('#saveAndGenerateBtn');
+            const badgeWrapper = $('#badgeWrapper');
+            const footerInfo = $('#footerInfo');
+
+            // --- FUNCTIONS ------------------------------------
+            function renderTable(visitorList = visitors) {
+                visitorsBody.innerHTML = "";
+                if (!visitorList.length) {
+                    visitorsBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;">No visitors found.</td></tr>`;
+                    return;
+                }
+
+                visitorList
+                    .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time))
+                    .forEach(v => {
+                        const tr = document.createElement('tr');
+                        const parkingPill = v.parking ? `<span class="pill green">Yes</span>` : `<span class="pill gray">No</span>`;
+                        const visitDate = new Date(v.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                        const visitTime = new Date('1970-01-01T' + v.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                        tr.innerHTML = `
+                            <td>${v.name}</td>
+                            <td>${v.type}</td>
+                            <td>${v.phone}</td>
+                            <td>${v.email}</td>
+                            <td>${parkingPill}</td>
+                            <td>${visitDate}</td>
+                            <td>${visitTime}</td>
+                            <td>${v.notes || '—'}</td>
+                        `;
+                        visitorsBody.appendChild(tr);
+                    });
+            }
+
+            function resetModal() {
+                addVisitorForm.reset();
+                badgeWrapper.style.display = 'none';
+
+                const now = new Date();
+                $('#visitDate').value = now.toISOString().split('T')[0];
+                $('#visitTime').value = now.toTimeString().slice(0, 5);
+                parkingLabel.textContent = "No";
+
+                saveAndGenerateBtn.style.display = 'block';
+                printBadgeBtn.style.display = 'none';
+                footerInfo.style.display = 'block';
+            }
+
+            function openModal() {
+                resetModal();
+                addVisitorModal.classList.add('visible');
+            }
+
+            function closeModal() {
+                addVisitorModal.classList.remove('visible');
+            }
+
+            function updateBadgePreview() {
+                const name = $('#visitorName').value || "Visitor Name";
+                const type = $('#visitorType').value || "Visitor";
+                const date = $('#visitDate').value;
+                const time = $('#visitTime').value;
+
+                const badge = $('#visitorBadge');
+                badge.setAttribute('data-type', type);
+
+                const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'V';
+                badge.querySelector('.badge-avatar').textContent = initials;
+
+                $('#badgeName').textContent = name;
+                $('#badgeType').textContent = type;
+
+                const checkinTime = time ? new Date('1970-01-01T' + time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '';
+                $('#badgeCheckin').textContent = `Check-in: ${checkinTime}`;
+
+                const validDate = date ? new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+                $('#badgeValid').textContent = `Valid for: ${validDate}`;
+
+                const qrCodeEl = $('#qrCode');
+                qrCodeEl.innerHTML = '';
+                const qrData = `Visitor: ${name}\nType: ${type}\nDate: ${date}`;
+                const qr = qrcode(0, 'M');
+                qr.addData(qrData);
+                qr.make();
+                qrCodeEl.innerHTML = qr.createImgTag(4, 4);
+
+                badgeWrapper.style.display = 'block';
+            }
+
+            // --- EVENT LISTENERS ------------------------------
+            addVisitorBtn.addEventListener('click', openModal);
+
+            addVisitorModal.addEventListener('click', (e) => {
+                if (e.target.matches('.modal') || e.target.closest('[data-close]')) {
+                    closeModal();
+                }
+            });
+
+            parkingSwitch.addEventListener('change', () => {
+                parkingLabel.textContent = parkingSwitch.checked ? "Yes" : "No";
+            });
+
+            addVisitorForm.addEventListener('input', updateBadgePreview);
+
+            addVisitorForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const btn = $('#saveAndGenerateBtn');
+                const btnText = btn.querySelector('.btn-text');
+                const spinner = btn.querySelector('.spinner');
+
+                btnText.style.display = 'none';
+                spinner.style.display = 'block';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    const newVisitor = {
+                        id: Date.now(),
+                        name: $('#visitorName').value,
+                        type: $('#visitorType').value,
+                        phone: $('#phone').value,
+                        email: $('#email').value,
+                        parking: $('#parkingRequired').checked,
+                        date: $('#visitDate').value,
+                        time: $('#visitTime').value,
+                        notes: $('#notes').value
+                    };
+                    visitors.push(newVisitor);
+                    renderTable();
+
+                    btnText.style.display = 'block';
+                    spinner.style.display = 'none';
+                    btn.disabled = false;
+
+                    closeModal();
+                }, 1500);
+            });
+
+            saveAndGenerateBtn.addEventListener('click', () => {
+                addVisitorForm.requestSubmit();
+            });
+
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.toLowerCase().trim();
+                const filtered = visitors.filter(v =>
+                    v.name.toLowerCase().includes(term) ||
+                    v.type.toLowerCase().includes(term) ||
+                    v.email.toLowerCase().includes(term) ||
+                    v.phone.includes(term)
+                );
+                renderTable(filtered);
+            });
+
+            printBadgeBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            // --- INITIALIZATION -------------------------------
+            renderTable();
+        });
+    </script>
+</body>
+
+</html>

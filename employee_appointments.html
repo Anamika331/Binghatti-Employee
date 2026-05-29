@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Appointments</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link href="style.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-grad-a: #e9e9ee;
+      --selected: #fde68a;
+      --bg-grad-b: #fff6cf;
+      --ink: #1f2937;
+      --ink-2: #374151;
+      --muted: #6b7280;
+      --chip-blue-bg: #e0f2fe;
+      --chip-blue-fg: #0284c7;
+      --chip-green-bg: #dcfce7;
+      --chip-green-fg: #166534;
+      --chip-red-bg: #fee2e2;
+      --chip-red-fg: #991b1b;
+      --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --radius-xl: 1.5rem;
+      --lux-bg: #ffffff;
+      --lux-gold: #d4af37;
+      --lux-gold-2: #b78f2a;
+      --lux-black: #000000;
+      --lux-muted: rgba(0, 0, 0, 0.65);
+      --lux-radius: 14px;
+      --lux-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Lexend", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+    }
+
+    .dashboard-container {
+      background: linear-gradient(90deg,
+          var(--bg-grad-a) 0%,
+          var(--bg-grad-b) 100%);
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0 0rem;
+      padding: 0 1.5rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .user-profile-widget {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 8px 16px;
+      border-radius: 50px;
+      box-shadow: var(--shadow-2);
+    }
+
+    .user-profile-widget img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .user-profile-widget .user-name {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .add-entity-btn {
+      font-family: "Lexend";
+      background: #fcd34d;
+      color: var(--ink);
+      font-weight: 400;
+      padding: 10px 40px;
+      border: none;
+      margin-top: 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: var(--shadow-2);
+      transition: background 0.2s ease, transform 0.2s ease,
+        box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .add-entity-btn:hover {
+      background: #facc15;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .table-container {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      width: 98%;
+      margin: 20px auto 10px;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 20px 20px 20px;
+    }
+
+    .table-controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .view-toggle-btn {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-family: "Lexend";
+      color: var(--ink-2);
+      box-shadow: var(--shadow-2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .view-toggle-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f9fafb;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem;
+    }
+
+    td {
+      padding: 1rem 0.75rem;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .pill.scheduled {
+      background: var(--chip-blue-bg);
+      color: var(--chip-blue-fg);
+    }
+
+    .pill.completed {
+      background: var(--chip-green-bg);
+      color: var(--chip-green-fg);
+    }
+
+    .pill.cancelled {
+      background: var(--chip-red-bg);
+      color: var(--chip-red-fg);
+    }
+
+    .action-btn {
+      background: var(--ink);
+      color: #fff;
+      padding: 0.4rem 1rem;
+      font-size: 12px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+    }
+
+    .action-btn.cancel {
+      background-color: var(--chip-red-bg);
+      color: var(--chip-red-fg);
+    }
+
+    /* MODALS */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      animation: zoomBounce 0.4s ease;
+      width: min(680px, 94vw);
+      background: var(--lux-bg);
+      border-radius: var(--lux-radius);
+      padding: 24px;
+      box-shadow: var(--lux-shadow);
+    }
+
+    @keyframes zoomBounce {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--lux-black);
+    }
+
+    .modal-header .close-btn {
+      position: static;
+      font-size: 2rem;
+      color: var(--muted);
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #4b5563;
+      font-weight: 400;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      outline: none;
+      font-size: 1rem;
+      font-family: "Lexend", sans-serif;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-submit-request {
+      width: 100%;
+      background: linear-gradient(90deg, var(--lux-gold), var(--lux-gold-2));
+      color: white;
+      font-weight: 600;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-family: "Lexend", sans-serif;
+      transition: filter 0.2s ease;
+    }
+
+    .btn-submit-request:hover {
+      filter: brightness(1.1);
+    }
+
+    /* ===== AI Assistant Modal ===== */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(90deg, #fcd34d, #d4af37);
+      border-radius: 50%;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1),
+        0 4px 6px rgba(0, 0, 0, 0.08);
+      border: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      z-index: 40;
+      color: black;
+      font-size: 25px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14),
+        0 6px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #aiAppointmentModal .modal-content {
+      width: 720px;
+      max-width: calc(100% - 48px);
+      background: var(--lux-bg);
+      padding: 24px;
+    }
+
+    #aiAppointmentModal .modal-header h2 {
+      font-size: 20px;
+    }
+
+    #aiAppointmentModal .modal-header p {
+      font-size: 13px;
+    }
+
+    #aiAppointmentModal .ai-modal-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #aiAppointmentModal .input-box {
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 10px;
+      padding: 12px;
+      position: relative;
+      background: rgba(212, 175, 55, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #aiAppointmentModal .input-box .input-wrap {
+      position: relative;
+    }
+
+    #aiAppointmentModal .input-box textarea {
+      width: 100%;
+      height: 100px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: "Lexend", sans-serif;
+      font-size: 14px;
+      color: var(--lux-black);
+      font-weight: 100;
+      resize: none;
+    }
+
+    #aiAppointmentModal .generate-btn-wrap {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    #aiAppointmentModal .generate-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(90deg, #fcd34d, #d4af37);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-family: "Lexend";
+      font-weight: 100;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(212, 175, 55, 0.14);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    #aiAppointmentModal .generate-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    #aiAppointmentModal .generate-btn:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #aiAppointmentModal .generate-btn svg {
+      width: 18px;
+      height: 18px;
+      color: #fff;
+    }
+
+    #aiAppointmentModal .output-box {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(0, 0, 0, 0.03);
+      min-height: 120px;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      color: var(--lux-muted);
+      font-size: 14px;
+      font-weight: 100;
+    }
+
+    #aiAppointmentModal .output-box pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+      font-family: "Lexend", sans-serif;
+      font-size: 14px;
+      width: 100%;
+      color: var(--ink-2);
+      text-align: left;
+    }
+
+    #aiAppointmentModal .output-box .ai-icon {
+      width: 26px;
+      height: 26px;
+      color: var(--lux-gold);
+    }
+
+    #aiAppointmentModal .modal-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #aiAppointmentModal .modal-actions .btn-clear {
+      font-family: "Lexend";
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: var(--lux-muted);
+      cursor: pointer;
+    }
+
+    #aiAppointmentModal .modal-actions .btn-confirm {
+      font-family: "Lexend";
+      background: #34d399;
+      /* Green for confirm */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 100;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgba(52, 211, 153, 0.14);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <header class="header">
+      <div class="logo-container">
+        <img src="pixellent.png" class="logo-image">
+        <div class="logo-text"></div>
+      </div>
+
+
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="employee-attendance.html">Attendance</a>
+        <a href="salary_employee.html">Salary</a>
+        <a href="parking.html">Parking</a>
+        <a href="delivery_Employee.html">Delivery</a>
+        <a href="pantry.html">Pantry</a>
+        <a href="employee_appointments.html" class="active">Appointments</a>
+        <a href="meeting-room.html">Facilities</a>
+        <a href="visitior-list.html">Visitor</a>
+        <a href="anoucement.html">Insights</a>
+        <a href="employee-chat.html">Chats</a>
+        <a href="maintenance.html">Maintenance</a>
+
+      </nav>
+
+      <div class="header-actions">
+        <a href="AI-assistant.html" class="setting-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+          </svg>
+          <span>AI</span>
+        </a>
+        <button class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+            </path>
+          </svg>
+        </button>
+        <div class="user-profile-btn"></div>
+      </div>
+    </header>
+
+    <div class="dashboard-header">
+      <h1>My Appointments</h1>
+      <div class="user-profile-widget">
+        <img id="userAvatar" src="" alt="User Avatar" />
+        <span id="userName" class="user-name"></span>
+      </div>
+    </div>
+    <div style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin: 0 1.5rem 1.25rem;
+        ">
+      <p class="subtitle-text" style="color: var(--muted); margin: 0">
+        Here are your upcoming and past appointments.
+      </p>
+      <button class="add-entity-btn" id="openAddModal" style="margin-left: 1.5rem">
+        Request Appointment
+      </button>
+    </div>
+    <div class="table-container">
+      <div class="table-controls">
+        <button id="upcomingFilterBtn" class="view-toggle-btn active" data-filter="upcoming">
+          Upcoming
+        </button>
+        <button id="pastFilterBtn" class="view-toggle-btn" data-filter="past">
+          Past
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>With Whom</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="appointments-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="addAppointmentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Request an Appointment</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <form id="appointment-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="appt-type">Appointment Type</label>
+            <select id="appt-type" class="select">
+              <option>General Inquiry</option>
+              <option>Performance Review</option>
+              <option>Leave Request</option>
+              <option>Technical Support</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="appt-with-whom">With Whom</label>
+            <input id="appt-with-whom" type="text" class="input" placeholder="e.g. Michael Chen" />
+          </div>
+          <div class="form-field">
+            <label for="appt-date">Preferred Date</label>
+            <input id="appt-date" type="date" class="input" />
+          </div>
+          <div class="form-field">
+            <label for="appt-time">Preferred Time</label>
+            <input id="appt-time" type="time" class="input" />
+          </div>
+          <div class="form-field full-width">
+            <label for="appt-notes">Notes</label>
+            <textarea id="appt-notes" class="textarea" rows="4"
+              placeholder="Please provide any details for your appointment..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit-request">
+          Submit Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <button class="fab" id="openAiModal">
+    <i class="fas fa-robot"></i>
+  </button>
+
+  <div id="aiAppointmentModal" class="modal">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div>
+          <h2>✨ AI Appointment Assistant</h2>
+          <p>
+            Describe the appointment, and our AI will fill out the form for
+            you.
+          </p>
+
+        </div>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="ai-modal-grid">
+        <div class="input-box">
+          <div class="input-wrap">
+            <textarea id="ai-appt-input"
+              placeholder="e.g., 'I want to book a leave request with Michael Chen for tomorrow afternoon'"></textarea>
+          </div>
+          <div class="generate-btn-wrap">
+            <button class="generate-btn" id="ai-generate-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M10.15 11.23a1 1 0 0 0-1.42 1.42l4.24 4.24a1 1 0 0 0 1.42-1.42l-4.24-4.24zm.71-4.24l-4.24 4.24a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4.24-4.24a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0zM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.71-11.29l2.83-2.83a1 1 0 0 0-1.42-1.42L12 9.29l.71-.71zM13.41 12l2.83-2.83a1 1 0 0 0-1.42-1.42L12 10.59l-2.83-2.83a1 1 0 0 0-1.42 1.42L10.59 12l-2.83 2.83a1 1 0 0 0 1.42 1.42L12 13.41l2.83 2.83a1 1 0 0 0 1.42-1.42L13.41 12z" />
+              </svg>
+              Generate Details
+            </button>
+          </div>
+        </div>
+        <div class="output-box">
+          <svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm-2 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zM5 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1zm14 0a1 1 0 0 1-1-1h-2a1 1 0 0 1 0 2h2a1 1 0 0 1 1-1zM12 1a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V2a1 1 0 0 1 1-1zm-4 4a1 1 0 0 1 0 2l-1.414 1.414a1 1 0 1 1-1.414-1.414L6.586 5a1 1 0 0 1 1.414 0zm8 0a1 1 0 0 1 0 2l-1.414 1.414a1 1 0 1 1-1.414-1.414L14.586 5a1 1 0 0 1 1.414 0zM12 21a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm4-4a1 1 0 0 1 0-2l1.414-1.414a1 1 0 1 1 1.414 1.414L17.414 17a1 1 0 0 1-1.414 0zM8 17a1 1 0 0 1 0-2l-1.414-1.414a1 1 0 1 1-1.414 1.414L6.586 17a1 1 0 0 1 1.414 0z" />
+          </svg>
+          <span>Generated appointment details will appear here.</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-clear">Clear</button>
+        <button class="btn-confirm">Confirm & Fill Form</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    // --- Logged-in User Simulation ---
+    const loggedInEmployee = {
+      id: "EMP-001",
+      name: "Priya Sharma",
+      photo: "https://i.pravatar.cc/150?img=1",
+    };
+
+    // --- Data & State ---
+    let allAppointmentData = [
+      {
+        id: "APT-101",
+        employeeId: "EMP-001",
+        type: "Performance Review",
+        withWhom: "Michael Chen",
+        date: "2025-08-21",
+        time: "10:00",
+        status: "scheduled",
+      },
+      {
+        id: "APT-102",
+        employeeId: "EMP-002",
+        type: "Onboarding",
+        withWhom: "HR Department",
+        date: "2025-08-19",
+        time: "15:30",
+        status: "scheduled",
+      },
+      {
+        id: "APT-106",
+        employeeId: "EMP-001",
+        type: "Technical Support",
+        withWhom: "IT Helpdesk",
+        date: "2025-08-25",
+        time: "16:00",
+        status: "scheduled",
+      },
+      {
+        id: "APT-107",
+        employeeId: "EMP-001",
+        type: "Leave Request",
+        withWhom: "Michael Chen",
+        date: "2025-09-05",
+        time: "09:00",
+        status: "scheduled",
+      },
+      {
+        id: "APT-103",
+        employeeId: "EMP-001",
+        type: "General Inquiry",
+        withWhom: "HR Department",
+        date: "2025-08-09",
+        time: "14:00",
+        status: "completed",
+      },
+      {
+        id: "APT-104",
+        employeeId: "EMP-001",
+        type: "Leave Request",
+        withWhom: "Michael Chen",
+        date: "2025-07-15",
+        time: "11:30",
+        status: "completed",
+      },
+      {
+        id: "APT-108",
+        employeeId: "EMP-001",
+        type: "Performance Review",
+        withWhom: "Michael Chen",
+        date: "2025-02-20",
+        time: "10:00",
+        status: "completed",
+      },
+      {
+        id: "APT-105",
+        employeeId: "EMP-002",
+        type: "Exit Interview",
+        withWhom: "HR Department",
+        date: "2025-08-11",
+        time: "11:00",
+        status: "completed",
+      },
+      {
+        id: "APT-109",
+        employeeId: "EMP-001",
+        type: "General Inquiry",
+        withWhom: "Accounts Team",
+        date: "2025-06-10",
+        time: "15:00",
+        status: "cancelled",
+      },
+    ];
+
+    let currentFilter = "upcoming"; // 'upcoming' or 'past'
+    let parsedAiData = null; // Will now hold the text response from the chatbot
+
+    function formatDate(iso) {
+      if (!iso) return "";
+      const date = new Date(iso);
+      const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString(
+        "en-US",
+        { month: "short", day: "numeric", year: "numeric" }
+      );
+    }
+
+    function formatTime(timeStr) {
+      if (!timeStr) return "";
+      const date = new Date(`1970-01-01T${timeStr}`);
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    }
+
+    // --- Render Functions ---
+    function renderUI() {
+      $("#userName").textContent = `Welcome, ${loggedInEmployee.name.split(" ")[0]
+        }`;
+      $("#userAvatar").src = loggedInEmployee.photo;
+      renderTable();
+    }
+
+    function renderTable() {
+      const now = new Date();
+      const myAppointments = allAppointmentData.filter(
+        (appt) => appt.employeeId === loggedInEmployee.id
+      );
+
+      const filteredData = myAppointments
+        .filter((appt) => {
+          const apptDateTime = new Date(`${appt.date}T${appt.time}`);
+          if (currentFilter === "upcoming") {
+            return (
+              apptDateTime >= now &&
+              (appt.status === "scheduled" || appt.status === "pending")
+            );
+          } else {
+            return (
+              apptDateTime < now ||
+              appt.status === "completed" ||
+              appt.status === "cancelled"
+            );
+          }
+        })
+        .sort((a, b) => {
+          const dateA = new Date(`${a.date}T${a.time}`);
+          const dateB = new Date(`${b.date}T${b.time}`);
+          return currentFilter === "upcoming" ? dateA - dateB : dateB - dateA;
+        });
+
+      $("#appointments-table-body").innerHTML = filteredData
+        .map((appt) => {
+          const isCancellable =
+            new Date(`${appt.date}T${appt.time}`) >= now &&
+            appt.status === "scheduled";
+          return `
+                <tr data-id="${appt.id}">
+                    <td>${appt.type}</td>
+                    <td>${appt.withWhom || "N/A"}</td>
+                    <td>${formatDate(appt.date)}</td>
+                    <td>${formatTime(appt.time)}</td>
+                    <td><span class="pill ${appt.status}">${appt.status
+            }</span></td>
+                    <td>
+                        ${isCancellable
+              ? `<button class="action-btn cancel" onclick="cancelAppointment('${appt.id}')">Cancel</button>`
+              : '<button class="action-btn" disabled>Viewed</button>'
+            }
+                    </td>
+                </tr>`;
+        })
+        .join("");
+    }
+
+    // --- Event Handlers ---
+    function cancelAppointment(apptId) {
+      if (confirm("Are you sure you want to cancel this appointment?")) {
+        const apptIndex = allAppointmentData.findIndex(
+          (a) => a.id === apptId
+        );
+        if (apptIndex !== -1) {
+          allAppointmentData[apptIndex].status = "cancelled";
+          renderTable();
+        }
+      }
+    }
+
+    // --- Modals & Forms ---
+    const addModal = $("#addAppointmentModal");
+    const aiModal = $("#aiAppointmentModal");
+    $("#openAddModal").addEventListener("click", () =>
+      addModal.classList.add("active")
+    );
+    $("#openAiModal").addEventListener("click", () =>
+      aiModal.classList.add("active")
+    );
+    $$(".close-btn").forEach((btn) =>
+      btn.addEventListener("click", (e) =>
+        e.target.closest(".modal").classList.remove("active")
+      )
+    );
+
+    // --- AI & Tab Logic for Modal ---
+    $("#ai-generate-btn").addEventListener("click", async () => {
+      const text = $("#ai-appt-input").value;
+      if (!text) return;
+
+      const outputBox = $("#aiAppointmentModal .output-box");
+      const generateBtn = $("#ai-generate-btn");
+
+      generateBtn.disabled = true;
+      outputBox.innerHTML = `<span>✨ Getting suggestions from the AI assistant...</span>`;
+
+      // Call the new API function and store the text response
+      parsedAiData = await callChatbotApi(text);
+      generateBtn.disabled = false;
+
+      if (!parsedAiData) {
+        outputBox.innerHTML = `<span>Sorry, there was an error with the AI assistant. Please try again or fill the form manually.</span>`;
+        return;
+      }
+
+      // Display the chatbot's response and explain what 'Confirm' does
+      const confirmationMsg = `Here is the AI's response. You can confirm to copy this text into your appointment's notes.<br><br><pre>${parsedAiData}</pre>`;
+      outputBox.innerHTML = confirmationMsg;
+    });
+
+    $("#aiAppointmentModal .btn-confirm").addEventListener("click", () => {
+      if (parsedAiData) {
+        // parsedAiData is now a string response from the chatbot
+        $("#appointment-form").reset(); // Clear any previous user input
+        $("#appt-notes").value = parsedAiData; // Populate the notes field with the AI response
+
+        aiModal.classList.remove("active");
+        addModal.classList.add("active");
+      } else {
+        // alert('Please generate a response from the AI assistant first.');
+      }
+    });
+
+    $("#aiAppointmentModal .btn-clear").addEventListener("click", () => {
+      $("#ai-appt-input").value = "";
+      $("#aiAppointmentModal .output-box").innerHTML = `
+                <svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm-2 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zM5 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1zm14 0a1 1 0 0 1-1-1h-2a1 1 0 0 1 0 2h2a1 1 0 0 1 1-1zM12 1a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V2a1 1 0 0 1 1-1zm-4 4a1 1 0 0 1 0 2l-1.414 1.414a1 1 0 1 1-1.414-1.414L6.586 5a1 1 0 0 1 1.414 0zm8 0a1 1 0 0 1 0 2l-1.414 1.414a1 1 0 1 1-1.414-1.414L14.586 5a1 1 0 0 1 1.414 0zM12 21a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm4-4a1 1 0 0 1 0-2l1.414-1.414a1 1 0 1 1 1.414 1.414L17.414 17a1 1 0 0 1-1.414 0zM8 17a1 1 0 0 1 0-2l-1.414-1.414a1 1 0 1 1-1.414 1.414L6.586 17a1 1 0 0 1 1.414 0z" />
+                </svg>
+                <span>Generated appointment details will appear here.</span>`;
+      parsedAiData = null;
+    });
+
+    async function callChatbotApi(prompt) {
+      const apiUrl = "https://binghatti-test-2.vercel.app/chatbot";
+      const payload = { queryText: prompt };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `API error: ${response.status} ${response.statusText}`
+          );
+        }
+
+        // The API might return JSON or plain text, so we handle both.
+        const responseText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          // Response is not JSON, so treat it as plain text.
+          return responseText;
+        }
+
+        // If it is JSON, try to find a meaningful string value.
+        if (typeof data === "object" && data !== null) {
+          if (data.response) return data.response;
+          if (data.answer) return data.answer;
+          if (data.text) return data.text;
+          const firstStringValue = Object.values(data).find(
+            (v) => typeof v === "string"
+          );
+          if (firstStringValue) return firstStringValue;
+          // If no clear answer, return the stringified object for debugging.
+          return JSON.stringify(data);
+        }
+
+        // Fallback for non-object JSON (e.g., a simple string in quotes)
+        return responseText;
+      } catch (error) {
+        console.error("Chatbot API call failed:", error);
+        // Return a user-friendly error message to be displayed in the UI
+        return `Sorry, I couldn't connect to the AI assistant. Please check your connection and try again.`;
+      }
+    }
+
+    // --- Page-level Event Listeners ---
+    $("#upcomingFilterBtn").addEventListener("click", () => {
+      currentFilter = "upcoming";
+      $("#upcomingFilterBtn").classList.add("active");
+      $("#pastFilterBtn").classList.remove("active");
+      renderTable();
+    });
+
+    $("#pastFilterBtn").addEventListener("click", () => {
+      currentFilter = "past";
+      $("#pastFilterBtn").classList.add("active");
+      $("#upcomingFilterBtn").classList.remove("active");
+      renderTable();
+    });
+
+    $("#appointment-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const newAppointment = {
+        id: `APT-${Date.now()}`,
+        employeeId: loggedInEmployee.id,
+        type: $("#appt-type").value,
+        withWhom: $("#appt-with-whom").value,
+        date: $("#appt-date").value,
+        time: $("#appt-time").value,
+        status: "scheduled",
+        notes: $("#appt-notes").value,
+      };
+
+      if (
+        !newAppointment.date ||
+        !newAppointment.time ||
+        !newAppointment.withWhom
+      ) {
+        // alert('Please fill out the With Whom, Date, and Time fields.');
+        return;
+      }
+
+      allAppointmentData.unshift(newAppointment);
+      addModal.classList.remove("active");
+
+      e.target.reset();
+      $("#upcomingFilterBtn").click();
+    });
+
+    document.addEventListener("DOMContentLoaded", renderUI);
+  </script>
+</body>
+
+</html>

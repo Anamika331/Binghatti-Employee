@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Pantry Services - Crectio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.4.1/css/all.min.css" />
+  <link href="style.css" rel="stylesheet">
+  <style>
+    * {
+      font-family: "Poppins", sans-serif !important;
+    }
+
+    :root {
+      --primary-color: #bc9821;
+      --secondary-color: #f59e0b;
+      --accent-color: #fcd34d;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --ai-bubble: #f3f4f6;
+      --user-bubble: #6366f1;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif !important;
+    }
+
+    .dashboard-container {
+
+      border-radius: 1.5rem;
+      box-shadow: none;
+      padding: 0;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* AI Assistant Floating Button */
+    .floating-ai-btn {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #1f2937;
+      color: white;
+      border: none;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      z-index: 999;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .floating-ai-btn:hover {
+      transform: scale(1.1);
+      background-color: #f59e0b;
+    }
+
+    /* AI Chat Container */
+    .ai-chat-container {
+      position: fixed;
+      bottom: 170px;
+      /* right: 30px; */
+      /* width: 350px; */
+      width: 70%;
+      /* height: 450px; */
+      height: 70vh;
+      background-color: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Modal Backdrop with Glass Morphism */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ai-chat-container.active {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .chat-header {
+      background: linear-gradient(90deg, #1f2937 0%, #374151 100%);
+      color: white;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+
+    .chat-title i {
+      color: #fcd34d;
+    }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chat-close:hover {
+      transform: rotate(90deg);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background-color: #f8fafc;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 0.8rem 1rem;
+      border-radius: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .ai-message {
+      background-color: white;
+      align-self: flex-start;
+      border-top-left-radius: 0.25rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .user-message {
+      background-color: #6366f1;
+      color: white;
+      align-self: flex-end;
+      border-top-right-radius: 0.25rem;
+    }
+
+    .chat-input-container {
+      padding: 1rem;
+      background-color: white;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 1.5rem;
+      border: 1px solid #d1d5db;
+      font-family: "Poppins", sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .chat-input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .send-button {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: #f59e0b;
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .send-button:hover {
+      background-color: #fcd34d;
+      transform: translateY(-2px);
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      background-color: white;
+      border-radius: 1rem;
+      width: fit-content;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #6b7280;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .ai-feature-highlight {
+      background: linear-gradient(90deg, #1f2937 0%, #374151 100%);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      color: white;
+      margin: 2rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .ai-highlight-content {
+      flex: 1;
+    }
+
+    .ai-highlight-content h2 {
+      font-weight: 500;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .ai-highlight-content p {
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .ai-feature-btn {
+      background-color: #fcd34d;
+      color: #1f2937;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ai-feature-btn:hover {
+      background-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+
+    .ai-highlight-icon {
+      font-size: 3rem;
+      color: #fcd34d;
+    }
+
+    .chat-header {
+      padding: 1.5rem;
+      background: linear-gradient(90deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle,
+          rgba(255, 255, 255, 0.2) 0%,
+          transparent 70%);
+      animation: rotate 20s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes typing {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+      }
+
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(31, 41, 55, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(31, 41, 55, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(31, 41, 55, 0);
+      }
+    }
+
+    /* Rest of your existing CSS */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0;
+    }
+
+    .dashboard-header h1 {
+      font-size: 3rem;
+      font-weight: 300;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .progress-item {
+      text-align: center;
+      flex: 1 1 200px;
+    }
+
+    .progress-item p {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar {
+      font-weight: 500;
+      padding: 0.75rem 2rem;
+      border-radius: 9999px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease;
+    }
+
+    .progress-bar:hover {
+      transform: translateY(-2px);
+    }
+
+    .progress-orders {
+      background-color: #1f2937;
+      color: #ffffff;
+    }
+
+    .progress-popular {
+      background-color: #10b981;
+      color: #ffffff;
+    }
+
+    .progress-delivery {
+      background-color: #fcd34d;
+      color: #1f2937;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-delivery::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: repeating-linear-gradient(-45deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.1) 10px,
+          transparent 10px,
+          transparent 20px);
+      opacity: 0.75;
+    }
+
+    .progress-delivery span {
+      position: relative;
+      z-index: 10;
+    }
+
+    .progress-satisfaction {
+      background-color: #ffffff;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+    }
+
+    .filter-search-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background-color: #f9fafb;
+    }
+
+    .filter-btn.active {
+      background-color: #1f2937;
+      color: #ffffff;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box input {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0.5rem 2.5rem 0.5rem 1rem;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .menu-item {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .menu-item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .menu-content {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .menu-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .menu-info div {
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-info i {
+      color: #f59e0b;
+      margin-right: 0.25rem;
+    }
+
+    .menu-info span {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .menu-title {
+      font-weight: 500;
+      font-size: 1.125rem;
+      margin-bottom: 0.25rem;
+      color: #1f2937;
+    }
+
+    .menu-sub-title {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    .menu-price {
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #1f2937;
+      margin-top: auto;
+    }
+
+    .view-btn {
+      background-color: #1f2937;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .add-to-cart {
+      background-color: #1f2937;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .add-to-cart:hover {
+      background-color: #374151;
+      transform: translateY(-2px);
+    }
+
+    .summary-card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-card {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #ffffff;
+    }
+
+    .card-icon.primary {
+      background-color: #1f2937;
+    }
+
+    .card-icon.warning {
+      background-color: #fcd34d;
+      color: #1f2937;
+    }
+
+    .card-icon.info {
+      background-color: #10b981;
+    }
+
+    .card-icon.danger {
+      background-color: #ef4444;
+    }
+
+    .card-content h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .card-content p {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .table-container {
+      background-color: #fff;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 95%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    thead {
+      background-color: #f9fafb;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: #6b7280;
+      padding: 0.75rem;
+    }
+
+    td {
+      padding: 1rem 0.75rem;
+      font-size: 0.875rem;
+      color: #374151;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr.selected {
+      background-color: #fcd34d;
+    }
+
+    .checkbox-cell {
+      text-align: center;
+    }
+
+    .favorite-btn {
+      background-color: transparent;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+      width: 40px;
+      height: 40px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .favorite-btn:hover {
+      color: #ef4444;
+      border-color: #ef4444;
+      transform: scale(1.1);
+    }
+
+    .favorite-btn.active {
+      color: #ef4444;
+      border-color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .cart-summary {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      width: 350px;
+      max-width: 90vw;
+      transform: translateY(150%);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1000;
+    }
+
+    .cart-summary.show {
+      transform: translateY(0);
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .cart-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+
+    .cart-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.3s ease;
+    }
+
+    .cart-close:hover {
+      color: #ef4444;
+      transform: rotate(90deg);
+    }
+
+    .cart-items {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e5e7eb;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .cart-item-name {
+      font-weight: 500;
+      color: #1f2937;
+    }
+
+    .cart-item-price {
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-top: 2px solid #e5e7eb;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .cart-total-amount {
+      color: #1f2937;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .cart-btn {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      text-align: center;
+    }
+
+    .cart-clear {
+      background-color: transparent;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+    }
+
+    .cart-clear:hover {
+      background-color: #f9fafb;
+    }
+
+    .cart-checkout {
+      background-color: #1f2937;
+      color: white;
+      border: none;
+    }
+
+    .cart-checkout:hover {
+      background-color: #fcd34d;
+    }
+
+    .floating-cart-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #1f2937;
+      color: white;
+      border: none;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      z-index: 999;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .floating-cart-btn:hover {
+      transform: scale(1.1);
+      background-color: #f59e0b;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .assistant-icon {
+      width: 50px;
+      height: 50px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      z-index: 1;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
+      }
+
+      70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(252, 211, 77, 0);
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(252, 211, 77, 0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .dashboard-header h1 {
+        font-size: 2rem;
+      }
+
+      .progress-container {
+        max-width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cart-summary {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+      }
+
+      .floating-cart-btn {
+        bottom: 20px;
+        right: 20px;
+      }
+
+      .floating-ai-btn {
+        bottom: 90px;
+        right: 20px;
+      }
+
+      .ai-chat-container {
+        right: 20px;
+        width: calc(100% - 40px);
+      }
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 0.5rem 0;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0rem;
+    }
+
+    .action-button {
+      padding: 0.4rem 0.8rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      border: none;
+    }
+
+    .action-button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .ai-bubble .action-button {
+      background-color: rgba(31, 41, 55, 0.1);
+      color: var(--text-primary);
+    }
+
+    .ai-bubble .action-button:hover {
+      background-color: rgba(31, 41, 55, 0.2);
+    }
+
+    .message-bubble {
+      padding: 1rem 1.25rem;
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      transition: all 0.3s ease;
+      animation: bubbleAppear 0.3s ease-out;
+    }
+
+    .ai-bubble {
+      background-color: var(--ai-bubble);
+      color: var(--text-primary);
+      border-top-left-radius: 0;
+    }
+
+    .user-bubble {
+      background-color: var(--user-bubble);
+      color: white;
+      border-top-right-radius: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+
+    <header class="header">
+      <div class="logo-container">
+        <img src="pixellent.png" class="logo-image">
+        <div class="logo-text"></div>
+      </div>
+
+
+      <nav class="main-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="employee-attendance.html">Attendance</a>
+        <a href="salary_employee.html">Salary</a>
+        <a href="parking.html">Parking</a>
+        <a href="delivery_Employee.html">Delivery</a>
+        <a href="pantry.html" class="active">Pantry</a>
+        <a href="employee_appointments.html">Appointments</a>
+        <a href="meeting-room.html">Facilities</a>
+        <a href="visitior-list.html">Visitor</a>
+        <a href="anoucement.html">Insights</a>
+        <a href="employee-chat.html">Chats</a>
+        <a href="maintenance.html">Maintenance</a>
+
+      </nav>
+
+      <div class="header-actions">
+        <a href="AI-assistant.html" class="setting-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"></path>
+          </svg>
+          <span>AI</span>
+        </a>
+        <button class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22ZM19 17v-6a7 7 0 0 0-7-7 7 7 0 0 0-7 7v6l-2 2v1h18v-1l-2-2Z">
+            </path>
+          </svg>
+        </button>
+        <div class="user-profile-btn"></div>
+      </div>
+    </header>
+
+    <div class="dashboard-header">
+      <h1>Pantry Services</h1>
+      <div class="controls">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Breakfast</button>
+        <button class="filter-btn">Lunch</button>
+        <button class="filter-btn">Snacks</button>
+      </div>
+    </div>
+    <!-- AI Assistant Feature Highlight -->
+    <div class="ai-feature-highlight">
+      <div class="ai-highlight-content">
+        <h2>Meet Your AI Pantry Assistant</h2>
+        <p>
+          Get personalized recommendations, track orders, and get instant
+          answers to your questions with our intelligent AI assistant.
+        </p>
+        <button class="ai-feature-btn" id="tryAssistantBtn">
+          <i class="fas fa-robot"></i> Try Assistant Now
+        </button>
+      </div>
+      <div class="ai-highlight-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+    </div>
+    <div class="summary-card-container">
+      <div class="summary-card">
+        <div class="card-icon primary">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <div class="card-content">
+          <h3>24</h3>
+          <p>Total Orders This Month</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon warning">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="card-content">
+          <h3>10</h3>
+          <p>Popular Items</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon info">
+          <i class="fas fa-shipping-fast"></i>
+        </div>
+        <div class="card-content">
+          <h3>12 min</h3>
+          <p>Avg. Delivery Time</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon danger">
+          <i class="fas fa-smile"></i>
+        </div>
+        <div class="card-content">
+          <h3>100%</h3>
+          <p>Authentic Taste</p>
+        </div>
+      </div>
+    </div>
+    <div class="filter-search-container">
+      <div class="filters">
+        <button class="filter-btn active">All Items</button>
+        <button class="filter-btn">Beverages</button>
+        <button class="filter-btn">Desserts</button>
+      </div>
+      <div class="search-box">
+        <input type="text" placeholder="Search menu..." />
+      </div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&w=600&h=600&q=80"
+          alt="Caesar Salad" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.8</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">15 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Caesar Salad</div>
+          <div class="menu-sub-title">
+            Crispy romaine lettuce, parmesan cheese, and garlic croutons with
+            a creamy Caesar dressing.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&w=600&h=600&q=80"
+          alt="Espresso" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.9</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">5 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Espresso</div>
+          <div class="menu-sub-title">
+            A single shot of rich, dark roasted espresso coffee. Perfect for a
+            quick caffeine boost.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1661529515567-dcb300f41da5?auto=format&w=600&h=600&q=80"
+          alt="Veggie Burger" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.5</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">20 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Veggie Burger</div>
+          <div class="menu-sub-title">
+            A hearty plant-based patty served on a toasted bun with fresh
+            lettuce, tomato, and onion.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?auto=format&w=600&h=600&q=80"
+          alt="Berry Smoothie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.7</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">8 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Berry Smoothie</div>
+          <div class="menu-sub-title">
+            A refreshing blend of mixed berries, banana, and a hint of honey,
+            perfect for a healthy treat.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1700937244987-92488ab2ada5?auto=format&w=600&h=600&q=80"
+          alt="Chicken Sandwich" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.6</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">18 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Grilled Chicken Sandwich</div>
+          <div class="menu-sub-title">
+            Tender grilled chicken breast, Swiss cheese, and avocado slices on
+            toasted sourdough bread.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1640660611016-683170c77f23?auto=format&w=600&h=600&q=80"
+          alt="Chocolate Chip Cookie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.8</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">6 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Chocolate Chip Cookie</div>
+          <div class="menu-sub-title">
+            A classic, soft-baked cookie packed with rich chocolate chips.
+            Tastes like home!
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&w=600&h=600&q=80"
+          alt="Chocolate Chip Cookie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">5.0</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">6 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Margherita Pizza</div>
+          <div class="menu-sub-title">
+            Classic delight with 100% real mozzarella cheese.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1701579231305-d84d8af9a3fd?auto=format&w=600&h=600&q=80"
+          alt="Chocolate Chip Cookie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">5.0</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">6 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Chicken Biryani</div>
+          <div class="menu-sub-title">
+            | 1000 ml | | Chicken Biryani (Served with 1 pc chicken, 1 egg and
+            1 pc Potato)
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1699708263762-00ca477760bd?auto=format&w=600&h=600&q=80"
+          alt="Chocolate Chip Cookie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">4.9</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">6 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Kaju Katli</div>
+          <div class="menu-sub-title">
+            Make any celebration special with a box of 200 gms of Kaju Katli
+            Barfi with silver coating.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="https://images.unsplash.com/photo-1714799263412-2e0c1f875959?auto=format&w=600&h=600&q=80"
+          alt="Chocolate Chip Cookie" />
+        <div class="menu-content">
+          <div class="menu-info">
+            <div class="menu-rating">
+              <i class="fas fa-star" style="color: #f59e0b"></i>&nbsp;
+              <span style="position: relative; top: 2px">5.0</span>
+            </div>
+            <div class="menu-time">
+              <span style="color: #ef4444; font-weight: bold">6 min</span>
+            </div>
+          </div>
+          <div class="menu-title">Rasgulla [ 4pc ]</div>
+          <div class="menu-sub-title">
+            Rasgulla is a syrupy dessert. It is made from ball-shaped
+            dumplings of chhena dough, cooked in light sugar syrup made of
+            sugar.
+          </div>
+          <div class="menu-price"></div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <!-- Insert this where you want the Previous Orders section to appear -->
+    <hr style="border: none; height: 1px; background: #d1d5db; margin: 3rem 0" />
+    <h2 style="
+          font-weight: 500;
+          font-size: 1.75rem;
+          color: #1f2937;
+          margin-bottom: 1.5rem;
+        ">
+      Previous Orders
+    </h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#1001</td>
+            <td>Veggie Burger</td>
+            <td>1</td>
+            <td>Aug 6, 2025</td>
+            <td><span class="pill green">Delivered</span></td>
+            <td><button class="view-btn add-to-cart1">View</button></td>
+          </tr>
+          <tr>
+            <td>#1000</td>
+            <td>Berry Smoothie</td>
+            <td>2</td>
+            <td>Aug 5, 2025</td>
+            <td><span class="pill gray">Canceled</span></td>
+            <td><button class="view-btn add-to-cart1">View</button></td>
+          </tr>
+          <tr>
+            <td>#0999</td>
+            <td>Caesar Salad</td>
+            <td>1</td>
+            <td>Aug 4, 2025</td>
+            <td><span class="pill green">Delivered</span></td>
+            <td><button class="view-btn add-to-cart1">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- AI Assistant Floating Button -->
+  <button class="floating-ai-btn" id="aiToggle">
+    <i class="fas fa-robot"></i>
+  </button>
+  <!-- AI Chat Container -->
+  <div class="ai-chat-container" id="aiChatContainer">
+    <div class="chat-header">
+      <div class="chat-title">
+        <div class="assistant-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        Pixellent Pantry Assistant
+      </div>
+      <button class="chat-close" id="chatClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai-message">
+        Hello! I'm your Pantry Assistant. How can I help you today?
+      </div>
+      <div class="message ai-message">
+        You can ask me about menu items, order status, dietary preferences, or
+        get personalized recommendations!
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Ask something about your order..." />
+      <button class="send-button" id="sendButton">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+      <!-- <button class="send-button" id="sendButton_voice">
+          <i style="font-size: 1rem" class="fas fa-microphone"></i>
+        </button> -->
+    </div>
+  </div>
+  <!-- Modal Backdrop with Glass Morphism -->
+  <div class="modal" id="aiModalBackdrop"></div>
+
+  <!-- Floating Cart Button -->
+  <button class="floating-cart-btn" id="cartToggle">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count" id="cartCount">0</span>
+  </button>
+  <!-- Cart Summary -->
+  <div class="cart-summary" id="cartSummary">
+    <div class="cart-header">
+      <h3 class="cart-title">Your Cart</h3>
+      <button class="cart-close" id="cartClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="empty-cart">
+        <i class="fas fa-shopping-basket"></i>
+        <p>Your cart is empty</p>
+      </div>
+    </div>
+    <div class="cart-total" id="cartTotalSection" style="display: none">
+      <!-- <span>Total:</span> -->
+      <!-- <span class="cart-total-amount" id="cartTotal">$0.00</span> -->
+    </div>
+    <div class="cart-actions" id="cartActions" style="display: none">
+      <button class="cart-btn cart-clear" id="clearCart">Clear Cart</button>
+      <button class="cart-btn cart-checkout" id="checkoutBtn">
+        <i class="fas fa-check"></i> Checkout
+      </button>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.4.1/js/all.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+      let cart = [];
+      let cartTotal = 0;
+      // AI Assistant functionality
+      const aiChatContainer = $("#aiChatContainer");
+      const aiToggle = $("#aiToggle");
+      const chatClose = $("#chatClose");
+      const sendButton = $("#sendButton");
+      const chatInput = $("#chatInput");
+      const chatMessages = $("#chatMessages");
+      const aiModalBackdrop = $("#aiModalBackdrop");
+
+      // Toggle AI chat
+      aiToggle.click(function () {
+        aiChatContainer.toggleClass("active");
+        aiModalBackdrop.toggleClass("active");
+      });
+
+      chatClose.click(function () {
+        aiChatContainer.removeClass("active");
+        aiModalBackdrop.removeClass("active");
+        window.speechSynthesis.cancel();
+      });
+
+      // Close modal when clicking on backdrop
+      aiModalBackdrop.click(function () {
+        aiChatContainer.removeClass("active");
+        aiModalBackdrop.removeClass("active");
+        window.speechSynthesis.cancel();
+      });
+
+      // Send message
+      sendButton.click(sendMessage);
+      chatInput.on("keypress", function (e) {
+        if (e.which === 13) {
+          sendMessage();
+        }
+      });
+      /*
+      function sendMessage() {
+        const message = chatInput.val().trim();
+        if (message) {
+          // Add user message
+          chatMessages.append(`
+            <div class="message user-message">${message}</div>
+          `);
+          chatInput.val("");
+          // Show typing indicator
+          chatMessages.append(`
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          `);
+          // Scroll to bottom
+          chatMessages.scrollTop(chatMessages[0].scrollHeight);
+          // Simulate AI response after delay
+          setTimeout(() => {
+            // Remove typing indicator
+            $(".typing-indicator").remove();
+            // Add AI response
+            const aiResponse = generateAIResponse(message);
+            chatMessages.append(`
+              <div class="message ai-message">${aiResponse}</div>
+            `);
+            // Scroll to bottom
+            chatMessages.scrollTop(chatMessages[0].scrollHeight);
+          }, 1500);
+        }
+      }
+
+      function generateAIResponse(message) {
+        const lowerMessage = message.toLowerCase();
+        if (
+          lowerMessage.includes("recommend") ||
+          lowerMessage.includes("suggest")
+        ) {
+          return "Based on your preferences, I recommend trying our Caesar Salad or Berry Smoothie. Both are popular healthy options!";
+        } else if (
+          lowerMessage.includes("delivery") ||
+          lowerMessage.includes("time")
+        ) {
+          return "Our average delivery time is 12 minutes. We're committed to getting your order to you quickly!";
+        } else if (
+          lowerMessage.includes("vegetarian") ||
+          lowerMessage.includes("vegan")
+        ) {
+          return "We have several vegetarian options: Veggie Burger, Caesar Salad, Margherita Pizza, and Berry Smoothie. The Veggie Burger is our most popular plant-based item!";
+        } else if (
+          lowerMessage.includes("order") ||
+          lowerMessage.includes("status")
+        ) {
+          return "To check your order status, please provide your order ID. You can also view your order history in the Previous Orders section below.";
+        } else if (
+          lowerMessage.includes("hello") ||
+          lowerMessage.includes("hi")
+        ) {
+          return "Hello! How can I assist you with your pantry order today?";
+        } else {
+          return "I'm here to help with your pantry needs! You can ask about menu items, order status, dietary preferences, or get recommendations. What would you like to know?";
+        }
+      }
+*/
+      async function sendMessage() {
+        const message = chatInput.val().trim();
+        if (!message) return;
+
+        // Add user message
+        chatMessages.append(`
+    <div class="message user-message">${message}</div>
+  `);
+        chatInput.val("");
+
+        // Show typing indicator (or loader)
+        chatMessages.append(`
+    <div class="message ai typing-loader" style="display: flex; align-items: center;">
+      <div class="avatar ai-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="message-content">
+        <div class="message-bubble ai-bubble response-loader">
+           <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+        </div>
+      </div>
+    </div>
+  `);
+        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+
+        // Call API and handle response
+        try {
+          const response = await fetch(
+            "https://binghatti-test-2.vercel.app/chatbot",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ queryText: message }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("API error");
+          }
+
+          const data = await response.json();
+          const fullResponse =
+            data.answer || "I'm sorry, I couldn't understand that.";
+
+          // Remove loader
+          $(".response-loader").closest(".typing-loader").remove();
+
+          // Add AI response container
+          const messageElement = $(`
+      <div class="message ai">
+        <div class="avatar ai-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble ai-bubble typing-text"></div>
+          <div class="message-time">${getCurrentTime()}</div>
+          <div class="message-actions">
+            <button class="action-button"><i class="far fa-copy"></i> Copy</button>
+            <button class="action-button"><i class="far fa-thumbs-up"></i> Like</button>
+            <button class="action-button"><i class="fas fa-redo"></i> Regenerate</button>
+          </div>
+        </div>
+      </div>
+    `);
+
+          chatMessages.append(messageElement);
+          chatMessages.scrollTop(chatMessages[0].scrollHeight);
+
+          const typingDiv = messageElement.find(".typing-text");
+          let i = 0;
+          const typingSpeed = 20;
+
+          // Start voice
+          speakText(fullResponse.replace(/<br\s*\/?>/gi, " "));
+
+          function typeWriter() {
+            if (i < fullResponse.length) {
+              typingDiv.append(
+                fullResponse.charAt(i) === "\n"
+                  ? "<br>"
+                  : fullResponse.charAt(i)
+              );
+              i++;
+              chatMessages.scrollTop(chatMessages[0].scrollHeight);
+              setTimeout(typeWriter, typingSpeed);
+            }
+          }
+
+          typeWriter();
+        } catch (error) {
+          console.error("AI error:", error);
+
+          $(".response-loader").closest(".typing-loader").remove();
+
+          chatMessages.append(`
+      <div class="message ai">
+        <div class="avatar ai-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble ai-bubble">
+            Oops! Something went wrong. Please try again later.
+          </div>
+          <div class="message-time">${getCurrentTime()}</div>
+        </div>
+      </div>
+    `);
+        }
+      }
+
+      let selectedVoice = null;
+
+      window.speechSynthesis.onvoiceschanged = () => {
+        const voices = speechSynthesis.getVoices();
+        const preferredVoices = [
+          "Google UK English Female",
+          "Google US English",
+          "Samantha",
+          "Microsoft Zira",
+          "Jenny",
+        ];
+
+        selectedVoice =
+          voices.find((voice) =>
+            preferredVoices.some((name) => voice.name.includes(name))
+          ) ||
+          voices.find(
+            (voice) =>
+              voice.name.toLowerCase().includes("female") ||
+              voice.lang === "en-US"
+          ) ||
+          voices[0];
+
+        console.log(
+          "✅ Selected voice:",
+          selectedVoice?.name,
+          "| Lang:",
+          selectedVoice?.lang
+        );
+      };
+
+      function speakText(text) {
+        window.speechSynthesis.cancel();
+
+        if (!selectedVoice) {
+          console.warn("Voice not ready yet. Trying again...");
+          setTimeout(() => speakText(text), 500);
+          return;
+        }
+
+        const cleanedText = text.replace(
+          /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF\uDC00-\uDFFF])/g,
+          ""
+        );
+
+        const utterance = new SpeechSynthesisUtterance(cleanedText);
+        utterance.voice = selectedVoice;
+        utterance.pitch = 1.2;
+        utterance.rate = 1;
+        utterance.volume = 1;
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Try Assistant button
+      $("#tryAssistantBtn").click(function () {
+        aiChatContainer.addClass("active");
+        aiModalBackdrop.addClass("active");
+      });
+
+      // Filter buttons
+      $(".filter-btn").click(function () {
+        $(".filter-btn").removeClass("active");
+        $(this).addClass("active");
+        // In a real app, this would filter the menu items
+        $(".menu-item").hide().fadeIn(500);
+      });
+
+      // Add to cart
+      $(".add-to-cart").click(function () {
+        const menuItem = $(this).closest(".menu-item");
+        const itemName = menuItem.find(".menu-title").text();
+        const itemPrice = 8.99; // For demo purposes
+        // Check if item is already in the cart
+        const isAlreadyInCart = cart.some((c) => c.name === itemName);
+        if (!isAlreadyInCart) {
+          // Add to cart array
+          cart.push({ name: itemName, price: itemPrice });
+          cartTotal += itemPrice;
+          // Update cart count
+          $("#cartCount").text(cart.length);
+          // Update cart UI
+          updateCartUI();
+          // Show animation
+          $(this).html('<i class="fas fa-check"></i> Added!');
+          setTimeout(() => {
+            $(this).html('<i class="fas fa-plus"></i> Add to Cart');
+          }, 1500);
+          // Show cart summary
+          $("#cartSummary").addClass("show");
+          // Add animation to cart button
+          $(".floating-cart-btn").addClass(
+            "animate__animated animate__rubberBand"
+          );
+          setTimeout(() => {
+            $(".floating-cart-btn").removeClass(
+              "animate__animated animate__rubberBand"
+            );
+          }, 1000);
+        } else {
+          // Optional: Show already added feedback
+          $(this).html('<i class="fas fa-check-double"></i> Already in Cart');
+          setTimeout(() => {
+            $(this).html('<i class="fas fa-plus"></i> Add to Cart');
+          }, 1500);
+        }
+      });
+
+      // Update cart UI
+      function updateCartUI() {
+        const cartItemsContainer = $("#cartItems");
+        cartItemsContainer.empty();
+        if (cart.length === 0) {
+          cartItemsContainer.html(`
+              <div class="empty-cart">
+                <i class="fas fa-shopping-basket"></i>
+                <p>Your cart is empty</p>
+              </div>
+            `);
+          $("#cartTotalSection, #cartActions").hide();
+        } else {
+          // <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+          cart.forEach((item, index) => {
+            const cartItem = $(`
+                <div class="cart-item">
+                  <div class="cart-item-name">${item.name}</div>
+                </div>
+              `);
+            cartItemsContainer.append(cartItem);
+          });
+          // $("#cartTotal").text(`$${cartTotal.toFixed(2)}`);
+          $("#cartTotalSection, #cartActions").show();
+        }
+      }
+
+      // Toggle cart
+      $("#cartToggle").click(function () {
+        $("#cartSummary").toggleClass("show");
+      });
+
+      $("#cartClose").click(function () {
+        $("#cartSummary").removeClass("show");
+      });
+
+      // Favorite button
+      $(".favorite-btn").click(function () {
+        $(this).toggleClass("active");
+        if ($(this).hasClass("active")) {
+          $(this).html('<i class="fas fa-heart"></i>');
+        } else {
+          $(this).html('<i class="far fa-heart"></i>');
+        }
+      });
+
+      // Clear cart
+      $("#clearCart").click(function () {
+        cart = [];
+        cartTotal = 0;
+        $("#cartCount").text("0");
+        updateCartUI();
+      });
+
+      // Checkout button
+      $("#checkoutBtn").click(function () {
+        cart = [];
+        cartTotal = 0;
+        $("#cartCount").text("0");
+        updateCartUI();
+        $("#cartSummary").removeClass("show");
+      });
+
+      // Search functionality
+      $(".search-bar input").on("input", function () {
+        const searchTerm = $(this).val().toLowerCase();
+        $(".menu-item").each(function () {
+          const itemName = $(this)
+            .find(".menu-item-name")
+            .text()
+            .toLowerCase();
+          const itemDesc = $(this)
+            .find(".menu-item-description")
+            .text()
+            .toLowerCase();
+          if (
+            itemName.includes(searchTerm) ||
+            itemDesc.includes(searchTerm)
+          ) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
